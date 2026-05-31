@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.gocommotion.com)",
+      "WebSearch",
+      "WebFetch(domain:www.dubicars.com)",
+      "WebFetch(domain:uae.dubizzle.com)",
+      "WebFetch(domain:www.yallamotor.com)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/next build *)",
+      "Bash(./node_modules/.bin/next dev *)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //F //PID 20016)",
+      "Bash(xargs sed *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\msi user\\Desktop\\Developer\\DXB Car\\src\\app"
+    ]
+  }
+}

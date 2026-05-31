@@ -1,0 +1,360 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+/* === Enums === */
+enum Role {
+  buyer
+  dealer
+  b2b_importer
+  admin
+}
+
+enum SubscriptionTier {
+  free
+  silver
+  gold
+  platinum
+}
+
+enum ListingStatus {
+  draft
+  pending_review
+  active
+  reserved
+  sold
+  archived
+  rejected
+}
+
+enum LeadType {
+  inquiry
+  contact_unlock
+  test_drive
+  export_inquiry
+}
+
+enum PaymentType {
+  subscription
+  lead_unlock
+  featured_listing
+  b2b_connection
+}
+
+enum PaymentGateway {
+  paytabs
+  stripe
+}
+
+/* === Users (mirror Clerk) === */
+model User {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clerkId         String        @unique @map("clerk_id") @db.VarChar(64)
+  email           String        @db.VarChar(320)
+  phone           String?       @db.VarChar(32)
+  name            String?       @db.VarChar(160)
+  imageUrl        String?       @map("image_url") @db.Text
+  role            Role          @default(buyer)
+  preferredLocale String?       @default("en") @map("preferred_locale") @db.VarChar(8)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  
+  dealer          Dealer?
+  b2bBuyer        BbBuyer?
+  savedListings   SavedListing[]
+  savedSearches   SavedSearch[]
+  leads           Lead[]
+  payments        Payment[]
+  auditLogs       AuditLog[]
+  listings        Listing[]
+  valuations      Valuation[]
+
+  @@index([email], map: "users_email_idx")
+  @@map("users")
+}
+
+/* === Dealers === */
+model Dealer {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String           @unique @map("user_id") @db.Uuid
+  clerkOrgId       String?          @map("clerk_org_id") @db.VarChar(64)
+  slug             String           @unique @db.VarChar(120)
+  businessName     String           @map("business_name") @db.VarChar(200)
+  logoUrl          String?          @map("logo_url") @db.Text
+  coverUrl         String?          @map("cover_url") @db.Text
+  tagline          String?          @db.VarChar(240)
+  description      String?          @db.Text
+  tradeLicense     String?          @map("trade_license") @db.VarChar(64)
+  emirate          String           @db.VarChar(32)
+  address          String?          @db.Text
+  lat              Float?
+  lng              Float?
+  workingHours     Json?            @map("working_hours")
+  phone            String?          @db.VarChar(32)
+  whatsapp         String?          @db.VarChar(32)
+  website          String?          @db.Text
+  subscriptionTier SubscriptionTier @default(free) @map("subscription_tier")
+  listingQuotaUsed Int              @default(0) @map("listing_quota_used")
+  isVerified       Boolean          @default(false) @map("is_verified")
+  isFeatured       Boolean          @default(false) @map("is_featured")
+  verifiedAt       DateTime?        @map("verified_at") @db.Timestamp(6)
+  rating           Float?           @default(0)
+  reviewCount      Int?             @default(0) @map("review_count")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listings         Listing[]
+  subscriptions    Subscription[]
+  leads            Lead[]
+  banners          Banner[]
+
+  @@index([emirate], map: "dealers_emirate_idx")
+  @@map("dealers")
+}
+
+/* === Subscriptions === */
+model Subscription {
+  id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dealerId             String           @map("dealer_id") @db.Uuid
+  tier                 SubscriptionTier
+  status               String           @default("active") @db.VarChar(32)
+  periodStart          DateTime         @default(now()) @map("period_start") @db.Timestamp(6)
+  periodEnd            DateTime?        @map("period_end") @db.Timestamp(6)
+  paytabsRef           String?          @map("paytabs_ref") @db.VarChar(128)
+  stripeSubscriptionId String?          @map("stripe_subscription_id") @db.VarChar(128)
+  createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt            DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  dealer               Dealer           @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+/* === Listings === */
+model Listing {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug          String        @unique @db.VarChar(200)
+  dealerId      String?       @map("dealer_id") @db.Uuid
+  sellerId      String?       @map("seller_id") @db.Uuid
+  make          String        @db.VarChar(64)
+  model         String        @db.VarChar(96)
+  trim          String?       @db.VarChar(96)
+  year          Int
+  bodyType      String?       @map("body_type") @db.VarChar(32)
+  fuel          String?       @db.VarChar(24)
+  transmission  String?       @db.VarChar(24)
+  kms           Int           @default(0)
+  colorExterior String?       @map("color_exterior") @db.VarChar(32)
+  colorInterior String?       @map("color_interior") @db.VarChar(32)
+  regionalSpec  String?       @map("regional_spec") @db.VarChar(32)
+  vin           String?       @db.VarChar(32)
+  cylinders     Int?
+  doors         Int?
+  seats         Int?
+  horsepower    Int?
+  priceAED      BigInt        @map("price_aed")
+  monthlyEMI    Int?          @map("monthly_emi")
+  condition     String?       @db.VarChar(32)
+  description   String?       @db.Text
+  features      Json?         @default("[]")
+  emirate       String        @db.VarChar(32)
+  locationLat   Float?        @map("location_lat")
+  locationLng   Float?        @map("location_lng")
+  status        ListingStatus @default(draft)
+  isExportReady Boolean       @default(false) @map("is_export_ready")
+  isFeatured    Boolean       @default(false) @map("is_featured")
+  isInspected   Boolean       @default(false) @map("is_inspected")
+  featuredUntil DateTime?     @map("featured_until") @db.Timestamp(6)
+  viewCount     Int           @default(0) @map("view_count")
+  inquiryCount  Int           @default(0) @map("inquiry_count")
+  publishedAt   DateTime?     @map("published_at") @db.Timestamp(6)
+  soldAt        DateTime?     @map("sold_at") @db.Timestamp(6)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  dealer        Dealer?       @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  seller        User?         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  media         ListingMedia[]
+  leads         Lead[]
+  savedListings SavedListing[]
+
+  @@index([status], map: "listings_status_idx")
+  @@index([make, model], map: "listings_make_model_idx")
+  @@index([priceAED], map: "listings_price_idx")
+  @@index([emirate], map: "listings_emirate_idx")
+  @@index([dealerId], map: "listings_dealer_idx")
+  @@index([isExportReady], map: "listings_export_idx")
+  @@map("listings")
+}
+
+model ListingMedia {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId String   @map("listing_id") @db.Uuid
+  url       String   @db.Text
+  type      String   @default("photo") @db.VarChar(16)
+  isHero    Boolean  @default(false) @map("is_hero")
+  sortOrder Int      @default(0) @map("sort_order")
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("listing_media")
+}
+
+/* === Leads === */
+model Lead {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId          String?   @map("listing_id") @db.Uuid
+  buyerId            String?   @map("buyer_id") @db.Uuid
+  dealerId           String?   @map("dealer_id") @db.Uuid
+  type               LeadType
+  feeAED             Int       @default(0) @map("fee_aed")
+  paid               Boolean   @default(false)
+  paidAt             DateTime? @map("paid_at") @db.Timestamp(6)
+  message            String?   @db.Text
+  buyerName          String?   @map("buyer_name") @db.VarChar(160)
+  buyerEmail         String?   @map("buyer_email") @db.VarChar(320)
+  buyerPhone         String?   @map("buyer_phone") @db.VarChar(32)
+  destinationCountry String?   @map("destination_country") @db.VarChar(64)
+  quantity           Int?
+  shippingPreference String?   @map("shipping_preference") @db.VarChar(32)
+  status             String    @default("new") @db.VarChar(32)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  listing            Listing?  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer              User?     @relation(fields: [buyerId], references: [id], onDelete: SetNull)
+  dealer             Dealer?   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+
+  @@map("leads")
+}
+
+/* === Saved listings & searches === */
+model SavedListing {
+  userId    String   @map("user_id") @db.Uuid
+  listingId String   @map("listing_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listingId])
+  @@map("saved_listings")
+}
+
+model SavedSearch {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  name           String?  @db.VarChar(120)
+  query          Json
+  alertFrequency String?  @default("daily") @map("alert_frequency") @db.VarChar(16)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("saved_searches")
+}
+
+/* === B2B === */
+model BbBuyer {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String           @unique @map("user_id") @db.Uuid
+  companyName     String           @map("company_name") @db.VarChar(200)
+  country         String           @db.VarChar(64)
+  tradeLicenseUrl String?          @map("trade_license_url") @db.Text
+  contactPhone    String?          @map("contact_phone") @db.VarChar(32)
+  isVerified      Boolean          @default(false) @map("is_verified")
+  verifiedAt      DateTime?        @map("verified_at") @db.Timestamp(6)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exportInquiries ExportInquiry[]
+
+  @@map("b2b_buyers")
+}
+
+model ExportInquiry {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  b2bBuyerId         String   @map("b2b_buyer_id") @db.Uuid
+  listingIds         Json     @map("listing_ids")
+  destinationCountry String   @map("destination_country") @db.VarChar(64)
+  shippingPreference String?  @map("shipping_preference") @db.VarChar(32)
+  docRequests        Json?    @default("[]") @map("doc_requests")
+  notes              String?  @db.Text
+  status             String   @default("new") @db.VarChar(32)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  b2bBuyer           BbBuyer  @relation(fields: [b2bBuyerId], references: [id], onDelete: Cascade)
+
+  @@map("export_inquiries")
+}
+
+/* === Payments === */
+model Payment {
+  id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String?        @map("user_id") @db.Uuid
+  amountAED  Int            @map("amount_aed")
+  type       PaymentType
+  gateway    PaymentGateway
+  gatewayRef String?        @map("gateway_ref") @db.VarChar(200)
+  status     String         @default("pending") @db.VarChar(32)
+  metadata   Json?
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user       User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("payments")
+}
+
+/* === Banners === */
+model Banner {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  placement String    @db.VarChar(32)
+  imageUrl  String    @map("image_url") @db.Text
+  link      String?   @db.Text
+  title     String?   @db.VarChar(200)
+  startsAt  DateTime  @default(now()) @map("starts_at") @db.Timestamp(6)
+  endsAt    DateTime? @map("ends_at") @db.Timestamp(6)
+  dealerId  String?   @map("dealer_id") @db.Uuid
+  isActive  Boolean   @default(true) @map("is_active")
+
+  dealer    Dealer?   @relation(fields: [dealerId], references: [id], onDelete: SetNull)
+
+  @@map("banners")
+}
+
+/* === Valuations === */
+model Valuation {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String?  @map("user_id") @db.Uuid
+  inputs            Json
+  estimatedValueAED Int      @map("estimated_value_aed")
+  confidence        Float?   @default(0.7)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("valuations")
+}
+
+/* === Audit Log === */
+model AuditLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorId    String?  @map("actor_id") @db.Uuid
+  action     String   @db.VarChar(64)
+  entityType String?  @map("entity_type") @db.VarChar(32)
+  entityId   String?  @map("entity_id") @db.VarChar(64)
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@map("audit_log")
+}

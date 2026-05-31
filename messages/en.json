@@ -1,0 +1,195 @@
+{
+  "nav": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "export": "Export",
+    "valuation": "Valuation",
+    "dealers": "Dealers",
+    "pricing": "Pricing",
+    "finance": "Finance",
+    "inspection": "Inspection",
+    "about": "About",
+    "contact": "Contact",
+    "signIn": "Sign in",
+    "requestDemo": "Request a Demo",
+    "listYourCar": "List Your Car"
+  },
+  "hero": {
+    "eyebrow": "DUBAI AUTOMOTIVE MARKETPLACE",
+    "title": "Buying, selling, and exporting cars in the UAE, finally on one operating system.",
+    "subtitle": "DXB Motors connects yards, dealers, and private sellers with local buyers and global importers — with verified inventory, AI search, and end-to-end export workflows.",
+    "ctaPrimary": "Browse Inventory",
+    "ctaSecondary": "List with us",
+    "searchPlaceholder": "Try 'Red BMW under 80k AED'",
+    "stats": {
+      "listings": "Active listings",
+      "dealers": "Verified yards",
+      "exports": "Countries shipped",
+      "responseTime": "Avg lead response"
+    }
+  },
+  "bento": {
+    "eyebrow": "PRACTICAL CAPABILITIES",
+    "title": "A practical path to a modern car marketplace, built for Dubai's reality.",
+    "tile1": {
+      "title": "Self-service portal for yards and dealers, not just classified ads.",
+      "desc": "Bulk CSV upload, inventory analytics, lead inbox, and subscription billing — purpose-built for high-turnover Dubai yards."
+    },
+    "tile2": {
+      "title": "AI-powered natural language search across every listing.",
+      "desc": "\"Red BMW under 80k\" returns the right cars. Faceted filters and saved searches with email alerts on top."
+    },
+    "tile3": {
+      "title": "Stronger trust signals on every listing.",
+      "desc": "Verified dealer badges, inspection reports, GCC-spec flags, and transparent price history — what international buyers ask for first."
+    },
+    "tile4": {
+      "title": "Unified visibility across inventory, leads, and analytics.",
+      "desc": "One dashboard for views, inquiries, conversions, and revenue — across web, WhatsApp, and call."
+    },
+    "tile5": {
+      "title": "Cross-border by default — exports built in.",
+      "desc": "Mark stock export-ready, route B2B importer inquiries, attach RTA deregistration and export certificates."
+    },
+    "tile6": {
+      "title": "Scalable deployment across emirates, languages, and buyer types.",
+      "desc": "Arabic + English, RTL-native, all 7 emirates, AED / USD / SAR pricing — ready for the GCC and beyond."
+    }
+  },
+  "values": {
+    "eyebrow": "WHY DXB MOTORS",
+    "title": "Built around the four user types Dubai's market actually has.",
+    "items": [
+      { "title": "Car Yards & Dealers", "desc": "Upload inventory in bulk, manage listings, receive qualified leads, and track subscriptions." },
+      { "title": "Private Sellers", "desc": "List your car in minutes with photos, specs, and direct WhatsApp leads." },
+      { "title": "Local Buyers", "desc": "Search, compare up to 3 cars, save searches, get price-drop alerts." },
+      { "title": "International Importers", "desc": "Browse export-ready inventory, request documents, coordinate shipping." }
+    ]
+  },
+  "market": {
+    "eyebrow": "MARKET OPPORTUNITY",
+    "title": "A USD 20–35 billion market with no dedicated yard-forward platform.",
+    "stats": [
+      { "value": "USD 35.78B", "label": "UAE used-car market projection by 2030", "source": "Mordor Intelligence" },
+      { "value": "+42%", "label": "Increase in online car demand in H1 2025 vs H1 2024", "source": "DubiCars" },
+      { "value": "1.44M", "label": "Registered vehicles in Dubai alone", "source": "Dubai Statistics Center" },
+      { "value": "11.73%", "label": "CAGR through 2030", "source": "Nexdigm Research" }
+    ]
+  },
+  "cta": {
+    "eyebrow": "GET STARTED",
+    "title": "List your inventory or browse Dubai's best yards in minutes.",
+    "subtitle": "Free to start. Upgrade only when you have leads coming in.",
+    "primary": "Request a Demo",
+    "secondary": "See Pricing"
+  },
+  "footer": {
+    "tagline": "Dubai's yard-forward automotive marketplace. Buy, sell, export — one OS.",
+    "rights": "All rights reserved.",
+    "columns": {
+      "marketplace": "Marketplace",
+      "platform": "Platform",
+      "company": "Company",
+      "trust": "Trust"
+    },
+    "trust": {
+      "verified": "Verified Dealers",
+      "inspected": "Inspection-Backed",
+      "gdpr": "GDPR Compliant",
+      "rta": "RTA Compatible"
+    }
+  },
+  "listing": {
+    "price": "Price",
+    "monthlyFrom": "From {amount}/mo",
+    "year": "Year",
+    "km": "Kilometers",
+    "make": "Make",
+    "model": "Model",
+    "trim": "Trim",
+    "bodyType": "Body type",
+    "fuel": "Fuel",
+    "transmission": "Transmission",
+    "regionalSpec": "Regional spec",
+    "color": "Color",
+    "features": "Features",
+    "callDealer": "Call dealer",
+    "whatsapp": "WhatsApp",
+    "message": "Message",
+    "save": "Save",
+    "saved": "Saved",
+    "share": "Share",
+    "exportReady": "Export Ready",
+    "verified": "Verified",
+    "inspected": "Inspected",
+    "newArrival": "New Arrival",
+    "reserved": "Reserved",
+    "viewDealer": "View dealer storefront",
+    "similar": "Similar cars",
+    "specs": "Specifications",
+    "description": "Description",
+    "location": "Location"
+  },
+  "filters": {
+    "title": "Filters",
+    "make": "Make",
+    "model": "Model",
+    "yearFrom": "Year from",
+    "yearTo": "Year to",
+    "priceFrom": "Price from",
+    "priceTo": "Price to",
+    "kmFrom": "Km from",
+    "kmTo": "Km to",
+    "bodyType": "Body type",
+    "fuel": "Fuel type",
+    "transmission": "Transmission",
+    "color": "Color",
+    "regionalSpec": "Regional specs",
+    "sellerType": "Seller type",
+    "inspectedOnly": "Inspected only",
+    "exportReady": "Export ready only",
+    "features": "Features",
+    "emirate": "Emirate",
+    "reset": "Reset",
+    "apply": "Apply",
+    "sort": {
+      "label": "Sort by",
+      "newest": "Newest",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "yearDesc": "Year: Newest",
+      "kmAsc": "Km: Lowest",
+      "relevance": "Relevance"
+    }
+  },
+  "export": {
+    "eyebrow": "B2B EXPORT",
+    "title": "Source UAE inventory for Africa, Asia, and beyond.",
+    "subtitle": "Verified B2B buyers can browse export-ready stock, request documentation, and coordinate shipping — directly with Dubai yards.",
+    "destinations": "Top destinations",
+    "registerB2B": "Register as B2B buyer",
+    "requestBulkQuote": "Request bulk quote"
+  },
+  "pricing": {
+    "title": "Dealer plans built for every yard size.",
+    "subtitle": "Start free. Upgrade when leads start flowing. Cancel anytime.",
+    "monthly": "/ month",
+    "listings": "{count} listings",
+    "unlimited": "Unlimited listings",
+    "recommended": "Most popular",
+    "getStarted": "Get started",
+    "talkToSales": "Talk to sales"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "viewAll": "View all"
+  }
+}

@@ -1,0 +1,379 @@
+import {
+  pgTable,
+  pgEnum,
+  text,
+  varchar,
+  integer,
+  bigint,
+  boolean,
+  timestamp,
+  jsonb,
+  uuid,
+  doublePrecision,
+  index,
+  uniqueIndex,
+  primaryKey,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+
+/* === Enums === */
+export const roleEnum = pgEnum("role", [
+  "buyer",
+  "dealer",
+  "b2b_importer",
+  "admin",
+]);
+
+export const subscriptionTierEnum = pgEnum("subscription_tier", [
+  "free",
+  "silver",
+  "gold",
+  "platinum",
+]);
+
+export const listingStatusEnum = pgEnum("listing_status", [
+  "draft",
+  "pending_review",
+  "active",
+  "reserved",
+  "sold",
+  "archived",
+  "rejected",
+]);
+
+export const leadTypeEnum = pgEnum("lead_type", [
+  "inquiry",
+  "contact_unlock",
+  "test_drive",
+  "export_inquiry",
+]);
+
+export const paymentTypeEnum = pgEnum("payment_type", [
+  "subscription",
+  "lead_unlock",
+  "featured_listing",
+  "b2b_connection",
+]);
+
+export const paymentGatewayEnum = pgEnum("payment_gateway", [
+  "paytabs",
+  "stripe",
+]);
+
+/* === Users (mirror Clerk) === */
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    clerkId: varchar("clerk_id", { length: 64 }).notNull().unique(),
+    email: varchar("email", { length: 320 }).notNull(),
+    phone: varchar("phone", { length: 32 }),
+    name: varchar("name", { length: 160 }),
+    imageUrl: text("image_url"),
+    role: roleEnum("role").notNull().default("buyer"),
+    preferredLocale: varchar("preferred_locale", { length: 8 }).default("en"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    clerkIdx: uniqueIndex("users_clerk_idx").on(t.clerkId),
+    emailIdx: index("users_email_idx").on(t.email),
+  }),
+);
+
+/* === Dealers === */
+export const dealers = pgTable(
+  "dealers",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    clerkOrgId: varchar("clerk_org_id", { length: 64 }),
+    slug: varchar("slug", { length: 120 }).notNull().unique(),
+    businessName: varchar("business_name", { length: 200 }).notNull(),
+    logoUrl: text("logo_url"),
+    coverUrl: text("cover_url"),
+    tagline: varchar("tagline", { length: 240 }),
+    description: text("description"),
+    tradeLicense: varchar("trade_license", { length: 64 }),
+    emirate: varchar("emirate", { length: 32 }).notNull(),
+    address: text("address"),
+    lat: doublePrecision("lat"),
+    lng: doublePrecision("lng"),
+    workingHours: jsonb("working_hours"),
+    phone: varchar("phone", { length: 32 }),
+    whatsapp: varchar("whatsapp", { length: 32 }),
+    website: text("website"),
+    subscriptionTier: subscriptionTierEnum("subscription_tier")
+      .notNull()
+      .default("free"),
+    listingQuotaUsed: integer("listing_quota_used").notNull().default(0),
+    isVerified: boolean("is_verified").notNull().default(false),
+    isFeatured: boolean("is_featured").notNull().default(false),
+    verifiedAt: timestamp("verified_at"),
+    rating: doublePrecision("rating").default(0),
+    reviewCount: integer("review_count").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    slugIdx: uniqueIndex("dealers_slug_idx").on(t.slug),
+    emirateIdx: index("dealers_emirate_idx").on(t.emirate),
+  }),
+);
+
+/* === Subscriptions === */
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  dealerId: uuid("dealer_id")
+    .notNull()
+    .references(() => dealers.id, { onDelete: "cascade" }),
+  tier: subscriptionTierEnum("tier").notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("active"),
+  periodStart: timestamp("period_start").defaultNow().notNull(),
+  periodEnd: timestamp("period_end"),
+  paytabsRef: varchar("paytabs_ref", { length: 128 }),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 128 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/* === Listings === */
+export const listings = pgTable(
+  "listings",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: varchar("slug", { length: 200 }).notNull().unique(),
+    dealerId: uuid("dealer_id").references(() => dealers.id, {
+      onDelete: "cascade",
+    }),
+    sellerId: uuid("seller_id").references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    make: varchar("make", { length: 64 }).notNull(),
+    model: varchar("model", { length: 96 }).notNull(),
+    trim: varchar("trim", { length: 96 }),
+    year: integer("year").notNull(),
+    bodyType: varchar("body_type", { length: 32 }),
+    fuel: varchar("fuel", { length: 24 }),
+    transmission: varchar("transmission", { length: 24 }),
+    kms: integer("kms").notNull().default(0),
+    colorExterior: varchar("color_exterior", { length: 32 }),
+    colorInterior: varchar("color_interior", { length: 32 }),
+    regionalSpec: varchar("regional_spec", { length: 32 }),
+    vin: varchar("vin", { length: 32 }),
+    cylinders: integer("cylinders"),
+    doors: integer("doors"),
+    seats: integer("seats"),
+    horsepower: integer("horsepower"),
+    priceAED: bigint("price_aed", { mode: "number" }).notNull(),
+    monthlyEMI: integer("monthly_emi"),
+    condition: varchar("condition", { length: 32 }),
+    description: text("description"),
+    features: jsonb("features").$type<string[]>().default([]),
+    emirate: varchar("emirate", { length: 32 }).notNull(),
+    locationLat: doublePrecision("location_lat"),
+    locationLng: doublePrecision("location_lng"),
+    status: listingStatusEnum("status").notNull().default("draft"),
+    isExportReady: boolean("is_export_ready").notNull().default(false),
+    isFeatured: boolean("is_featured").notNull().default(false),
+    isInspected: boolean("is_inspected").notNull().default(false),
+    featuredUntil: timestamp("featured_until"),
+    viewCount: integer("view_count").notNull().default(0),
+    inquiryCount: integer("inquiry_count").notNull().default(0),
+    publishedAt: timestamp("published_at"),
+    soldAt: timestamp("sold_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    slugIdx: uniqueIndex("listings_slug_idx").on(t.slug),
+    statusIdx: index("listings_status_idx").on(t.status),
+    makeModelIdx: index("listings_make_model_idx").on(t.make, t.model),
+    priceIdx: index("listings_price_idx").on(t.priceAED),
+    emirateIdx: index("listings_emirate_idx").on(t.emirate),
+    dealerIdx: index("listings_dealer_idx").on(t.dealerId),
+    exportIdx: index("listings_export_idx").on(t.isExportReady),
+  }),
+);
+
+export const listingMedia = pgTable("listing_media", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  type: varchar("type", { length: 16 }).notNull().default("photo"),
+  isHero: boolean("is_hero").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  width: integer("width"),
+  height: integer("height"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === Leads === */
+export const leads = pgTable("leads", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id").references(() => listings.id, {
+    onDelete: "cascade",
+  }),
+  buyerId: uuid("buyer_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  dealerId: uuid("dealer_id").references(() => dealers.id, {
+    onDelete: "cascade",
+  }),
+  type: leadTypeEnum("type").notNull(),
+  feeAED: integer("fee_aed").notNull().default(0),
+  paid: boolean("paid").notNull().default(false),
+  paidAt: timestamp("paid_at"),
+  message: text("message"),
+  buyerName: varchar("buyer_name", { length: 160 }),
+  buyerEmail: varchar("buyer_email", { length: 320 }),
+  buyerPhone: varchar("buyer_phone", { length: 32 }),
+  destinationCountry: varchar("destination_country", { length: 64 }),
+  quantity: integer("quantity"),
+  shippingPreference: varchar("shipping_preference", { length: 32 }),
+  status: varchar("status", { length: 32 }).notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === Saved listings & searches === */
+export const savedListings = pgTable(
+  "saved_listings",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    listingId: uuid("listing_id")
+      .notNull()
+      .references(() => listings.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.userId, t.listingId] }) }),
+);
+
+export const savedSearches = pgTable("saved_searches", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 120 }),
+  query: jsonb("query").notNull(),
+  alertFrequency: varchar("alert_frequency", { length: 16 }).default("daily"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === B2B === */
+export const b2bBuyers = pgTable("b2b_buyers", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique(),
+  companyName: varchar("company_name", { length: 200 }).notNull(),
+  country: varchar("country", { length: 64 }).notNull(),
+  tradeLicenseUrl: text("trade_license_url"),
+  contactPhone: varchar("contact_phone", { length: 32 }),
+  isVerified: boolean("is_verified").notNull().default(false),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const exportInquiries = pgTable("export_inquiries", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  b2bBuyerId: uuid("b2b_buyer_id")
+    .notNull()
+    .references(() => b2bBuyers.id, { onDelete: "cascade" }),
+  listingIds: jsonb("listing_ids").$type<string[]>().notNull(),
+  destinationCountry: varchar("destination_country", { length: 64 }).notNull(),
+  shippingPreference: varchar("shipping_preference", { length: 32 }),
+  docRequests: jsonb("doc_requests").$type<string[]>().default([]),
+  notes: text("notes"),
+  status: varchar("status", { length: 32 }).notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === Payments === */
+export const payments = pgTable("payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  amountAED: integer("amount_aed").notNull(),
+  type: paymentTypeEnum("type").notNull(),
+  gateway: paymentGatewayEnum("gateway").notNull(),
+  gatewayRef: varchar("gateway_ref", { length: 200 }),
+  status: varchar("status", { length: 32 }).notNull().default("pending"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === Banners === */
+export const banners = pgTable("banners", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  placement: varchar("placement", { length: 32 }).notNull(),
+  imageUrl: text("image_url").notNull(),
+  link: text("link"),
+  title: varchar("title", { length: 200 }),
+  startsAt: timestamp("starts_at").defaultNow().notNull(),
+  endsAt: timestamp("ends_at"),
+  dealerId: uuid("dealer_id").references(() => dealers.id, {
+    onDelete: "set null",
+  }),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+/* === Valuations === */
+export const valuations = pgTable("valuations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  inputs: jsonb("inputs").notNull(),
+  estimatedValueAED: integer("estimated_value_aed").notNull(),
+  confidence: doublePrecision("confidence").default(0.7),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === Audit Log === */
+export const auditLog = pgTable("audit_log", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  actorId: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
+  action: varchar("action", { length: 64 }).notNull(),
+  entityType: varchar("entity_type", { length: 32 }),
+  entityId: varchar("entity_id", { length: 64 }),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === Relations === */
+export const usersRelations = relations(users, ({ many, one }) => ({
+  dealer: one(dealers, { fields: [users.id], references: [dealers.userId] }),
+  b2bBuyer: one(b2bBuyers, { fields: [users.id], references: [b2bBuyers.userId] }),
+  savedListings: many(savedListings),
+  savedSearches: many(savedSearches),
+  leads: many(leads),
+}));
+
+export const dealersRelations = relations(dealers, ({ many, one }) => ({
+  user: one(users, { fields: [dealers.userId], references: [users.id] }),
+  listings: many(listings),
+  subscriptions: many(subscriptions),
+  leads: many(leads),
+}));
+
+export const listingsRelations = relations(listings, ({ many, one }) => ({
+  dealer: one(dealers, { fields: [listings.dealerId], references: [dealers.id] }),
+  seller: one(users, { fields: [listings.sellerId], references: [users.id] }),
+  media: many(listingMedia),
+  leads: many(leads),
+}));
+
+export const listingMediaRelations = relations(listingMedia, ({ one }) => ({
+  listing: one(listings, { fields: [listingMedia.listingId], references: [listings.id] }),
+}));
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Dealer = typeof dealers.$inferSelect;
+export type Listing = typeof listings.$inferSelect;
+export type ListingMedia = typeof listingMedia.$inferSelect;
+export type Lead = typeof leads.$inferSelect;
