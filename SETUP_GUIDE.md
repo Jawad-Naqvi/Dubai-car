@@ -1,8 +1,30 @@
 # DXB Motors — Setup Guide
 
-The app runs in two modes. **You're in Demo Mode right now** — everything works
-locally with no external accounts. When you're ready, switch to **Cloud Mode**
-to persist data in a real database and enable real auth/payments.
+> **Status: ✅ Connected to a live Neon PostgreSQL database.** All data now
+> persists in Postgres. The app uses the standard `pg` driver, so it is
+> **database-agnostic** — moving to AWS RDS/Aurora later means changing **only**
+> `DATABASE_URL` in `.env`, nothing in code.
+
+## Migrating to AWS RDS / Aurora (production)
+
+When you launch, point the app at AWS by editing one line:
+
+```bash
+DATABASE_URL=postgresql://<user>:<pass>@<your-db>.xxxx.<region>.rds.amazonaws.com:5432/dxbmotors?sslmode=require
+```
+
+Then `npm run db:push` (or `db:generate` + apply) to create the schema on RDS,
+and `npm run db:seed` if you want sample data. No application code changes — the
+`pg` driver and Drizzle schema work identically on Neon, RDS, and Aurora.
+
+> ⚠️ Before production, set `OPEN_DASHBOARDS=false` in `.env` (see below) and
+> **rotate the `CLERK_SECRET_KEY`** that was shared in plaintext.
+
+---
+
+The app also runs in **Demo Mode** automatically if `DATABASE_URL` is removed —
+everything works in-memory with no external accounts, useful for quick local
+trials.
 
 ---
 
@@ -59,6 +81,11 @@ Auth already works via Clerk. To grant a user the dealer or admin area:
    { "role": "admin" }
    ```
    (or `"dealer"` / `"b2b_importer"`). Buyers need no role.
+
+> **For testing right now**, `.env` has `OPEN_DASHBOARDS=true`, which opens the
+> dealer dashboard + admin panel without sign-in so you can click through
+> everything against the live DB. The dashboard falls back to a seeded dealer's
+> data. **Set it to `false` for production** to enforce Clerk roles.
 
 > ⚠️ The `CLERK_SECRET_KEY` currently in `.env.local` is a placeholder/test key
 > that was shared in plain text — **rotate it in the Clerk dashboard** before any

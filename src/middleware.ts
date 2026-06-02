@@ -6,10 +6,10 @@ import { isDbEnabled } from "./lib/db/enabled";
 
 const handleI18nRouting = createIntlMiddleware(routing);
 
-// Demo mode: with no real database wired, the dashboard/admin areas are open so
-// the whole product can be explored locally without configuring Clerk roles.
-// In production (real DB), full auth + role gating below applies.
-const DEMO_MODE = !isDbEnabled();
+// Dashboard/admin areas are open when there's no real DB (demo) or when
+// OPEN_DASHBOARDS=true (testing against a live DB). In production with the flag
+// off, full Clerk auth + role gating below applies.
+const DEMO_MODE = !isDbEnabled() || process.env.OPEN_DASHBOARDS === "true";
 
 const isProtectedRoute = createRouteMatcher([
   "/(.*)/dashboard(.*)",

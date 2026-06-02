@@ -51,6 +51,7 @@ export function HomeSearch() {
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && go()}
             placeholder={t("hero.searchPlaceholder")}
+            suppressHydrationWarning
             className="flex-1 bg-transparent text-white placeholder:text-muted text-xs outline-none py-1.5"
           />
           <Button variant="gold" size="md" onClick={go}>

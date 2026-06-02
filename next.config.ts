@@ -16,9 +16,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "cdn.dxbmotors.ae" },
       { protocol: "https", hostname: "api.dicebear.com" },
     ],
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 86400, // cache optimized images for 24h
   },
+  compress: true,
+  poweredByHeader: false,
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
+    optimizeServerReact: true,
   },
 };
 

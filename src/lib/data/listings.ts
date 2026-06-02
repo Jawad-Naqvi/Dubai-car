@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { and, asc, desc, eq, gte, ilike, inArray, lte, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { listings, dealers, listingMedia, type Listing } from "@/lib/db/schema";
@@ -189,7 +190,26 @@ function facetCounts(items: MockListing[], key: (l: MockListing) => string) {
 /* Public API                                                          */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Cached search. DB reads are wrapped in the Next.js data cache (tag
+ * "listings") so repeat browse hits don't round-trip to the database — writes
+ * call revalidateTag("listings") to keep results real-time fresh. Demo mode is
+ * already in-memory, so it skips the cache.
+ */
+const cachedSearch = unstable_cache(
+  (p: ListingSearchParams) => runSearchListings(p),
+  ["search-listings"],
+  { revalidate: 120, tags: ["listings"] },
+);
+
 export async function searchListings(
+  p: ListingSearchParams = {},
+): Promise<ListingSearchResult> {
+  if (!isDbEnabled()) return runSearchListings(p);
+  return cachedSearch(p);
+}
+
+async function runSearchListings(
   p: ListingSearchParams = {},
 ): Promise<ListingSearchResult> {
   const page = Math.max(1, p.page ?? 1);
@@ -359,6 +379,12 @@ function buildConditions(p: ListingSearchParams) {
   return conds;
 }
 
+const cachedGetById = unstable_cache(
+  (id: string) => runGetListingById(id),
+  ["listing-by-id"],
+  { revalidate: 120, tags: ["listings"] },
+);
+
 export async function getListingById(id: string): Promise<MockListing | null> {
   if (!isDbEnabled()) {
     return (
@@ -367,6 +393,10 @@ export async function getListingById(id: string): Promise<MockListing | null> {
       null
     );
   }
+  return cachedGetById(id);
+}
+
+async function runGetListingById(id: string): Promise<MockListing | null> {
   const hero = db.$with("hero").as(
     db
       .select({
@@ -408,15 +438,25 @@ export async function getListingsByIds(ids: string[]): Promise<MockListing[]> {
   return byId.filter(Boolean) as MockListing[];
 }
 
+const cachedMedia = unstable_cache(
+  async (id: string) => {
+    const media = await db
+      .select({ url: listingMedia.url })
+      .from(listingMedia)
+      .where(eq(listingMedia.listingId, id))
+      .orderBy(asc(listingMedia.sortOrder));
+    return media.map((m) => m.url);
+  },
+  ["listing-media"],
+  { revalidate: 300, tags: ["listings"] },
+);
+
 export async function getListingMedia(id: string): Promise<string[]> {
-  const found = await getListingById(id);
-  if (!isDbEnabled()) return found?.imageUrls ?? [];
-  const media = await db
-    .select({ url: listingMedia.url })
-    .from(listingMedia)
-    .where(eq(listingMedia.listingId, id))
-    .orderBy(asc(listingMedia.sortOrder));
-  return media.map((m) => m.url);
+  if (!isDbEnabled()) {
+    const found = await getListingById(id);
+    return found?.imageUrls ?? [];
+  }
+  return cachedMedia(id);
 }
 
 export async function getSimilarListings(

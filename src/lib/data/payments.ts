@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { payments, dealers, subscriptions } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId } from "./demo-store";
-import { getCurrentDealer } from "./users";
+import { getEffectiveDealer } from "./users";
+import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
 
 export interface InvoiceView {
@@ -32,6 +33,7 @@ export async function changePlan(
 ): Promise<{ ok: boolean; tier: string; amountAED: number }> {
   const tier = subscriptionTiers.find((t) => t.id === tierId);
   if (!tier) throw new Error("Unknown plan");
+  bust("dealers");
 
   if (!isDbEnabled()) {
     const store = demoStore();
@@ -50,7 +52,7 @@ export async function changePlan(
     return { ok: true, tier: tier.id, amountAED: tier.monthlyAED };
   }
 
-  const dealer = await getCurrentDealer();
+  const dealer = await getEffectiveDealer();
   if (dealer) {
     await db
       .update(dealers)

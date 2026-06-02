@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { dealers, listings } from "@/lib/db/schema";
@@ -25,10 +26,20 @@ export interface DealerView {
   address?: string;
 }
 
+const cachedDealers = unstable_cache(
+  () => runGetDealers(),
+  ["all-dealers"],
+  { revalidate: 300, tags: ["dealers"] },
+);
+
 export async function getDealers(): Promise<DealerView[]> {
   if (!isDbEnabled()) {
     return mockDealers.map((d) => ({ ...d, tagline: d.tagline }));
   }
+  return cachedDealers();
+}
+
+async function runGetDealers(): Promise<DealerView[]> {
   const rows = await db
     .select({
       dealer: dealers,
@@ -63,6 +74,12 @@ export async function getDealers(): Promise<DealerView[]> {
   }));
 }
 
+const cachedDealerBySlug = unstable_cache(
+  (slug: string) => runGetDealerBySlug(slug),
+  ["dealer-by-slug"],
+  { revalidate: 300, tags: ["dealers"] },
+);
+
 export async function getDealerBySlug(
   slug: string,
 ): Promise<DealerView | null> {
@@ -70,6 +87,12 @@ export async function getDealerBySlug(
     const d = mockDealers.find((x) => x.slug === slug);
     return d ? { ...d } : null;
   }
+  return cachedDealerBySlug(slug);
+}
+
+async function runGetDealerBySlug(
+  slug: string,
+): Promise<DealerView | null> {
   const rows = await db
     .select({
       dealer: dealers,

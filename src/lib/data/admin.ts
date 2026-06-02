@@ -5,6 +5,7 @@ import { listings, dealers, users, listingMedia, leads, payments } from "@/lib/d
 import { isDbEnabled } from "@/lib/db/enabled";
 import { mockDealers, mockListings } from "@/lib/mock-data";
 import { demoStore } from "./demo-store";
+import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
 
 export interface ModerationItem {
@@ -78,6 +79,7 @@ export async function moderateListing(
   if (!isDbEnabled()) {
     const l = demoStore().newListings.find((x) => x.id === id);
     if (l) l.moderationStatus = action === "approve" ? "active" : "rejected";
+    bust("listings");
     return true;
   }
   await db
@@ -87,6 +89,7 @@ export async function moderateListing(
       ...(action === "approve" ? { publishedAt: new Date() } : {}),
     })
     .where(eq(listings.id, id));
+  bust("listings");
   return true;
 }
 
@@ -196,11 +199,15 @@ export async function toggleDealerVerified(
   id: string,
   verified: boolean,
 ): Promise<boolean> {
-  if (!isDbEnabled()) return true;
+  if (!isDbEnabled()) {
+    bust("dealers");
+    return true;
+  }
   await db
     .update(dealers)
     .set({ isVerified: verified, verifiedAt: verified ? new Date() : null })
     .where(eq(dealers.id, id));
+  bust("dealers");
   return true;
 }
 

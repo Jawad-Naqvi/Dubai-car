@@ -20,6 +20,7 @@ export function CompareButton({
     return (
       <button
         onClick={() => toggle(listingId)}
+        suppressHydrationWarning
         className={cn(
           "flex items-center justify-center gap-1.5 h-9 rounded-sm border text-xs font-semibold transition-colors",
           active
@@ -43,6 +44,7 @@ export function CompareButton({
       }}
       aria-label={active ? "Remove from compare" : "Add to compare"}
       title="Compare"
+      suppressHydrationWarning
       className={cn(
         "h-7 w-7 rounded-sm bg-[#0A0A0A]/80 backdrop-blur border flex items-center justify-center transition-colors",
         active
