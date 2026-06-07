@@ -20,6 +20,8 @@ const isProtectedRoute = createRouteMatcher([
 
 const isAdminRoute = createRouteMatcher(["/(.*)/admin(.*)", "/admin(.*)"]);
 
+const ADMIN_COOKIE = "dxb_admin";
+
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
 
@@ -29,18 +31,23 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  if (!DEMO_MODE && isProtectedRoute(req)) {
-    const { userId, sessionClaims, redirectToSignIn } = await auth();
+  const locale = pathname.split("/")[1] || "en";
+  const isAdminLogin = pathname.includes("/admin-login");
 
+  // --- Admin PIN gate: /admin/* requires a valid admin PIN cookie ---
+  if (isAdminRoute(req) && !isAdminLogin) {
+    const token = req.cookies.get(ADMIN_COOKIE)?.value;
+    const expected = process.env.ADMIN_SESSION_TOKEN ?? "dxb-admin";
+    if (!token || token !== expected) {
+      return NextResponse.redirect(new URL(`/${locale}/admin-login`, req.url));
+    }
+  }
+
+  // --- Dealer dashboard gate (Clerk) — admin handled by PIN above ---
+  if (!DEMO_MODE && isProtectedRoute(req) && !isAdminRoute(req)) {
+    const { userId, redirectToSignIn } = await auth();
     if (!userId) {
       return redirectToSignIn({ returnBackUrl: req.url });
-    }
-
-    if (isAdminRoute(req)) {
-      const role = (sessionClaims?.metadata as { role?: string } | undefined)?.role;
-      if (role !== "admin") {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
-      }
     }
   }
 

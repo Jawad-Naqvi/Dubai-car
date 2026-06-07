@@ -1,7 +1,7 @@
 import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { listings, dealers, users, listingMedia, leads, payments } from "@/lib/db/schema";
+import { listings, dealers, users, listingMedia, leads, payments, b2bBuyers } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { mockDealers, mockListings } from "@/lib/mock-data";
 import { demoStore } from "./demo-store";
@@ -209,6 +209,93 @@ export async function toggleDealerVerified(
     .where(eq(dealers.id, id));
   bust("dealers");
   return true;
+}
+
+/* ---------------- Activity / Audit ---------------- */
+
+export interface ActivityItem {
+  type: string;
+  label: string;
+  detail: string;
+  at: string;
+}
+
+export async function getRecentActivity(): Promise<ActivityItem[]> {
+  if (!isDbEnabled()) {
+    const s = demoStore();
+    const items: ActivityItem[] = [
+      ...s.leads.map((l) => ({
+        type: "lead",
+        label: "New lead",
+        detail: `${l.buyerName ?? "Someone"} · ${l.type}`,
+        at: l.createdAt,
+      })),
+      ...s.newListings.map((l) => ({
+        type: "listing",
+        label: "Listing created",
+        detail: `${l.year} ${l.make} ${l.model}`,
+        at: l.createdAt,
+      })),
+      ...s.b2bBuyers.map((b) => ({
+        type: "b2b",
+        label: "B2B registration",
+        detail: `${b.companyName} (${b.country})`,
+        at: b.createdAt,
+      })),
+    ];
+    return items.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 50);
+  }
+
+  const [recentListings, recentLeads, recentPayments, recentB2B] = await Promise.all([
+    db
+      .select({ make: listings.make, model: listings.model, year: listings.year, status: listings.status, at: listings.createdAt })
+      .from(listings)
+      .orderBy(desc(listings.createdAt))
+      .limit(20),
+    db
+      .select({ name: leads.buyerName, type: leads.type, at: leads.createdAt })
+      .from(leads)
+      .orderBy(desc(leads.createdAt))
+      .limit(20),
+    db
+      .select({ amount: payments.amountAED, type: payments.type, at: payments.createdAt })
+      .from(payments)
+      .orderBy(desc(payments.createdAt))
+      .limit(20),
+    db
+      .select({ company: b2bBuyers.companyName, country: b2bBuyers.country, at: b2bBuyers.createdAt })
+      .from(b2bBuyers)
+      .orderBy(desc(b2bBuyers.createdAt))
+      .limit(20),
+  ]);
+
+  const items: ActivityItem[] = [
+    ...recentListings.map((l) => ({
+      type: "listing",
+      label: l.status === "active" ? "Listing published" : "Listing created",
+      detail: `${l.year} ${l.make} ${l.model}`,
+      at: l.at.toISOString(),
+    })),
+    ...recentLeads.map((l) => ({
+      type: "lead",
+      label: "New lead",
+      detail: `${l.name ?? "Someone"} · ${l.type}`,
+      at: l.at.toISOString(),
+    })),
+    ...recentPayments.map((p) => ({
+      type: "payment",
+      label: "Payment",
+      detail: `AED ${p.amount} · ${p.type}`,
+      at: p.at.toISOString(),
+    })),
+    ...recentB2B.map((b) => ({
+      type: "b2b",
+      label: "B2B registration",
+      detail: `${b.company} (${b.country})`,
+      at: b.at.toISOString(),
+    })),
+  ];
+  return items.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 50);
 }
 
 /* ---------------- Revenue ---------------- */

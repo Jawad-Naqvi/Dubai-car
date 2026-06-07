@@ -1,6 +1,14 @@
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import dns from "node:dns";
 import * as schema from "./schema";
+
+// Prefer IPv4 — avoids intermittent ENOTFOUND on networks with flaky IPv6.
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch {
+  /* older node */
+}
 
 type DB = NodePgDatabase<typeof schema>;
 
@@ -32,6 +40,13 @@ function getDb(): DB {
     connectionString: url,
     ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
     max: 10,
+    keepAlive: true,
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
+  });
+  // Don't let an idle-client error crash the process.
+  cachedPool.on("error", (err) => {
+    console.error("pg pool error (non-fatal):", err.message);
   });
   cached = drizzle(cachedPool, { schema });
   return cached;

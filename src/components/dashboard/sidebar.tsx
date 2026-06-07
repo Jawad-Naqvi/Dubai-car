@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { brand } from "@/lib/brand";
 import {
@@ -21,6 +21,7 @@ import {
   TrendingUp,
   Image as ImageIcon,
   Database,
+  Lock,
 } from "lucide-react";
 
 const dealerNav = [
@@ -62,9 +63,17 @@ export function DashboardSidebar({
   role?: "dealer" | "buyer" | "b2b" | "admin";
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const items =
     role === "admin" ? adminNav : role === "buyer" ? buyerNav : role === "b2b" ? b2bNav : dealerNav;
   const isAdmin = role === "admin";
+  const locale = pathname.split("/")[1] || "en";
+
+  const lockAdmin = async () => {
+    await fetch("/api/admin-login", { method: "DELETE" });
+    router.push(`/${locale}/admin-login`);
+    router.refresh();
+  };
 
   return (
     <aside className="hidden lg:flex w-64 flex-col bg-[#121212] border-e border-white/5 min-h-screen sticky top-0">
@@ -104,13 +113,23 @@ export function DashboardSidebar({
       </div>
 
       <div className="mt-auto p-4 border-t border-white/5">
-        <Link
-          href="/dashboard/settings"
-          className="flex items-center gap-3 px-3 py-2 rounded-sm text-xs text-secondary hover:bg-white/5"
-        >
-          <Settings className="h-4 w-4" />
-          Settings
-        </Link>
+        {isAdmin ? (
+          <button
+            onClick={lockAdmin}
+            className="flex w-full items-center gap-3 px-3 py-2 rounded-sm text-xs text-secondary hover:bg-white/5 hover:text-white"
+          >
+            <Lock className="h-4 w-4" />
+            Lock admin
+          </button>
+        ) : (
+          <Link
+            href="/dashboard/settings"
+            className="flex items-center gap-3 px-3 py-2 rounded-sm text-xs text-secondary hover:bg-white/5"
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Link>
+        )}
       </div>
     </aside>
   );
