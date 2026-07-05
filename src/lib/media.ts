@@ -49,7 +49,9 @@ export async function uploadImages(files: File[]): Promise<string[]> {
   // Lazy import via a variable specifier so the demo build doesn't require the
   // AWS SDK to be installed. Run `npm i @aws-sdk/client-s3` before enabling R2.
   const sdkName = "@aws-sdk/client-s3";
-  const { S3Client, PutObjectCommand } = await import(sdkName);
+  const { S3Client, PutObjectCommand } = await import(
+    /* webpackIgnore: true */ /* turbopackIgnore: true */ sdkName
+  );
   const client = new S3Client({
     region: "auto",
     endpoint: `https://${process.env.CF_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
