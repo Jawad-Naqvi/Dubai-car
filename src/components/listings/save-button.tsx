@@ -20,6 +20,7 @@ export function SaveButton({
     return (
       <button
         onClick={() => toggle(listingId)}
+        suppressHydrationWarning
         className={cn(
           "flex items-center justify-center gap-1.5 h-9 rounded-sm border text-xs font-semibold transition-colors",
           saved
@@ -42,6 +43,7 @@ export function SaveButton({
         toggle(listingId);
       }}
       aria-label={saved ? "Remove from saved" : "Save"}
+      suppressHydrationWarning
       className={cn(
         "h-8 w-8 rounded-sm bg-[#0A0A0A]/80 backdrop-blur border flex items-center justify-center transition-colors",
         saved

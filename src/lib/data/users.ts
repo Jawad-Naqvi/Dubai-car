@@ -14,12 +14,17 @@ export async function getCurrentRole(): Promise<Role> {
   return role ?? "buyer";
 }
 
+/** True when dashboards/admin are intentionally opened for testing. */
+export function dashboardsOpen(): boolean {
+  return !isDbEnabled() || process.env.OPEN_DASHBOARDS === "true";
+}
+
 /**
- * Admin guard for API routes. In demo mode (no real DB) admin tools are open so
- * the workflow is testable locally; in production it requires the admin role.
+ * Admin guard for API routes. Open in demo mode or when OPEN_DASHBOARDS=true (for
+ * testing against a live DB); otherwise requires the Clerk admin role.
  */
 export async function isAdminAllowed(): Promise<boolean> {
-  if (!isDbEnabled()) return true;
+  if (dashboardsOpen()) return true;
   return (await getCurrentRole()) === "admin";
 }
 
@@ -111,4 +116,25 @@ export async function getCurrentDealer() {
     .where(eq(dealers.userId, u.id))
     .limit(1);
   return rows[0] ?? null;
+}
+
+/**
+ * Dealer context for the dashboard. Uses the signed-in user's dealer; when
+ * dashboards are open for testing and the user has none, falls back to the
+ * first seeded dealer so the dashboard shows real data.
+ */
+export async function getEffectiveDealer() {
+  if (!isDbEnabled()) return null;
+  const own = await getCurrentDealer();
+  if (own) return own;
+  if (process.env.OPEN_DASHBOARDS === "true") {
+    // Deterministic pick so the dashboard always shows the same dealer.
+    const rows = await db
+      .select()
+      .from(dealers)
+      .orderBy(dealers.businessName)
+      .limit(1);
+    return rows[0] ?? null;
+  }
+  return null;
 }

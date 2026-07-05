@@ -47,6 +47,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
+        // Some browser extensions (password managers / form fillers) inject a
+        // `fdprocessedid` attribute onto buttons before React hydrates, which
+        // triggers a benign hydration-mismatch warning. Suppressing it here.
+        suppressHydrationWarning
         className={cn(buttonVariants({ variant, size, className }))}
         {...props}
       />

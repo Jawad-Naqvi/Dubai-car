@@ -1,11 +1,12 @@
 import "server-only";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { desc, eq, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { listings, dealers, listingMedia, leads, type Listing } from "@/lib/db/schema";
+import { listings, listingMedia, leads, type Listing } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { mockListings } from "@/lib/mock-data";
 import { demoStore } from "./demo-store";
-import { getCurrentDealer, getOrSyncUser } from "./users";
+import { getEffectiveDealer, getOrSyncUser, dashboardsOpen } from "./users";
+import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
 
 /** The mock dealer we treat as "you" in demo mode (no real dealer identity). */
@@ -63,7 +64,7 @@ export async function getDealerContext(): Promise<DealerContext> {
         created,
     };
   }
-  const dealer = await getCurrentDealer();
+  const dealer = await getEffectiveDealer();
   const tierId = dealer?.subscriptionTier ?? "free";
   const tier =
     subscriptionTiers.find((t) => t.id === tierId) ?? subscriptionTiers[0];
@@ -125,7 +126,7 @@ export async function getDealerInventory(): Promise<InventoryRow[]> {
     return [...created, ...owned];
   }
 
-  const dealer = await getCurrentDealer();
+  const dealer = await getEffectiveDealer();
   const user = await getOrSyncUser();
   const hero = db.$with("hero").as(
     db
@@ -137,14 +138,14 @@ export async function getDealerInventory(): Promise<InventoryRow[]> {
       .where(eq(listingMedia.isHero, true))
       .groupBy(listingMedia.listingId),
   );
-  const cond =
-    dealer && user
-      ? or(eq(listings.dealerId, dealer.id), eq(listings.sellerId, user.id))
-      : dealer
-        ? eq(listings.dealerId, dealer.id)
-        : user
-          ? eq(listings.sellerId, user.id)
-          : sql`false`;
+  const ownerConds = [];
+  if (dealer) ownerConds.push(eq(listings.dealerId, dealer.id));
+  if (user) ownerConds.push(eq(listings.sellerId, user.id));
+  // In testing mode (OPEN_DASHBOARDS), also surface guest-created listings that
+  // aren't tied to any dealer/seller, so what you list shows up here.
+  if (dashboardsOpen())
+    ownerConds.push(sql`(${listings.dealerId} is null and ${listings.sellerId} is null)`);
+  const cond = ownerConds.length ? or(...ownerConds) : sql`false`;
 
   const rows = await db
     .with(hero)
@@ -198,7 +199,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       revenueMonth: ctx.monthlyAED + leadCount * 50,
     };
   }
-  const dealer = await getCurrentDealer();
+  const dealer = await getEffectiveDealer();
   const leadRows = await db
     .select({ c: sql<number>`count(*)::int` })
     .from(leads)
@@ -227,6 +228,7 @@ export async function updateListingStatus(
         else l.status = patch.status as typeof l.status;
       }
       if (patch.isFeatured != null) l.isFeatured = patch.isFeatured;
+      bust("listings");
       return true;
     }
     return true; // mock-owned rows: accept no-op so the UI flow works
@@ -239,6 +241,7 @@ export async function updateListingStatus(
       ...(patch.status === "sold" ? { soldAt: new Date() } : {}),
     })
     .where(eq(listings.id, id));
+  bust("listings");
   return true;
 }
 
@@ -246,8 +249,10 @@ export async function deleteListing(id: string): Promise<boolean> {
   if (!isDbEnabled()) {
     const store = demoStore();
     store.newListings = store.newListings.filter((x) => x.id !== id);
+    bust("listings");
     return true;
   }
   await db.delete(listings).where(eq(listings.id, id));
+  bust("listings");
   return true;
 }

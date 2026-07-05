@@ -74,6 +74,7 @@ function CheckRow({
           type="checkbox"
           checked={!!checked}
           onChange={(e) => onChange?.(e.target.checked)}
+          suppressHydrationWarning
           className="h-3 w-3 rounded-sm border-white/20 bg-transparent text-[#D4AF37] focus:ring-[#D4AF37]/40"
         />
         {label}
@@ -219,6 +220,7 @@ export function FilterSidebar({
                 onKeyDown={(e) => e.key === "Enter" && apply()}
                 placeholder="Min"
                 inputMode="numeric"
+                suppressHydrationWarning
                 className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
               />
               <input
@@ -227,6 +229,7 @@ export function FilterSidebar({
                 onKeyDown={(e) => e.key === "Enter" && apply()}
                 placeholder="Max"
                 inputMode="numeric"
+                suppressHydrationWarning
                 className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
               />
             </div>
@@ -251,6 +254,7 @@ export function FilterSidebar({
                 onKeyDown={(e) => e.key === "Enter" && apply()}
                 placeholder="From"
                 inputMode="numeric"
+                suppressHydrationWarning
                 className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
               />
               <input
@@ -259,6 +263,7 @@ export function FilterSidebar({
                 onKeyDown={(e) => e.key === "Enter" && apply()}
                 placeholder="To"
                 inputMode="numeric"
+                suppressHydrationWarning
                 className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
               />
             </div>

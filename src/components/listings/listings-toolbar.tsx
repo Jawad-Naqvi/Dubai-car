@@ -28,6 +28,7 @@ export function ListingSearchBar({ className }: { className?: string }) {
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && push({ q: value || null })}
           placeholder="Make, model, or keyword"
+          suppressHydrationWarning
           className="flex-1 bg-transparent text-white placeholder:text-muted text-xs outline-none py-1.5"
         />
         <Button variant="gold" size="md" onClick={() => push({ q: value || null })}>
@@ -49,6 +50,7 @@ export function ListingSortBar() {
         <select
           value={emirate}
           onChange={(e) => push({ emirate: e.target.value || null })}
+          suppressHydrationWarning
           className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-sm bg-[#161616] border border-white/10 text-[10px] text-secondary hover:border-[#D4AF37]/30 focus:outline-none cursor-pointer"
         >
           <option value="">All emirates</option>
@@ -64,6 +66,7 @@ export function ListingSortBar() {
         <select
           value={sort}
           onChange={(e) => push({ sort: e.target.value })}
+          suppressHydrationWarning
           className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-sm bg-[#161616] border border-white/10 text-[10px] text-secondary hover:border-[#D4AF37]/30 focus:outline-none cursor-pointer"
         >
           {Object.entries(SORT_LABELS).map(([k, label]) => (

@@ -88,6 +88,7 @@ export function Nav() {
         <div className="flex items-center gap-2">
           <button
             onClick={switchLocale}
+            suppressHydrationWarning
             className="hidden md:inline-flex items-center gap-1 text-[11px] text-secondary hover:text-white px-2 py-1 rounded-sm hover:bg-white/5 transition-colors"
           >
             <Globe className="h-3 w-3" />
@@ -131,6 +132,7 @@ export function Nav() {
 
           <button
             onClick={() => setOpen(!open)}
+            suppressHydrationWarning
             className="lg:hidden h-8 w-8 rounded-sm border border-white/10 flex items-center justify-center"
             aria-label="Menu"
           >

@@ -38,13 +38,37 @@ export async function registerB2BBuyer(
     return { id: buyer.id };
   }
 
-  // Ensure there's a user to attach to. Require sign-in in DB mode.
-  if (!user) throw new Error("Please sign in to register as a B2B buyer.");
+  // Attach to the signed-in user, or create a lightweight importer account from
+  // the submitted contact details (so guest registrations still persist).
+  let userId = user?.id;
+  if (!userId) {
+    const email =
+      input.email || `b2b+${Date.now()}@guest.${"dxbmotors.ae"}`;
+    const existing = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    if (existing[0]) {
+      userId = existing[0].id;
+    } else {
+      const [created] = await db
+        .insert(users)
+        .values({
+          clerkId: `guest_b2b_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          email,
+          name: input.contactName || input.companyName,
+          role: "b2b_importer",
+        })
+        .returning({ id: users.id });
+      userId = created.id;
+    }
+  }
 
   const [row] = await db
     .insert(b2bBuyers)
     .values({
-      userId: user.id,
+      userId,
       companyName: input.companyName,
       country: input.country,
       contactPhone: input.contactPhone,
@@ -54,11 +78,10 @@ export async function registerB2BBuyer(
     .onConflictDoNothing()
     .returning({ id: b2bBuyers.id });
 
-  // Promote the user's role to b2b_importer.
   await db
     .update(users)
     .set({ role: "b2b_importer" })
-    .where(eq(users.id, user.id));
+    .where(eq(users.id, userId));
 
   return { id: row?.id ?? "existing" };
 }

@@ -6,6 +6,7 @@ import { listings, listingMedia, dealers } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { slugify } from "@/lib/utils";
 import { demoStore, demoId, type DemoListing } from "./demo-store";
+import { bust } from "./revalidate";
 import type { CurrentUser } from "./users";
 
 export const listingInputSchema = z.object({
@@ -99,6 +100,7 @@ export async function createListing(
       inquiryCount: 0,
     };
     store.newListings.unshift(listing);
+    bust("listings");
     return { id: listing.id, slug, status: "pending_review" };
   }
 
@@ -161,5 +163,6 @@ export async function createListing(
       .where(eq(dealers.id, dealerId));
   }
 
+  bust("listings");
   return { id: row.id, slug: row.slug, status: "pending_review" };
 }

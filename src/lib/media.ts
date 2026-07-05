@@ -1,10 +1,12 @@
 import "server-only";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
 /**
  * Media upload adapter. When Cloudflare R2 credentials are present we upload to
- * R2 and return CDN URLs. Until then (demo mode), we map each uploaded file to a
- * curated stock photo so the listing always renders a real car image and the
- * upload UX is fully exercised. Swap `isStorageEnabled` inputs for production.
+ * R2 and return CDN URLs. Otherwise we save the real uploaded files to
+ * `public/uploads/` and return same-origin `/uploads/...` paths — so the
+ * seller's actual photos are shown (works for local + single-server deploys).
  */
 export function isStorageEnabled(): boolean {
   return Boolean(
@@ -15,38 +17,41 @@ export function isStorageEnabled(): boolean {
   );
 }
 
-const STOCK = [
-  "1583121274602-3e2820c69888",
-  "1606664515524-ed2f786a0bd6",
-  "1555215695-3004980ad54e",
-  "1494976388531-d1058494cdd8",
-  "1568844293986-8d0400bd4745",
-  "1606220588913-b3aacb4d2f46",
-  "1503376780353-7e6692767b70",
-  "1565891741441-64926e441838",
-  "1567808291548-fc3ee04dbcf0",
-  "1568605114967-8130f3a36994",
-].map(
-  (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`,
-);
+function safeExt(name: string, type: string) {
+  const fromName = (name.split(".").pop() || "").toLowerCase();
+  if (/^(jpe?g|png|webp|avif|gif)$/.test(fromName)) return fromName;
+  if (type.includes("png")) return "png";
+  if (type.includes("webp")) return "webp";
+  if (type.includes("avif")) return "avif";
+  return "jpg";
+}
 
-let rot = 0;
+let counter = 0;
 
 export async function uploadImages(files: File[]): Promise<string[]> {
   if (!isStorageEnabled()) {
-    // Demo: return deterministic-ish stock photos, one per uploaded file.
-    return files.map(() => {
-      const url = STOCK[rot % STOCK.length];
-      rot += 1;
-      return url;
-    });
+    // Save the real uploaded files to /public/uploads and return their paths.
+    const dir = path.join(process.cwd(), "public", "uploads");
+    await mkdir(dir, { recursive: true });
+    const urls: string[] = [];
+    for (const file of files) {
+      counter += 1;
+      const ext = safeExt(file.name, file.type);
+      const filename = `listing-${Date.now()}-${counter}.${ext}`;
+      const bytes = Buffer.from(await file.arrayBuffer());
+      await writeFile(path.join(dir, filename), bytes);
+      urls.push(`/uploads/${filename}`);
+    }
+    return urls;
   }
 
   // ---- Real R2 upload (S3-compatible) ----
   // Lazy import via a variable specifier so the demo build doesn't require the
   // AWS SDK to be installed. Run `npm i @aws-sdk/client-s3` before enabling R2.
   const sdkName = "@aws-sdk/client-s3";
-  const { S3Client, PutObjectCommand } = await import(sdkName);
+  const { S3Client, PutObjectCommand } = await import(
+    /* webpackIgnore: true */ /* turbopackIgnore: true */ sdkName
+  );
   const client = new S3Client({
     region: "auto",
     endpoint: `https://${process.env.CF_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
