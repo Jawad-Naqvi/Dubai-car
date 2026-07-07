@@ -65,14 +65,14 @@ export default function ValuationPage() {
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-5xl mx-auto">
           {/* Form */}
-          <div className="rounded bg-[#161616] border border-white/8 p-5">
+          <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5">
             <div className="space-y-5">
               <div>
                 <label className="text-xs text-muted mb-2 block">Make</label>
                 <select
                   value={make}
                   onChange={(e) => setMake(e.target.value)}
-                  className="w-full h-11 rounded-sm bg-[#0A0A0A] border border-white/10 px-3 text-sm focus:outline-none focus:border-[#D4AF37]/40"
+                  className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
                 >
                   {popularMakes.map((m) => (
                     <option key={m}>{m}</option>
@@ -84,7 +84,7 @@ export default function ValuationPage() {
                 <input
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="w-full h-11 rounded-sm bg-[#0A0A0A] border border-white/10 px-3 text-sm focus:outline-none focus:border-[#D4AF37]/40"
+                  className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -96,7 +96,7 @@ export default function ValuationPage() {
                     onChange={(e) => setYear(Number(e.target.value))}
                     min={1990}
                     max={2026}
-                    className="w-full h-11 rounded-sm bg-[#0A0A0A] border border-white/10 px-3 text-sm focus:outline-none focus:border-[#D4AF37]/40"
+                    className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
                   />
                 </div>
                 <div>
@@ -105,7 +105,7 @@ export default function ValuationPage() {
                     type="number"
                     value={kms}
                     onChange={(e) => setKms(Number(e.target.value))}
-                    className="w-full h-11 rounded-sm bg-[#0A0A0A] border border-white/10 px-3 text-sm focus:outline-none focus:border-[#D4AF37]/40"
+                    className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
                   />
                 </div>
               </div>
@@ -118,8 +118,8 @@ export default function ValuationPage() {
                       onClick={() => setCondition(c)}
                       className={
                         condition === c
-                          ? "h-11 rounded-sm text-xs font-semibold bg-[#F0CE5C] text-[#1A1208]"
-                          : "h-11 rounded-sm text-xs bg-[#0A0A0A] border border-white/10 text-secondary hover:border-[#D4AF37]/30"
+                          ? "h-11 rounded-sm text-xs font-semibold bg-[#C8A93E] text-white"
+                          : "h-11 rounded-sm text-xs bg-white border border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/30"
                       }
                     >
                       {c}
@@ -131,11 +131,11 @@ export default function ValuationPage() {
           </div>
 
           {/* Estimate */}
-          <div className="rounded bg-bento-dark border border-[#D4AF37]/25 p-5 relative overflow-hidden grain">
+          <div className="rounded-xl bg-white border border-[#C8A93E]/25 shadow-card p-5 relative overflow-hidden grain">
             <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-40" />
             <div className="relative">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-5 w-5 text-[#F0CE5C]" />
+                <Sparkles className="h-5 w-5 text-[#C8A93E]" />
                 <Eyebrow tone="gold">ESTIMATE</Eyebrow>
               </div>
               <div className="mt-4 text-sm text-secondary">
@@ -149,7 +149,7 @@ export default function ValuationPage() {
               </div>
 
               {comps !== null && (
-                <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-[#F0CE5C] bg-[#D4AF37]/10 border border-[#D4AF37]/25 rounded-sm px-2 py-1">
+                <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-[#A98F2E] bg-[#C8A93E]/12 border border-[#C8A93E]/25 rounded-sm px-2 py-1">
                   <BadgeCheck className="h-3 w-3" />
                   {comps > 0
                     ? `Blended with ${comps} live comparables`

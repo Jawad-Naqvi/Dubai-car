@@ -45,7 +45,7 @@ const COMMON_FEATURES = [
 ];
 
 const field =
-  "w-full h-10 rounded-sm bg-[#0F0F0F] border border-white/10 px-3 text-sm text-white placeholder:text-muted focus:outline-none focus:border-[#D4AF37]/40";
+  "w-full h-10 rounded-sm bg-white border border-[#E5E5E5] px-3 text-sm text-[#1A1A1A] placeholder:text-muted focus:outline-none focus:border-[#C8A93E]";
 const labelCls = "text-[11px] uppercase tracking-wider text-muted mb-1.5 block";
 
 function SellWizardInner() {
@@ -129,8 +129,8 @@ function SellWizardInner() {
   if (done) {
     return (
       <div className="mx-auto max-w-xl px-6 py-20 text-center">
-        <div className="h-14 w-14 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 grid place-items-center mx-auto">
-          <CheckCircle2 className="h-7 w-7 text-[#F0CE5C]" />
+        <div className="h-14 w-14 rounded-full bg-[#C8A93E]/10 border border-[#C8A93E]/30 grid place-items-center mx-auto">
+          <CheckCircle2 className="h-7 w-7 text-[#C8A93E]" />
         </div>
         <h1 className="mt-5 text-xl font-bold tracking-tight">
           Your listing is in review
@@ -164,16 +164,16 @@ function SellWizardInner() {
           <div key={s} className="flex items-center gap-2 flex-1">
             <div
               className={`flex items-center gap-1.5 ${
-                i <= step ? "text-[#F0CE5C]" : "text-muted"
+                i <= step ? "text-[#C8A93E]" : "text-muted"
               }`}
             >
               <div
                 className={`h-6 w-6 rounded-full grid place-items-center text-[10px] font-semibold border ${
                   i < step
-                    ? "bg-[#F0CE5C] text-[#1A1208] border-[#F0CE5C]"
+                    ? "bg-[#C8A93E] text-white border-[#C8A93E]"
                     : i === step
-                      ? "border-[#F0CE5C]"
-                      : "border-white/15"
+                      ? "border-[#C8A93E]"
+                      : "border-[#E5E5E5]"
                 }`}
               >
                 {i < step ? <Check className="h-3 w-3" /> : i + 1}
@@ -182,14 +182,14 @@ function SellWizardInner() {
             </div>
             {i < STEPS.length - 1 && (
               <div
-                className={`h-px flex-1 ${i < step ? "bg-[#F0CE5C]/40" : "bg-white/10"}`}
+                className={`h-px flex-1 ${i < step ? "bg-[#C8A93E]/40" : "bg-[#E5E5E5]"}`}
               />
             )}
           </div>
         ))}
       </div>
 
-      <div className="mt-6 rounded bg-[#161616] border border-white/8 p-5">
+      <div className="mt-6 rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5">
         {step === 0 && (
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -308,10 +308,10 @@ function SellWizardInner() {
         {step === 1 && (
           <div className="space-y-4">
             {suggested && (
-              <div className="rounded-sm bg-[#D4AF37]/8 border border-[#D4AF37]/25 p-3 flex items-start gap-2">
-                <Sparkles className="h-4 w-4 text-[#F0CE5C] mt-0.5" />
+              <div className="rounded-sm bg-[#C8A93E]/10 border border-[#C8A93E]/25 p-3 flex items-start gap-2">
+                <Sparkles className="h-4 w-4 text-[#C8A93E] mt-0.5" />
                 <div>
-                  <div className="text-xs font-semibold text-[#F0CE5C]">
+                  <div className="text-xs font-semibold text-[#A98F2E]">
                     Suggested price: {formatAED(suggested.estimate)}
                   </div>
                   <div className="text-[11px] text-muted mt-0.5">
@@ -319,7 +319,7 @@ function SellWizardInner() {
                     {formatAED(suggested.high)}.{" "}
                     <button
                       type="button"
-                      className="text-[#F0CE5C] hover:underline"
+                      className="text-[#A98F2E] hover:underline"
                       onClick={() => set("priceAED", suggested.estimate)}
                     >
                       Use this
@@ -392,7 +392,7 @@ function SellWizardInner() {
             <div>
               <label className={labelCls}>Description</label>
               <textarea
-                className="w-full rounded-sm bg-[#0F0F0F] border border-white/10 px-3 py-2 text-sm text-white placeholder:text-muted focus:outline-none focus:border-[#D4AF37]/40 min-h-[90px]"
+                className="w-full rounded-sm bg-white border border-[#E5E5E5] px-3 py-2 text-sm text-[#1A1A1A] placeholder:text-muted focus:outline-none focus:border-[#C8A93E] min-h-[90px]"
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 placeholder="Service history, ownership, condition notes…"
@@ -417,8 +417,8 @@ function SellWizardInner() {
                       }
                       className={`text-[11px] px-2 py-1 rounded-sm border transition-colors ${
                         on
-                          ? "bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#F0CE5C]"
-                          : "border-white/10 text-secondary hover:border-[#D4AF37]/30"
+                          ? "bg-[#C8A93E]/10 border-[#C8A93E]/40 text-[#A98F2E]"
+                          : "border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/30"
                       }`}
                     >
                       {f}
@@ -432,7 +432,7 @@ function SellWizardInner() {
                 type="checkbox"
                 checked={form.isExportReady}
                 onChange={(e) => set("isExportReady", e.target.checked)}
-                className="h-4 w-4 rounded-sm accent-[#D4AF37]"
+                className="h-4 w-4 rounded-sm accent-[#C8A93E]"
               />
               <span className="text-xs text-secondary">
                 This car is export-ready (RTA deregistration possible)
@@ -475,7 +475,7 @@ function SellWizardInner() {
             </div>
 
             {/* Review summary */}
-            <div className="rounded-sm bg-[#0F0F0F] border border-white/8 p-4">
+            <div className="rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] p-4">
               <div className="text-[11px] uppercase tracking-wider text-muted mb-2">
                 Review
               </div>

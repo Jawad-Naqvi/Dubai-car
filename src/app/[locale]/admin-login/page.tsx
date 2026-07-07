@@ -74,17 +74,17 @@ export default function AdminLoginPage() {
 
       <div className="relative w-full max-w-sm">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-black text-sm">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-black text-sm">
             DXB
           </div>
-          <span className="text-white font-bold text-xl">{brand.name}</span>
+          <span className="text-[#1A1A1A] font-bold text-xl">{brand.name}</span>
         </div>
 
-        <div className="rounded-lg bg-[#141414] border border-white/10 p-7 text-center">
-          <div className="h-12 w-12 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 grid place-items-center mx-auto">
-            <ShieldCheck className="h-6 w-6 text-[#F0CE5C]" />
+        <div className="rounded-lg bg-white shadow-card border border-[#E5E5E5] p-7 text-center">
+          <div className="h-12 w-12 rounded-full bg-[#C8A93E]/10 border border-[#C8A93E]/30 grid place-items-center mx-auto">
+            <ShieldCheck className="h-6 w-6 text-[#C8A93E]" />
           </div>
-          <h1 className="mt-4 text-base font-bold">Admin access</h1>
+          <h1 className="mt-4 text-base font-bold text-[#1A1A1A]">Admin access</h1>
           <p className="mt-1 text-xs text-muted">Enter your 4-digit admin PIN</p>
 
           <div
@@ -104,7 +104,7 @@ export default function AdminLoginPage() {
                 type="password"
                 maxLength={1}
                 disabled={loading}
-                className="h-14 w-12 rounded-md bg-[#0F0F0F] border border-white/15 text-center text-2xl font-bold text-white focus:outline-none focus:border-[#D4AF37]/60 disabled:opacity-50"
+                className="h-14 w-12 rounded-md bg-white border border-[#E5E5E5] text-center text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:border-[#C8A93E] disabled:opacity-50"
               />
             ))}
           </div>

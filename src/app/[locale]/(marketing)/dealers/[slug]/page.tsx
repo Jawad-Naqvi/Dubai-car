@@ -35,15 +35,15 @@ export default async function DealerStorefront({
   return (
     <>
       <section className="relative">
-        <div className="h-48 lg:h-64 bg-gradient-to-br from-[#1A1A1A] via-[#161616] to-[#121212] relative overflow-hidden">
+        <div className="h-48 lg:h-64 bg-[#F4F4F4] relative overflow-hidden">
           <RadialGlow color="gold" size="xl" className="-top-40 -right-40 opacity-30" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.2),transparent_55%)]" />
         </div>
 
         <div className="mx-auto max-w-7xl px-6 lg:px-6 -mt-20">
-          <div className="rounded bg-[#161616] border border-white/8 p-5 lg:p-6 relative overflow-hidden grain">
+          <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5 lg:p-6 relative overflow-hidden grain">
             <div className="flex flex-col md:flex-row md:items-start gap-6">
-              <div className="h-24 w-24 lg:h-28 lg:w-28 rounded bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-black text-sm flex-shrink-0 ring-4 ring-[#161616]">
+              <div className="h-24 w-24 lg:h-28 lg:w-28 rounded bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-black text-sm flex-shrink-0 ring-4 ring-white">
                 {dealer.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
@@ -52,7 +52,7 @@ export default async function DealerStorefront({
                     {dealer.name}
                   </h1>
                   {dealer.isVerified && (
-                    <BadgeCheck className="h-6 w-6 text-[#F0CE5C]" />
+                    <BadgeCheck className="h-6 w-6 text-[#C8A93E]" />
                   )}
                   {dealer.isFeatured && <Badge tone="featured">Featured</Badge>}
                 </div>
@@ -60,7 +60,7 @@ export default async function DealerStorefront({
 
                 <div className="mt-5 flex flex-wrap gap-5 text-sm">
                   <div className="flex items-center gap-1.5">
-                    <Star className="h-4 w-4 fill-[#F0CE5C] text-[#F0CE5C]" />
+                    <Star className="h-4 w-4 fill-[#C8A93E] text-[#C8A93E]" />
                     <span className="font-semibold">{dealer.rating}</span>
                     <span className="text-muted">({dealer.reviewCount} reviews)</span>
                   </div>
@@ -106,7 +106,7 @@ export default async function DealerStorefront({
           </div>
 
           {inventory.length === 0 ? (
-            <div className="rounded bg-[#161616] border border-white/8 p-6 text-center text-muted">
+            <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-6 text-center text-muted">
               No active listings yet.
             </div>
           ) : (

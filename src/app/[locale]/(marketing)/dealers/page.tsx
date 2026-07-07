@@ -39,9 +39,9 @@ export default async function DealersPage({
               <Link
                 key={d.id}
                 href={`/dealers/${d.slug}`}
-                className="group rounded bg-[#161616] border border-white/8 overflow-hidden hover:border-[#D4AF37]/40 transition-all hover:-translate-y-1"
+                className="group rounded-xl bg-white border border-[#E5E5E5] overflow-hidden shadow-card hover:shadow-card-hover hover:border-[#C8A93E]/40 transition-all hover:-translate-y-1"
               >
-                <div className="aspect-[16/9] bg-gradient-to-br from-[#1A1A1A] via-[#161616] to-[#121212] relative overflow-hidden">
+                <div className="aspect-[16/9] bg-[#F4F4F4] relative overflow-hidden">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.3),transparent_55%)]" />
                   {d.isFeatured && (
                     <Badge tone="featured" className="absolute top-3 left-3">
@@ -50,23 +50,23 @@ export default async function DealersPage({
                   )}
                 </div>
                 <div className="p-6 -mt-10 relative">
-                  <div className="h-16 w-16 rounded-sm bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-bold text-sm border-4 border-[#161616]">
+                  <div className="h-16 w-16 rounded-sm bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-bold text-sm border-4 border-white">
                     {d.name.charAt(0)}
                   </div>
                   <div className="mt-4 flex items-center gap-1.5">
-                    <h3 className="font-semibold text-sm truncate group-hover:text-[#F0CE5C] transition-colors">
+                    <h3 className="font-semibold text-sm truncate group-hover:text-[#A98F2E] transition-colors">
                       {d.name}
                     </h3>
                     {d.isVerified && (
-                      <BadgeCheck className="h-4 w-4 text-[#F0CE5C] flex-shrink-0" />
+                      <BadgeCheck className="h-4 w-4 text-[#C8A93E] flex-shrink-0" />
                     )}
                   </div>
                   <p className="mt-2 text-sm text-secondary line-clamp-2">
                     {d.tagline}
                   </p>
-                  <div className="mt-5 pt-5 border-t border-white/5 grid grid-cols-3 gap-2 text-xs">
+                  <div className="mt-5 pt-5 border-t border-[#E5E5E5] grid grid-cols-3 gap-2 text-xs">
                     <div className="flex items-center gap-1 text-secondary">
-                      <Star className="h-3 w-3 fill-[#F0CE5C] text-[#F0CE5C]" />
+                      <Star className="h-3 w-3 fill-[#C8A93E] text-[#C8A93E]" />
                       {d.rating}
                     </div>
                     <div className="flex items-center gap-1 text-secondary">

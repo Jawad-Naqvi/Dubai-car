@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -39,10 +38,11 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={isRTL ? "rtl" : "ltr"} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         />
         {isRTL && (
           <link
@@ -52,22 +52,21 @@ export default async function LocaleLayout({
         )}
       </head>
       <body
-        className="bg-page text-white antialiased"
+        className="bg-page text-[#1A1A1A] antialiased"
         style={{
           fontFamily: isRTL
-            ? '"Tajawal", "Switzer", ui-sans-serif, system-ui, sans-serif'
-            : '"Switzer", "Tajawal", ui-sans-serif, system-ui, sans-serif',
+            ? '"Tajawal", "Inter", ui-sans-serif, system-ui, sans-serif'
+            : '"Inter", "Tajawal", ui-sans-serif, system-ui, sans-serif',
         }}
       >
         <ClerkProvider
           appearance={{
-            baseTheme: dark,
             variables: {
-              colorPrimary: "#D4AF37",
-              colorBackground: "#161616",
-              colorInputBackground: "#121212",
-              colorInputText: "#FFFFFF",
-              colorText: "#FFFFFF",
+              colorPrimary: "#C8A93E",
+              colorBackground: "#FFFFFF",
+              colorInputBackground: "#FFFFFF",
+              colorInputText: "#1A1A1A",
+              colorText: "#1A1A1A",
               borderRadius: "0.75rem",
             },
           }}
@@ -75,13 +74,13 @@ export default async function LocaleLayout({
           <NextIntlClientProvider messages={messages}>
             {children}
             <Toaster
-              theme="dark"
+              theme="light"
               position="top-center"
               toastOptions={{
                 style: {
-                  background: "#161616",
-                  border: "1px solid rgba(212,175,55,0.3)",
-                  color: "#fff",
+                  background: "#FFFFFF",
+                  border: "1px solid #E5E5E5",
+                  color: "#1A1A1A",
                 },
               }}
             />

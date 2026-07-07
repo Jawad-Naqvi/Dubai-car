@@ -1,40 +1,46 @@
 @import "tailwindcss";
 
 @theme {
-  /* === DXB Motors — Pure Black / White / Gold === */
-  --color-bg-page: #0A0A0A;
-  --color-bg-surface: #121212;
-  --color-bg-card: #161616;
-  --color-bg-card-soft: #1C1C1C;
-  --color-bg-elevated: #222222;
+  /* === DXB Motors — Clean Light / Gold (cars.com-inspired) === */
+  --color-bg-page: #F8F8F8;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-card-soft: #F4F4F4;
+  --color-bg-elevated: #FFFFFF;
 
-  --color-gold: #D4AF37;
-  --color-gold-bright: #F0CE5C;
-  --color-gold-ink: #1A1208;
-  --color-gold-deep: #8C7220;
-  --color-cream: #F6E8B8;
+  --color-gold: #C8A93E;
+  --color-gold-bright: #D8B84E;
+  --color-gold-ink: #FFFFFF;
+  --color-gold-deep: #A98F2E;
+  --color-cream: #F3EAC9;
 
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #D4D4D4;
-  --color-text-muted: #888888;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6B6B6B;
+  --color-text-muted: #9A9A9A;
 
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-danger: #EF4444;
+  --color-line: #E5E5E5;
 
-  --font-sans: "Switzer", "Tajawal", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Switzer", "Tajawal", ui-sans-serif, system-ui, sans-serif;
+  --color-success: #1A7A4A;
+  --color-info: #1B4FA0;
+  --color-warning: #B7791F;
+  --color-danger: #DC2626;
 
-  --radius-card: 0.25rem;
-  --radius-card-lg: 0.375rem;
-  --radius-panel: 0.5rem;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-gold-glow: 0 0 60px -10px rgba(212, 175, 55, 0.45);
+  --radius-card: 0.75rem;
+  --radius-card-lg: 0.75rem;
+  --radius-panel: 0.75rem;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-nav: 0 1px 0 rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-gold-glow: 0 10px 30px -8px rgba(200, 169, 62, 0.35);
 }
 
 @layer base {
   * {
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-line);
   }
   html, body {
     background-color: var(--color-bg-page);
@@ -48,8 +54,8 @@
     font-family: var(--font-sans);
   }
   ::selection {
-    background-color: rgba(212, 175, 55, 0.35);
-    color: #fff;
+    background-color: rgba(200, 169, 62, 0.28);
+    color: #1A1A1A;
   }
 }
 
@@ -57,52 +63,57 @@
   .bg-page { background-color: var(--color-bg-page); }
   .bg-surface { background-color: var(--color-bg-surface); }
   .bg-card { background-color: var(--color-bg-card); }
+  .bg-card-soft { background-color: var(--color-bg-card-soft); }
   .bg-elevated { background-color: var(--color-bg-elevated); }
   .text-secondary { color: var(--color-text-secondary); }
   .text-muted { color: var(--color-text-muted); }
-  .ring-gold { box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.30); }
+  .border-line { border-color: var(--color-line); }
+  .ring-gold { box-shadow: 0 0 0 1px rgba(200, 169, 62, 0.35); }
   .glow-gold { box-shadow: var(--shadow-gold-glow); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-card-hover { box-shadow: var(--shadow-card-hover); }
+  .shadow-nav { box-shadow: var(--shadow-nav); }
 
+  /* Solid gold text (keeps legacy class name working on the light theme) */
   .text-gradient-gold {
-    background: linear-gradient(135deg, #F6E8B8 0%, #F0CE5C 40%, #D4AF37 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--color-gold);
+    -webkit-background-clip: initial;
+    background-clip: initial;
   }
 
+  /* Light hero panel — soft off-white with a faint gold wash */
   .bg-hero-panel {
     background:
-      radial-gradient(circle at 85% 15%, rgba(240, 206, 92, 0.20), transparent 55%),
-      radial-gradient(circle at 15% 85%, rgba(212, 175, 55, 0.10), transparent 50%),
-      linear-gradient(135deg, #161616 0%, #0A0A0A 55%, rgba(212, 175, 55, 0.08) 100%);
+      radial-gradient(circle at 85% 10%, rgba(200, 169, 62, 0.10), transparent 55%),
+      radial-gradient(circle at 10% 90%, rgba(200, 169, 62, 0.06), transparent 50%),
+      linear-gradient(180deg, #FFFFFF 0%, #F8F8F8 100%);
   }
 
   .bg-bento-dark {
     background-color: var(--color-bg-card);
-    background-image: radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.18), transparent 55%);
+    background-image: radial-gradient(circle at 0% 0%, rgba(200, 169, 62, 0.08), transparent 55%);
   }
 
   .bg-bento-gold {
     background:
-      radial-gradient(circle at 100% 0%, rgba(246, 232, 184, 0.45), transparent 60%),
-      linear-gradient(135deg, #D4AF37 0%, #8C7220 60%, #1A1208 110%);
+      radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.6), transparent 60%),
+      linear-gradient(135deg, #C8A93E 0%, #A98F2E 100%);
   }
 
   .bg-bento-black {
-    background-color: #0F0F0F;
+    background-color: #FFFFFF;
     background-image:
-      radial-gradient(circle at 100% 0%, rgba(212, 175, 55, 0.22), transparent 60%),
-      linear-gradient(135deg, #1A1A1A 0%, #0A0A0A 100%);
+      radial-gradient(circle at 100% 0%, rgba(200, 169, 62, 0.10), transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #F4F4F4 100%);
   }
 
+  /* Grain disabled on the light theme (kept as a no-op so class refs stay safe) */
   .grain::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.03;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0;
   }
 
   @keyframes float-slow {
@@ -112,8 +123,8 @@
   .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
 
   @keyframes pulse-glow {
-    0%, 100% { opacity: 0.25; }
-    50% { opacity: 0.5; }
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.3; }
   }
   .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
 

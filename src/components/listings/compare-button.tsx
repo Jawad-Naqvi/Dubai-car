@@ -24,8 +24,8 @@ export function CompareButton({
         className={cn(
           "flex items-center justify-center gap-1.5 h-9 rounded-sm border text-xs font-semibold transition-colors",
           active
-            ? "border-[#D4AF37]/50 bg-[#D4AF37]/10 text-[#F0CE5C]"
-            : "border-white/10 text-secondary hover:border-[#D4AF37]/40 hover:text-white",
+            ? "border-[#C8A93E]/50 bg-[#C8A93E]/10 text-[#A98F2E]"
+            : "border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40 hover:text-[#1A1A1A]",
           className,
         )}
       >
@@ -46,10 +46,10 @@ export function CompareButton({
       title="Compare"
       suppressHydrationWarning
       className={cn(
-        "h-7 w-7 rounded-sm bg-[#0A0A0A]/80 backdrop-blur border flex items-center justify-center transition-colors",
+        "h-7 w-7 rounded-lg bg-white/90 backdrop-blur border flex items-center justify-center transition-colors",
         active
-          ? "border-[#D4AF37]/50 text-[#F0CE5C]"
-          : "border-white/10 text-white hover:border-[#D4AF37]/40",
+          ? "border-[#C8A93E]/50 text-[#C8A93E]"
+          : "border-[#E5E5E5] text-[#1A1A1A] hover:border-[#C8A93E]/40",
         className,
       )}
     >

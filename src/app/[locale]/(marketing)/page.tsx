@@ -46,15 +46,15 @@ export default async function LandingPage({
         <RadialGlow color="emerald" size="lg" className="-bottom-40 -left-40" />
 
         <div className="relative mx-auto max-w-7xl px-4 lg:px-6">
-          <div className="relative rounded bg-hero-panel ring-1 ring-[#D4AF37]/20 px-5 py-12 lg:px-10 lg:py-16 grain overflow-hidden">
+          <div className="relative rounded bg-hero-panel ring-1 ring-[#E5E5E5] px-5 py-12 lg:px-10 lg:py-16 grain overflow-hidden">
             <RadialGlow color="gold" size="md" className="top-5 right-5 opacity-20" />
 
             <div className="relative z-10 max-w-3xl mx-auto text-center">
               <Eyebrow tone="gold">{t("hero.eyebrow")}</Eyebrow>
-              <h1 className="mt-5 text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight leading-[1.1] text-white">
+              <h1 className="mt-5 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1] text-[#1A1A1A]">
                 {t("hero.title")}
               </h1>
-              <p className="mt-4 text-sm lg:text-base text-[#C4D1CB] max-w-xl mx-auto leading-relaxed">
+              <p className="mt-4 text-sm lg:text-base text-secondary max-w-xl mx-auto leading-relaxed">
                 {t("hero.subtitle")}
               </p>
 
@@ -108,7 +108,7 @@ export default async function LandingPage({
             </div>
 
             {/* Stats strip */}
-            <div className="relative z-10 mt-12 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="relative z-10 mt-12 pt-8 border-t border-[#E5E5E5] grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { value: "26K+", label: t("hero.stats.listings") },
                 { value: "850+", label: t("hero.stats.dealers") },
@@ -145,7 +145,7 @@ export default async function LandingPage({
             <BentoCard variant="dark" className="col-span-12 md:col-span-7 row-span-2">
               <div className="flex flex-col h-full justify-between">
                 <div>
-                  <Building2 className="h-5 w-5 text-[#F0CE5C] mb-3" />
+                  <Building2 className="h-5 w-5 text-[#C8A93E] mb-3" />
                   <BentoTitle>{t("bento.tile1.title")}</BentoTitle>
                   <BentoDesc>{t("bento.tile1.desc")}</BentoDesc>
                 </div>
@@ -153,7 +153,7 @@ export default async function LandingPage({
                   {["Bulk CSV upload", "Analytics", "Lead inbox", "Subscriptions"].map((c) => (
                     <span
                       key={c}
-                      className="text-[10px] px-2 py-0.5 rounded-sm bg-white/5 border border-white/10 text-secondary"
+                      className="text-[10px] px-2 py-0.5 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-secondary"
                     >
                       {c}
                     </span>
@@ -166,9 +166,9 @@ export default async function LandingPage({
             <BentoCard variant="gold" className="col-span-12 md:col-span-5 row-span-2">
               <div className="flex flex-col h-full justify-between">
                 <div>
-                  <Sparkles className="h-5 w-5 text-[#1A1208] mb-3" />
-                  <BentoTitle className="text-[#1A1208]">{t("bento.tile2.title")}</BentoTitle>
-                  <p className="mt-2 text-xs text-[#1A1208]/80 leading-relaxed">
+                  <Sparkles className="h-5 w-5 text-white mb-3" />
+                  <BentoTitle className="text-white">{t("bento.tile2.title")}</BentoTitle>
+                  <p className="mt-2 text-xs text-white/90 leading-relaxed">
                     {t("bento.tile2.desc")}
                   </p>
                 </div>
@@ -180,7 +180,7 @@ export default async function LandingPage({
                   ].map((q) => (
                     <div
                       key={q}
-                      className="flex items-center gap-1.5 text-[11px] text-[#1A1208] bg-white/40 backdrop-blur rounded-sm px-2.5 py-1 border border-[#1A1208]/10"
+                      className="flex items-center gap-1.5 text-[11px] text-[#1A1A1A] bg-white/90 backdrop-blur rounded-md px-2.5 py-1 border border-white/60"
                     >
                       <Search className="h-2.5 w-2.5" />
                       {q}
@@ -191,19 +191,19 @@ export default async function LandingPage({
             </BentoCard>
 
             <BentoCard variant="dark" className="col-span-12 md:col-span-4">
-              <Shield className="h-5 w-5 text-[#F0CE5C] mb-2.5" />
+              <Shield className="h-5 w-5 text-[#C8A93E] mb-2.5" />
               <BentoTitle>{t("bento.tile3.title")}</BentoTitle>
               <BentoDesc>{t("bento.tile3.desc")}</BentoDesc>
             </BentoCard>
 
             <BentoCard variant="dark" className="col-span-12 md:col-span-4">
-              <BarChart3 className="h-5 w-5 text-[#F0CE5C] mb-2.5" />
+              <BarChart3 className="h-5 w-5 text-[#C8A93E] mb-2.5" />
               <BentoTitle>{t("bento.tile4.title")}</BentoTitle>
               <BentoDesc>{t("bento.tile4.desc")}</BentoDesc>
             </BentoCard>
 
             <BentoCard variant="emerald" className="col-span-12 md:col-span-4">
-              <Ship className="h-5 w-5 text-[#F0CE5C] mb-2.5" />
+              <Ship className="h-5 w-5 text-[#C8A93E] mb-2.5" />
               <BentoTitle>{t("bento.tile5.title")}</BentoTitle>
               <p className="mt-2 text-xs text-secondary leading-relaxed">
                 {t("bento.tile5.desc")}
@@ -213,7 +213,7 @@ export default async function LandingPage({
             <BentoCard variant="dark" className="col-span-12">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="max-w-xl">
-                  <Globe className="h-5 w-5 text-[#F0CE5C] mb-2.5" />
+                  <Globe className="h-5 w-5 text-[#C8A93E] mb-2.5" />
                   <BentoTitle>{t("bento.tile6.title")}</BentoTitle>
                   <BentoDesc>{t("bento.tile6.desc")}</BentoDesc>
                 </div>
@@ -222,7 +222,7 @@ export default async function LandingPage({
                     (c) => (
                       <span
                         key={c}
-                        className="text-[10px] px-2 py-0.5 rounded-sm bg-[#1A1A1A] border border-[#D4AF37]/30 text-[#F0CE5C]"
+                        className="text-[10px] px-2 py-0.5 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-[#A98F2E]"
                       >
                         {c}
                       </span>
@@ -237,7 +237,7 @@ export default async function LandingPage({
 
       {/* ================ USER TYPES ================ */}
       <section className="relative py-12 lg:py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#121212]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/60 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 lg:px-6">
           <div className="max-w-2xl">
             <Eyebrow tone="emerald">{t("values.eyebrow")}</Eyebrow>
@@ -260,12 +260,12 @@ export default async function LandingPage({
               return (
                 <div
                   key={key}
-                  className="group rounded bg-[#161616] border border-white/8 p-4 hover:border-[#D4AF37]/30 transition-all relative overflow-hidden"
+                  className="group rounded bg-white border border-[#E5E5E5] shadow-card p-4 hover:border-[#C8A93E]/30 transition-all relative overflow-hidden"
                 >
-                  <div className="absolute -top-8 -right-8 w-20 h-20 rounded-full bg-[#D4AF37]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute -top-8 -right-8 w-20 h-20 rounded-full bg-[#C8A93E]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative">
-                    <div className="h-9 w-9 rounded-sm bg-gradient-to-br from-[#D4AF37]/20 to-[#1A1A1A] flex items-center justify-center mb-3 ring-1 ring-[#D4AF37]/30">
-                      <Icon className="h-4 w-4 text-[#F0CE5C]" />
+                    <div className="h-9 w-9 rounded-sm bg-gradient-to-br from-[#C8A93E]/15 to-[#F4F4F4] flex items-center justify-center mb-3 ring-1 ring-[#C8A93E]/25">
+                      <Icon className="h-4 w-4 text-[#C8A93E]" />
                     </div>
                     <h3 className="text-sm font-semibold tracking-tight">{item.title}</h3>
                     <p className="mt-1.5 text-xs text-secondary leading-relaxed">
@@ -290,7 +290,7 @@ export default async function LandingPage({
             </h2>
           </div>
 
-          <div className="mt-10 rounded bg-[#121212] border border-white/8 p-5 lg:p-8 grain relative overflow-hidden">
+          <div className="mt-10 rounded bg-white border border-[#E5E5E5] shadow-card p-5 lg:p-8 grain relative overflow-hidden">
             <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-30" />
 
             <div className="relative grid grid-cols-3 md:grid-cols-5 gap-3 items-center">
@@ -298,7 +298,7 @@ export default async function LandingPage({
                 {["Yards", "Dealers", "Private sellers", "Inspection partners"].map((s) => (
                   <div
                     key={s}
-                    className="px-3 py-2 rounded-sm bg-[#161616] border border-white/10 text-[10px] text-center text-secondary"
+                    className="px-3 py-2 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-[10px] text-center text-secondary"
                   >
                     {s}
                   </div>
@@ -306,30 +306,30 @@ export default async function LandingPage({
               </div>
 
               <div className="flex items-center justify-center">
-                <ArrowRight className="h-5 w-5 text-[#D4AF37]/40 rtl-flip" />
+                <ArrowRight className="h-5 w-5 text-[#C8A93E]/50 rtl-flip" />
               </div>
 
               <div className="relative">
-                <div className="aspect-square rounded-sm bg-gradient-to-br from-[#D4AF37] via-[#8C7220] to-[#1A1A1A] p-px">
-                  <div className="h-full w-full rounded-[3px] bg-[#0A0A0A] flex flex-col items-center justify-center text-center p-4">
-                    <Network className="h-5 w-5 text-[#F0CE5C] mb-2" />
+                <div className="aspect-square rounded-xl bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] p-[2px] shadow-card">
+                  <div className="h-full w-full rounded-[10px] bg-white flex flex-col items-center justify-center text-center p-4">
+                    <Network className="h-5 w-5 text-[#C8A93E] mb-2" />
                     <div className="text-[10px] text-secondary uppercase tracking-widest">
                       DXB Motors
                     </div>
-                    <div className="text-xs font-bold mt-0.5">Listings · AI · Leads</div>
+                    <div className="text-xs font-bold mt-0.5 text-[#1A1A1A]">Listings · AI · Leads</div>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center justify-center">
-                <ArrowRight className="h-5 w-5 text-[#D4AF37]/40 rtl-flip" />
+                <ArrowRight className="h-5 w-5 text-[#C8A93E]/50 rtl-flip" />
               </div>
 
               <div className="space-y-2">
                 {["Local buyers", "B2B importers", "Africa / Asia", "Bulk orders"].map((s) => (
                   <div
                     key={s}
-                    className="px-3 py-2 rounded-sm bg-[#161616] border border-white/10 text-[10px] text-center text-secondary"
+                    className="px-3 py-2 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-[10px] text-center text-secondary"
                   >
                     {s}
                   </div>
@@ -360,16 +360,16 @@ export default async function LandingPage({
               return (
                 <div
                   key={i}
-                  className="rounded bg-bento-dark border border-white/8 p-5 relative overflow-hidden grain"
+                  className="rounded bg-white border border-[#E5E5E5] shadow-card p-5 relative overflow-hidden grain"
                 >
-                  <TrendingUp className="h-4 w-4 text-[#F0CE5C] mb-3" />
+                  <TrendingUp className="h-4 w-4 text-[#C8A93E] mb-3" />
                   <div className="text-2xl lg:text-3xl font-bold text-gradient-gold leading-none">
                     {stat.value}
                   </div>
                   <div className="mt-2.5 text-xs text-secondary leading-relaxed">
                     {stat.label}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/5 text-[9px] text-muted uppercase tracking-wider">
+                  <div className="mt-3 pt-3 border-t border-[#E5E5E5] text-[9px] text-muted uppercase tracking-wider">
                     {stat.source}
                   </div>
                 </div>
@@ -404,7 +404,7 @@ export default async function LandingPage({
                     "WhatsApp lead routing",
                   ].map((f) => (
                     <li key={f} className="flex items-center gap-1.5 text-xs text-secondary">
-                      <CheckCircle2 className="h-3 w-3 text-[#F0CE5C]" />
+                      <CheckCircle2 className="h-3 w-3 text-[#C8A93E]" />
                       {f}
                     </li>
                   ))}
@@ -418,11 +418,11 @@ export default async function LandingPage({
                   <div className="absolute inset-0 rounded-full bg-white/30 animate-ping" />
                   <div className="absolute inset-3 rounded-full bg-white/40 animate-ping [animation-delay:0.5s]" />
                   <div className="relative h-14 w-14 rounded-full bg-white flex items-center justify-center">
-                    <Mic className="h-5 w-5 text-[#1A1208]" />
+                    <Mic className="h-5 w-5 text-[#C8A93E]" />
                   </div>
                 </div>
-                <div className="text-[#1A1208]">
-                  <div className="text-[10px] uppercase tracking-widest font-bold opacity-70">
+                <div className="text-white">
+                  <div className="text-[10px] uppercase tracking-widest font-bold opacity-80">
                     Voice search
                   </div>
                   <div className="mt-0.5 text-sm font-bold">
@@ -434,7 +434,7 @@ export default async function LandingPage({
 
             <BentoCard variant="emerald" className="min-h-[152px]">
               <div className="h-full flex flex-col justify-between">
-                <Globe className="h-5 w-5 text-[#F0CE5C]" />
+                <Globe className="h-5 w-5 text-[#C8A93E]" />
                 <div>
                   <div className="text-2xl font-bold text-gradient-gold">42</div>
                   <p className="mt-1.5 text-xs text-secondary">
@@ -451,7 +451,7 @@ export default async function LandingPage({
       <section className="relative pt-8 pb-20 overflow-hidden">
         <RadialGlow color="gold" size="xl" className="-top-40 left-1/2 -translate-x-1/2 opacity-30" />
         <div className="relative mx-auto max-w-7xl px-4 lg:px-6">
-          <div className="rounded bg-hero-panel ring-1 ring-[#D4AF37]/25 px-5 py-12 lg:px-10 lg:py-14 text-center grain relative overflow-hidden">
+          <div className="rounded bg-hero-panel ring-1 ring-[#E5E5E5] px-5 py-12 lg:px-10 lg:py-14 text-center grain relative overflow-hidden">
             <RadialGlow color="gold" size="md" className="-bottom-20 -left-20 opacity-40" />
             <div className="relative z-10 max-w-2xl mx-auto">
               <Eyebrow tone="gold">{t("cta.eyebrow")}</Eyebrow>

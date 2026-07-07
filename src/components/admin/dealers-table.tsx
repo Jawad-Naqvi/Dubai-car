@@ -48,20 +48,20 @@ export function DealersTable({ dealers }: { dealers: AdminDealer[] }) {
   return (
     <main className="p-5 space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
-        <div className="flex items-center gap-2 h-8 w-80 rounded-sm bg-[#161616] border border-white/10 px-4 text-xs">
+        <div className="flex items-center gap-2 h-8 w-80 rounded-sm bg-white border border-[#E5E5E5] px-4 text-xs">
           <Search className="h-4 w-4 text-muted" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search dealer…"
-            className="flex-1 bg-transparent outline-none text-white placeholder:text-muted"
+            className="flex-1 bg-transparent outline-none text-[#1A1A1A] placeholder:text-muted"
           />
         </div>
       </div>
 
-      <div className="rounded bg-[#161616] border border-white/8 overflow-x-auto">
+      <div className="rounded-lg bg-white shadow-card border border-[#E5E5E5] overflow-x-auto">
         <table className="w-full min-w-[720px]">
-          <thead className="bg-[#121212] text-[10px] uppercase tracking-widest text-muted">
+          <thead className="bg-[#F4F4F4] text-[10px] uppercase tracking-widest text-muted">
             <tr>
               <th className="text-start p-4 font-medium">Dealer</th>
               <th className="text-start p-4 font-medium hidden md:table-cell">Emirate</th>
@@ -76,16 +76,16 @@ export function DealersTable({ dealers }: { dealers: AdminDealer[] }) {
             {filtered.map((d) => {
               const isVerified = verified[d.id] ?? d.isVerified;
               return (
-                <tr key={d.id} className={`border-t border-white/5 hover:bg-white/[0.02] ${busy === d.id ? "opacity-50" : ""}`}>
+                <tr key={d.id} className={`border-t border-[#E5E5E5] hover:bg-[#F8F8F8] ${busy === d.id ? "opacity-50" : ""}`}>
                   <td className="p-4">
                     <Link href={`/dealers/${d.slug}`} className="flex items-center gap-3 group">
-                      <div className="h-8 w-10 rounded-sm bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-bold text-xs">
+                      <div className="h-8 w-10 rounded-sm bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-bold text-xs">
                         {d.name.charAt(0)}
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold text-xs flex items-center gap-1 group-hover:text-[#F0CE5C] transition-colors">
+                        <div className="font-semibold text-xs text-[#1A1A1A] flex items-center gap-1 group-hover:text-[#A98F2E] transition-colors">
                           {d.name}
-                          {isVerified && <BadgeCheck className="h-3.5 w-3.5 text-[#F0CE5C]" />}
+                          {isVerified && <BadgeCheck className="h-3.5 w-3.5 text-[#C8A93E]" />}
                         </div>
                         <div className="text-xs text-muted">{d.id.slice(0, 8)}</div>
                       </div>

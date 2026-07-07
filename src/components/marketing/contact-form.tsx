@@ -7,7 +7,7 @@ import { RadialGlow } from "@/components/marketing/radial-glow";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 const inputCls =
-  "h-11 w-full rounded-sm bg-[#0A0A0A] border border-white/10 px-3 text-sm focus:outline-none focus:border-[#D4AF37]/40";
+  "h-11 w-full rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]";
 
 export function ContactForm() {
   const [loading, setLoading] = useState(false);
@@ -52,14 +52,14 @@ export function ContactForm() {
   };
 
   return (
-    <div className="rounded bg-bento-dark border border-white/8 p-5 lg:p-6 grain relative overflow-hidden">
+    <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5 lg:p-6 grain relative overflow-hidden">
       <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-30" />
       <div className="relative">
         <h2 className="text-2xl font-bold">Send us a message</h2>
 
         {done ? (
           <div className="mt-8 flex flex-col items-center text-center py-8">
-            <CheckCircle2 className="h-10 w-10 text-[#F0CE5C]" />
+            <CheckCircle2 className="h-10 w-10 text-[#C8A93E]" />
             <h3 className="mt-3 text-sm font-semibold">Thanks — message received</h3>
             <p className="mt-1 text-xs text-muted max-w-xs">
               Our team will get back to you within one business day.
@@ -110,7 +110,7 @@ export function ContactForm() {
               rows={5}
               value={form.message}
               onChange={(e) => set("message", e.target.value)}
-              className="w-full rounded-sm bg-[#0A0A0A] border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-[#D4AF37]/40"
+              className="w-full rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 py-2 text-sm focus:outline-none focus:border-[#C8A93E]"
             />
             <Button
               type="submit"

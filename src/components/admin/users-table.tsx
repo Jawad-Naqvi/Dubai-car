@@ -51,20 +51,20 @@ export function UsersTable({ users }: { users: AdminUser[] }) {
   return (
     <main className="p-5 space-y-4">
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 h-8 w-80 rounded-sm bg-[#161616] border border-white/10 px-4 text-xs">
+        <div className="flex items-center gap-2 h-8 w-80 rounded-sm bg-white border border-[#E5E5E5] px-4 text-xs">
           <Search className="h-4 w-4 text-muted" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name or email…"
-            className="flex-1 bg-transparent outline-none text-white placeholder:text-muted"
+            className="flex-1 bg-transparent outline-none text-[#1A1A1A] placeholder:text-muted"
           />
         </div>
       </div>
 
-      <div className="rounded bg-[#161616] border border-white/8 overflow-x-auto">
+      <div className="rounded-lg bg-white shadow-card border border-[#E5E5E5] overflow-x-auto">
         <table className="w-full min-w-[640px]">
-          <thead className="bg-[#121212] text-[10px] uppercase tracking-widest text-muted">
+          <thead className="bg-[#F4F4F4] text-[10px] uppercase tracking-widest text-muted">
             <tr>
               <th className="text-start p-4 font-medium">User</th>
               <th className="text-start p-4 font-medium hidden md:table-cell">Email</th>
@@ -76,14 +76,14 @@ export function UsersTable({ users }: { users: AdminUser[] }) {
             {filtered.map((u) => {
               const role = roles[u.id] ?? u.role;
               return (
-                <tr key={u.id} className={`border-t border-white/5 hover:bg-white/[0.02] ${busy === u.id ? "opacity-50" : ""}`}>
+                <tr key={u.id} className={`border-t border-[#E5E5E5] hover:bg-[#F8F8F8] ${busy === u.id ? "opacity-50" : ""}`}>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#1A1A1A] flex items-center justify-center text-xs font-bold">
+                      <div className="h-9 w-9 rounded-full bg-[#C8A93E]/10 flex items-center justify-center text-xs font-bold text-[#A98F2E]">
                         {u.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-semibold text-xs">{u.name}</div>
+                        <div className="font-semibold text-xs text-[#1A1A1A]">{u.name}</div>
                         <div className="text-xs text-muted">{u.id.slice(0, 10)}</div>
                       </div>
                     </div>
@@ -95,23 +95,23 @@ export function UsersTable({ users }: { users: AdminUser[] }) {
                   <td className="p-4">
                     <Dropdown.Root>
                       <Dropdown.Trigger asChild>
-                        <button className="inline-flex items-center gap-1 text-xs text-secondary hover:text-white">
+                        <button className="inline-flex items-center gap-1 text-xs text-secondary hover:text-[#A98F2E]">
                           Edit role <ChevronDown className="h-3 w-3" />
                         </button>
                       </Dropdown.Trigger>
                       <Dropdown.Portal>
                         <Dropdown.Content
                           align="end"
-                          className="z-50 min-w-[150px] rounded-md bg-[#161616] border border-white/10 p-1 shadow-xl text-xs"
+                          className="z-50 min-w-[150px] rounded-md bg-white border border-[#E5E5E5] p-1 shadow-card text-xs"
                         >
                           {ROLES.map((r) => (
                             <Dropdown.Item
                               key={r}
                               onClick={() => changeRole(u.id, r)}
-                              className="flex items-center justify-between px-2.5 py-2 rounded-sm cursor-pointer outline-none text-secondary data-[highlighted]:bg-white/5 capitalize"
+                              className="flex items-center justify-between px-2.5 py-2 rounded-sm cursor-pointer outline-none text-secondary data-[highlighted]:bg-[#F4F4F4] capitalize"
                             >
                               {r.replace("_", " ")}
-                              {role === r && <Check className="h-3 w-3 text-[#F0CE5C]" />}
+                              {role === r && <Check className="h-3 w-3 text-[#C8A93E]" />}
                             </Dropdown.Item>
                           ))}
                         </Dropdown.Content>

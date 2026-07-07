@@ -4,20 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-semibold tracking-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CE5C]/60 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-semibold tracking-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A93E]/50 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        gold: "bg-[#F0CE5C] text-[#1A1208] hover:bg-[#FFE08A]",
+        gold: "bg-[#C8A93E] text-white shadow-sm hover:bg-[#B4972F]",
         gold_outline:
-          "border border-[#D4AF37]/50 text-[#F0CE5C] hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]",
+          "border border-[#C8A93E]/60 text-[#A98F2E] bg-white hover:bg-[#C8A93E]/10 hover:border-[#C8A93E]",
         ghost:
-          "border border-white/15 text-white hover:bg-white/5 hover:border-white/30",
-        dark: "bg-[#161616] text-white border border-white/10 hover:border-white/25",
+          "border border-[#E5E5E5] bg-white text-[#1A1A1A] hover:bg-[#F4F4F4] hover:border-[#D4D4D4]",
+        dark: "bg-[#1A1A1A] text-white border border-[#1A1A1A] hover:bg-[#333333]",
         emerald:
-          "bg-[#1A1A1A] text-white border border-[#D4AF37]/30 hover:bg-[#1F1F1F]",
-        link: "text-[#F0CE5C] underline-offset-4 hover:underline",
-        danger: "bg-[#EF4444] text-white hover:bg-[#DC2626]",
+          "bg-white text-[#1A1A1A] border border-[#E5E5E5] hover:bg-[#F4F4F4]",
+        link: "text-[#A98F2E] underline-offset-4 hover:underline",
+        danger: "bg-[#DC2626] text-white hover:bg-[#B91C1C]",
       },
       size: {
         xs: "h-7 px-2.5 text-[11px] rounded-sm",

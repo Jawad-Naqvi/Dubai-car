@@ -54,10 +54,10 @@ export default async function AboutPage({
             {principles.map((p) => (
               <div
                 key={p.title}
-                className="rounded bg-[#161616] border border-white/8 p-4 hover:border-[#D4AF37]/30 transition-colors"
+                className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4 hover:border-[#C8A93E]/30 hover:shadow-card-hover transition-colors"
               >
-                <div className="h-12 w-12 rounded-sm bg-[#D4AF37]/15 ring-1 ring-[#D4AF37]/30 flex items-center justify-center mb-5">
-                  <p.icon className="h-5 w-5 text-[#F0CE5C]" />
+                <div className="h-12 w-12 rounded-lg bg-[#C8A93E]/10 ring-1 ring-[#C8A93E]/30 flex items-center justify-center mb-5">
+                  <p.icon className="h-5 w-5 text-[#C8A93E]" />
                 </div>
                 <h3 className="font-semibold text-sm">{p.title}</h3>
                 <p className="mt-2 text-sm text-secondary leading-relaxed">
@@ -73,13 +73,13 @@ export default async function AboutPage({
         <div className="mx-auto max-w-7xl px-6 lg:px-6">
           <div className="grid grid-cols-12 gap-5 auto-rows-[240px]">
             <BentoCard variant="gold" className="col-span-12 md:col-span-7 row-span-2">
-              <Eyebrow className="bg-[#1A1208]/10 text-[#1A1208] ring-[#1A1208]/30">
+              <Eyebrow className="bg-white/10 text-white ring-white/30">
                 MARKET POSITION
               </Eyebrow>
-              <BentoTitle className="text-[#1A1208] mt-6">
+              <BentoTitle className="text-white mt-6">
                 None of the incumbent platforms own both yard-self-service and B2B export.
               </BentoTitle>
-              <p className="mt-4 text-[#1A1208]/80 max-w-md">
+              <p className="mt-4 text-white/80 max-w-md">
                 Dubizzle is too general. YallaMotor is content-heavy.
                 DubiCars lacks export. Kavak is retail. We sit at the intersection
                 — purpose-built for the yards and importers Dubai's market
@@ -99,7 +99,7 @@ export default async function AboutPage({
             </BentoCard>
 
             <BentoCard variant="emerald" className="col-span-12 md:col-span-5">
-              <div className="text-sm font-bold text-[#F0CE5C]">+42%</div>
+              <div className="text-sm font-bold text-[#C8A93E]">+42%</div>
               <p className="mt-3 text-sm text-secondary">
                 Increase in online car demand in the UAE in H1 2025 vs H1 2024.
                 <br />

@@ -76,10 +76,10 @@ export function DashboardSidebar({
   };
 
   return (
-    <aside className="hidden lg:flex w-64 flex-col bg-[#121212] border-e border-white/5 min-h-screen sticky top-0">
-      <div className="p-5 border-b border-white/5">
+    <aside className="hidden lg:flex w-64 flex-col bg-white border-e border-[#E5E5E5] min-h-screen sticky top-0">
+      <div className="p-5 border-b border-[#E5E5E5]">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-sm bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-black text-xs">
+          <div className="h-9 w-9 rounded-sm bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-black text-xs">
             DXB
           </div>
           <span className="font-bold">{brand.name}</span>
@@ -100,8 +100,8 @@ export function DashboardSidebar({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-sm text-xs transition-colors",
                   isActive
-                    ? "bg-[#D4AF37]/15 text-[#F0CE5C] ring-1 ring-[#D4AF37]/30"
-                    : "text-secondary hover:bg-white/5 hover:text-white",
+                    ? "bg-[#C8A93E]/10 text-[#A98F2E] ring-1 ring-[#C8A93E]/30"
+                    : "text-secondary hover:bg-[#F4F4F4] hover:text-[#1A1A1A]",
                 )}
               >
                 <item.icon className="h-4 w-4" />
@@ -112,11 +112,11 @@ export function DashboardSidebar({
         </nav>
       </div>
 
-      <div className="mt-auto p-4 border-t border-white/5">
+      <div className="mt-auto p-4 border-t border-[#E5E5E5]">
         {isAdmin ? (
           <button
             onClick={lockAdmin}
-            className="flex w-full items-center gap-3 px-3 py-2 rounded-sm text-xs text-secondary hover:bg-white/5 hover:text-white"
+            className="flex w-full items-center gap-3 px-3 py-2 rounded-sm text-xs text-secondary hover:bg-[#F4F4F4] hover:text-[#1A1A1A]"
           >
             <Lock className="h-4 w-4" />
             Lock admin
@@ -124,7 +124,7 @@ export function DashboardSidebar({
         ) : (
           <Link
             href="/dashboard/settings"
-            className="flex items-center gap-3 px-3 py-2 rounded-sm text-xs text-secondary hover:bg-white/5"
+            className="flex items-center gap-3 px-3 py-2 rounded-sm text-xs text-secondary hover:bg-[#F4F4F4]"
           >
             <Settings className="h-4 w-4" />
             Settings

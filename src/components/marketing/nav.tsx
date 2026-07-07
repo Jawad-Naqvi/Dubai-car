@@ -27,11 +27,11 @@ function CountIcon({
       href={href}
       aria-label={label}
       title={label}
-      className="relative inline-flex h-8 w-8 items-center justify-center rounded-sm text-secondary hover:text-white hover:bg-white/5 transition-colors"
+      className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg text-secondary hover:text-[#1A1A1A] hover:bg-[#F4F4F4] transition-colors"
     >
       {children}
       {count > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] px-1 rounded-full bg-[#F0CE5C] text-[#1A1208] text-[9px] font-bold flex items-center justify-center">
+        <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] px-1 rounded-full bg-[#C8A93E] text-white text-[9px] font-bold flex items-center justify-center">
           {count}
         </span>
       )}
@@ -62,13 +62,13 @@ export function Nav() {
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0A0A0A]/85 border-b border-white/5">
-      <div className="mx-auto max-w-7xl px-4 lg:px-6 h-12 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white border-b border-[#E5E5E5] shadow-nav">
+      <div className="mx-auto max-w-7xl px-4 lg:px-6 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
-          <div className="h-6 w-6 rounded-sm bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-black text-[10px]">
+          <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-black text-[10px]">
             DXB
           </div>
-          <span className="text-white font-bold text-sm tracking-tight group-hover:text-[#F0CE5C] transition-colors">
+          <span className="text-[#1A1A1A] font-bold text-base tracking-tight group-hover:text-[#A98F2E] transition-colors">
             {brand.name}
           </span>
         </Link>
@@ -78,7 +78,7 @@ export function Nav() {
             <Link
               key={item.key}
               href={item.href}
-              className="px-3 py-1.5 text-xs text-secondary hover:text-white transition-colors rounded-sm hover:bg-white/5"
+              className="px-3 py-2 text-sm font-medium text-secondary hover:text-[#1A1A1A] transition-colors rounded-lg hover:bg-[#F4F4F4]"
             >
               {t(item.key)}
             </Link>
@@ -89,23 +89,23 @@ export function Nav() {
           <button
             onClick={switchLocale}
             suppressHydrationWarning
-            className="hidden md:inline-flex items-center gap-1 text-[11px] text-secondary hover:text-white px-2 py-1 rounded-sm hover:bg-white/5 transition-colors"
+            className="hidden md:inline-flex items-center gap-1 text-xs font-medium text-secondary hover:text-[#1A1A1A] px-2 py-1.5 rounded-lg hover:bg-[#F4F4F4] transition-colors"
           >
             <Globe className="h-3 w-3" />
             {locale === "en" ? "AR" : "EN"}
           </button>
 
           <CountIcon href="/compare" count={compareCount} label="Compare">
-            <GitCompare className="h-3.5 w-3.5" />
+            <GitCompare className="h-4 w-4" />
           </CountIcon>
           <CountIcon href="/saved" count={savedCount} label="Saved cars">
-            <Heart className="h-3.5 w-3.5" />
+            <Heart className="h-4 w-4" />
           </CountIcon>
 
           <SignedOut>
             <Link
               href="/sign-in"
-              className="hidden md:inline-flex text-xs text-secondary hover:text-white px-2 py-1 transition-colors"
+              className="hidden md:inline-flex text-sm font-medium text-secondary hover:text-[#1A1A1A] px-2.5 py-1.5 transition-colors"
             >
               {t("signIn")}
             </Link>
@@ -117,14 +117,14 @@ export function Nav() {
           <SignedIn>
             <Link
               href="/dashboard"
-              className="hidden md:inline-flex text-xs text-secondary hover:text-white px-2 py-1 transition-colors"
+              className="hidden md:inline-flex text-sm font-medium text-secondary hover:text-[#1A1A1A] px-2.5 py-1.5 transition-colors"
             >
               Dashboard
             </Link>
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "h-7 w-7 ring-1 ring-[#D4AF37]/30",
+                  avatarBox: "h-7 w-7 ring-1 ring-[#C8A93E]/40",
                 },
               }}
             />
@@ -133,7 +133,7 @@ export function Nav() {
           <button
             onClick={() => setOpen(!open)}
             suppressHydrationWarning
-            className="lg:hidden h-8 w-8 rounded-sm border border-white/10 flex items-center justify-center"
+            className="lg:hidden h-9 w-9 rounded-lg border border-[#E5E5E5] text-[#1A1A1A] flex items-center justify-center hover:bg-[#F4F4F4]"
             aria-label="Menu"
           >
             {open ? <X className="h-3.5 w-3.5" /> : <Menu className="h-3.5 w-3.5" />}
@@ -142,14 +142,14 @@ export function Nav() {
       </div>
 
       {open && (
-        <div className="lg:hidden border-t border-white/5 bg-[#0A0A0A]/95 backdrop-blur-xl">
+        <div className="lg:hidden border-t border-[#E5E5E5] bg-white shadow-nav">
           <div className="max-w-7xl mx-auto px-4 py-2 flex flex-col">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="px-2 py-2.5 text-sm text-secondary hover:text-white border-b border-white/5"
+                className="px-2 py-3 text-sm font-medium text-secondary hover:text-[#1A1A1A] border-b border-[#E5E5E5]"
               >
                 {t(item.key)}
               </Link>
@@ -159,7 +159,7 @@ export function Nav() {
                 switchLocale();
                 setOpen(false);
               }}
-              className="mt-2 inline-flex items-center gap-2 px-2 py-2 text-xs text-secondary hover:text-white"
+              className="mt-2 inline-flex items-center gap-2 px-2 py-2 text-sm font-medium text-secondary hover:text-[#1A1A1A]"
             >
               <Globe className="h-3.5 w-3.5" />
               {locale === "en" ? "العربية" : "English"}

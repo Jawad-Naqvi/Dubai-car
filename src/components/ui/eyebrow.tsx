@@ -10,10 +10,10 @@ export function Eyebrow({
   tone?: "gold" | "emerald" | "white";
 }) {
   const toneClasses = {
-    gold: "bg-[#D4AF37]/10 ring-[#D4AF37]/30 text-[#F0CE5C]",
-    // legacy aliases — kept so existing callsites compile; now neutral white-on-grey
-    emerald: "bg-white/5 ring-white/20 text-white",
-    white: "bg-white/5 ring-white/20 text-white",
+    gold: "bg-[#C8A93E]/12 ring-[#C8A93E]/30 text-[#A98F2E]",
+    // legacy aliases — kept so existing callsites compile; neutral grey on light
+    emerald: "bg-[#F4F4F4] ring-[#E5E5E5] text-secondary",
+    white: "bg-[#F4F4F4] ring-[#E5E5E5] text-secondary",
   };
   return (
     <span

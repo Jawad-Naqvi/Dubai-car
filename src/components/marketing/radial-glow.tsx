@@ -11,9 +11,9 @@ export function RadialGlow({
   size?: "sm" | "md" | "lg" | "xl";
 }) {
   const colors = {
-    gold: "bg-[#D4AF37]",
-    emerald: "bg-white",
-    white: "bg-white",
+    gold: "bg-[#C8A93E]",
+    emerald: "bg-[#C8A93E]",
+    white: "bg-[#E5E5E5]",
   };
   const sizes = {
     sm: "w-48 h-48",
@@ -25,7 +25,7 @@ export function RadialGlow({
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute rounded-full opacity-15 blur-3xl animate-pulse-glow",
+        "pointer-events-none absolute rounded-full opacity-[0.07] blur-3xl animate-pulse-glow",
         colors[color],
         sizes[size],
         className,
@@ -39,12 +39,12 @@ export function StarField({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute inset-0 opacity-40",
+        "pointer-events-none absolute inset-0 opacity-50",
         className,
       )}
       style={{
         backgroundImage:
-          "radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0, transparent 50%), radial-gradient(1px 1px at 75% 60%, rgba(212,175,55,0.4) 0, transparent 50%), radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.3) 0, transparent 50%), radial-gradient(1px 1px at 90% 15%, rgba(212,175,55,0.4) 0, transparent 50%), radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,0.3) 0, transparent 50%)",
+          "radial-gradient(1px 1px at 20% 30%, rgba(200,169,62,0.18) 0, transparent 50%), radial-gradient(1px 1px at 75% 60%, rgba(0,0,0,0.05) 0, transparent 50%), radial-gradient(1.5px 1.5px at 40% 80%, rgba(200,169,62,0.14) 0, transparent 50%), radial-gradient(1px 1px at 90% 15%, rgba(0,0,0,0.05) 0, transparent 50%), radial-gradient(1px 1px at 10% 70%, rgba(200,169,62,0.12) 0, transparent 50%)",
         backgroundSize: "600px 600px",
       }}
     />

@@ -38,14 +38,14 @@ export default async function SellPage({
       <section className="relative pt-12 pb-24 overflow-hidden">
         <RadialGlow color="gold" size="xl" className="-top-40 -left-40 opacity-30" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
-          <div className="relative rounded bg-hero-panel ring-1 ring-[#D4AF37]/25 px-5 py-8 lg:px-6 lg:py-10 grain overflow-hidden">
+          <div className="relative rounded bg-hero-panel ring-1 ring-[#C8A93E]/25 px-5 py-8 lg:px-6 lg:py-10 grain overflow-hidden">
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 items-center">
               <div>
                 <Eyebrow tone="gold">LIST YOUR CAR</Eyebrow>
                 <h1 className="mt-6 text-sm lg:text-2xl font-bold tracking-tight leading-[1.05]">
                   Sell your car in Dubai — typically within 19 days.
                 </h1>
-                <p className="mt-6 text-sm text-[#C4D1CB] max-w-xl leading-relaxed">
+                <p className="mt-6 text-sm text-secondary max-w-xl leading-relaxed">
                   Free listings. Reach 2M+ buyers across the UAE. WhatsApp leads
                   delivered straight to your phone.
                 </p>
@@ -96,12 +96,12 @@ export default async function SellPage({
             {steps.map((s, i) => (
               <div
                 key={s.title}
-                className="rounded bg-[#161616] border border-white/8 p-4 relative overflow-hidden hover:border-[#D4AF37]/30 transition-colors"
+                className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4 relative overflow-hidden hover:shadow-card-hover hover:border-[#C8A93E]/30 transition-colors"
               >
                 <div className="text-2xl font-bold text-gradient-gold/30 absolute top-4 right-4 opacity-30">
                   0{i + 1}
                 </div>
-                <s.icon className="h-7 w-7 text-[#F0CE5C] mb-4" />
+                <s.icon className="h-7 w-7 text-[#C8A93E] mb-4" />
                 <h3 className="font-semibold">{s.title}</h3>
                 <p className="mt-2 text-sm text-secondary leading-relaxed">
                   {s.desc}
@@ -116,18 +116,18 @@ export default async function SellPage({
         <div className="mx-auto max-w-7xl px-6 lg:px-6">
           <div className="grid grid-cols-12 gap-5 auto-rows-[220px]">
             <BentoCard variant="gold" className="col-span-12 md:col-span-7 row-span-2">
-              <Wallet className="h-7 w-7 text-[#1A1208] mb-5" />
-              <BentoTitle className="text-[#1A1208]">
+              <Wallet className="h-7 w-7 text-white mb-5" />
+              <BentoTitle className="text-white">
                 Fair valuations powered by 26,000+ active listings.
               </BentoTitle>
-              <p className="mt-4 text-[#1A1208]/80 max-w-md">
+              <p className="mt-4 text-white/80 max-w-md">
                 We compare your car against every similar model on the market
                 right now — and show you the price range that gets a deal closed
                 quickly.
               </p>
             </BentoCard>
             <BentoCard variant="dark" className="col-span-12 md:col-span-5">
-              <Users className="h-7 w-7 text-[#F0CE5C] mb-4" />
+              <Users className="h-7 w-7 text-[#C8A93E] mb-4" />
               <BentoTitle className="text-sm">
                 Direct WhatsApp leads — no spam.
               </BentoTitle>
@@ -136,7 +136,7 @@ export default async function SellPage({
               </BentoDesc>
             </BentoCard>
             <BentoCard variant="emerald" className="col-span-12 md:col-span-5">
-              <Clock className="h-7 w-7 text-[#F0CE5C] mb-4" />
+              <Clock className="h-7 w-7 text-[#C8A93E] mb-4" />
               <BentoTitle className="text-sm">
                 Most cars sell within 19 days.
               </BentoTitle>

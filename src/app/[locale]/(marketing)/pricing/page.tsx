@@ -45,18 +45,18 @@ export default async function PricingPage({
                   key={tier.id}
                   className={
                     isRecommended
-                      ? "relative rounded bg-gradient-to-br from-[#D4AF37] via-[#8C7220] to-[#1A1A1A] p-[1.5px]"
-                      : "rounded bg-[#161616] border border-white/8 p-5 flex flex-col"
+                      ? "relative rounded-xl bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] p-[1.5px] shadow-card"
+                      : "rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5 flex flex-col"
                   }
                 >
                   {isRecommended ? (
-                    <div className="rounded-sm bg-[#0A0A0A] p-5 flex flex-col h-full relative overflow-hidden">
+                    <div className="rounded-[10px] bg-white p-5 flex flex-col h-full relative overflow-hidden">
                       <RadialGlow color="gold" size="sm" className="-top-6 -right-10 opacity-40" />
                       <div className="relative flex flex-col h-full">
                         <Badge tone="featured" className="self-start mb-4">
                           {t("recommended")}
                         </Badge>
-                        <Icon className="h-6 w-6 text-[#F0CE5C] mb-3" />
+                        <Icon className="h-6 w-6 text-[#C8A93E] mb-3" />
                         <h3 className="text-sm font-bold">{tier.name}</h3>
                         <div className="mt-4">
                           <span className="text-sm font-bold text-gradient-gold">
@@ -76,7 +76,7 @@ export default async function PricingPage({
                         <ul className="mt-6 space-y-3 flex-1">
                           {tier.features.map((f) => (
                             <li key={f} className="flex items-start gap-2 text-sm text-secondary">
-                              <CheckCircle2 className="h-4 w-4 text-[#F0CE5C] flex-shrink-0 mt-0.5" />
+                              <CheckCircle2 className="h-4 w-4 text-[#C8A93E] flex-shrink-0 mt-0.5" />
                               <span>{f}</span>
                             </li>
                           ))}
@@ -88,7 +88,7 @@ export default async function PricingPage({
                     </div>
                   ) : (
                     <>
-                      <Icon className="h-6 w-6 text-[#F0CE5C] mb-3" />
+                      <Icon className="h-6 w-6 text-[#C8A93E] mb-3" />
                       <h3 className="text-sm font-bold">{tier.name}</h3>
                       <div className="mt-4">
                         <span className="text-sm font-bold">
@@ -113,7 +113,7 @@ export default async function PricingPage({
                             key={f}
                             className="flex items-start gap-2 text-sm text-secondary"
                           >
-                            <CheckCircle2 className="h-4 w-4 text-[#F0CE5C] flex-shrink-0 mt-0.5" />
+                            <CheckCircle2 className="h-4 w-4 text-[#C8A93E] flex-shrink-0 mt-0.5" />
                             <span>{f}</span>
                           </li>
                         ))}
@@ -150,7 +150,7 @@ export default async function PricingPage({
               ].map((a) => (
                 <div
                   key={a.name}
-                  className="rounded bg-[#161616] border border-white/8 p-6"
+                  className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-6"
                 >
                   <h3 className="font-semibold">{a.name}</h3>
                   <div className="mt-3 text-sm font-bold text-gradient-gold">

@@ -74,9 +74,9 @@ export default async function DealerOverview() {
           {kpis.map((k) => (
             <div
               key={k.label}
-              className="rounded-sm bg-[#161616] border border-white/8 p-5 hover:border-[#D4AF37]/30 transition-colors"
+              className="rounded-lg bg-white border border-[#E5E5E5] shadow-card p-5 hover:border-[#C8A93E]/30 hover:shadow-card-hover transition-colors"
             >
-              <k.icon className="h-5 w-5 text-[#F0CE5C]" />
+              <k.icon className="h-5 w-5 text-[#C8A93E]" />
               <div className="mt-4 text-base font-bold tracking-tight">{k.value}</div>
               <div className="text-xs text-muted mt-1">{k.label}</div>
             </div>
@@ -85,8 +85,8 @@ export default async function DealerOverview() {
 
         <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
           {/* Leads */}
-          <div className="rounded bg-[#161616] border border-white/8 overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-white/5">
+          <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5]">
               <div>
                 <Eyebrow tone="gold">RECENT LEADS</Eyebrow>
                 <h2 className="mt-2 text-xs font-semibold">
@@ -106,7 +106,7 @@ export default async function DealerOverview() {
               </div>
             ) : (
               <table className="w-full">
-                <thead className="bg-[#121212] text-[10px] uppercase tracking-widest text-muted">
+                <thead className="bg-[#F4F4F4] text-[10px] uppercase tracking-widest text-muted">
                   <tr>
                     <th className="text-start px-4 py-3 font-medium">Buyer</th>
                     <th className="text-start px-4 py-3 font-medium">Type</th>
@@ -116,7 +116,7 @@ export default async function DealerOverview() {
                 </thead>
                 <tbody>
                   {leads.slice(0, 6).map((l) => (
-                    <tr key={l.id} className="border-t border-white/5 hover:bg-white/[0.02]">
+                    <tr key={l.id} className="border-t border-[#E5E5E5] hover:bg-[#F8F8F8]">
                       <td className="px-4 py-2.5">
                         <div className="font-semibold text-xs">{l.buyerName}</div>
                         <div className="text-xs text-muted">{timeAgo(l.createdAt)}</div>
@@ -124,7 +124,7 @@ export default async function DealerOverview() {
                       <td className="px-4 py-2.5 text-xs text-secondary">
                         {LEAD_LABELS[l.type] ?? l.type}
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-[#F0CE5C]">
+                      <td className="px-4 py-2.5 text-xs text-[#C8A93E]">
                         {l.feeAED ? formatAED(l.feeAED) : "—"}
                       </td>
                       <td className="px-4 py-2.5">
@@ -141,7 +141,7 @@ export default async function DealerOverview() {
 
           {/* Plan + quick actions */}
           <div className="space-y-5">
-            <div className="rounded bg-bento-dark border border-[#D4AF37]/25 p-4 relative overflow-hidden grain">
+            <div className="rounded-xl bg-bento-dark border border-[#C8A93E]/25 shadow-card p-4 relative overflow-hidden grain">
               <Eyebrow tone="gold">PLAN</Eyebrow>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-base font-bold">{ctx.tierName}</span>
@@ -153,9 +153,9 @@ export default async function DealerOverview() {
                 {ctx.listingsUsed} /{" "}
                 {ctx.listingQuota === Infinity ? "∞" : ctx.listingQuota} listings used
               </div>
-              <div className="mt-2 h-2 rounded-full bg-white/5 overflow-hidden">
+              <div className="mt-2 h-2 rounded-full bg-[#E5E5E5] overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F0CE5C]"
+                  className="h-full bg-[#C8A93E]"
                   style={{ width: `${quotaPct}%` }}
                 />
               </div>
@@ -164,7 +164,7 @@ export default async function DealerOverview() {
               </Button>
             </div>
 
-            <div className="rounded bg-[#161616] border border-white/8 p-4">
+            <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4">
               <h3 className="font-semibold">Quick actions</h3>
               <div className="mt-4 space-y-2">
                 <Button asChild variant="gold" size="md" className="w-full justify-start">
@@ -185,8 +185,8 @@ export default async function DealerOverview() {
         </div>
 
         {/* Top performing inventory */}
-        <div className="rounded bg-[#161616] border border-white/8 overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5]">
             <div>
               <Eyebrow tone="emerald">TOP PERFORMERS</Eyebrow>
               <h2 className="mt-2 text-xs font-semibold">Your highest-traffic listings</h2>
@@ -198,10 +198,10 @@ export default async function DealerOverview() {
               </Link>
             </Button>
           </div>
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-[#E5E5E5]">
             {topPerformers.map((l) => (
-              <div key={l.id} className="flex items-center gap-4 p-5 hover:bg-white/[0.02]">
-                <div className="relative h-14 w-20 rounded-sm overflow-hidden bg-[#121212] flex-shrink-0">
+              <div key={l.id} className="flex items-center gap-4 p-5 hover:bg-[#F8F8F8]">
+                <div className="relative h-14 w-20 rounded-sm overflow-hidden bg-[#F4F4F4] flex-shrink-0">
                   <Image src={l.imageUrl} alt="" fill sizes="80px" className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">

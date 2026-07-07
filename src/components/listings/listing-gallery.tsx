@@ -46,7 +46,7 @@ export function ListingGallery({
 
   return (
     <div>
-      <div className="relative rounded overflow-hidden bg-[#121212] border border-white/8 aspect-[16/10] group">
+      <div className="relative rounded-xl overflow-hidden bg-[#F4F4F4] border border-[#E5E5E5] shadow-card aspect-[16/10] group">
         {current ? (
           <Image
             src={current}
@@ -61,8 +61,6 @@ export function ListingGallery({
             No image
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/60 via-transparent to-transparent" />
-
         <div className="absolute top-3 left-3 flex flex-wrap gap-1">
           {badges.featured && <Badge tone="featured">Featured</Badge>}
           {badges.exportReady && <Badge tone="export">Export Ready</Badge>}
@@ -80,7 +78,7 @@ export function ListingGallery({
           <button
             onClick={share}
             aria-label="Share"
-            className="h-8 w-8 rounded-sm bg-[#0A0A0A]/80 backdrop-blur border border-white/10 flex items-center justify-center hover:border-[#D4AF37]/40"
+            className="h-8 w-8 rounded-sm bg-white/90 backdrop-blur border border-[#E5E5E5] text-[#1A1A1A] flex items-center justify-center hover:border-[#C8A93E]/40"
           >
             <Share2 className="h-3.5 w-3.5" />
           </button>
@@ -91,18 +89,18 @@ export function ListingGallery({
             <button
               onClick={() => go(-1)}
               aria-label="Previous photo"
-              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-sm bg-[#0A0A0A]/70 backdrop-blur border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:border-[#D4AF37]/40"
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-sm bg-white/90 backdrop-blur border border-[#E5E5E5] text-[#1A1A1A] flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:border-[#C8A93E]/40"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => go(1)}
               aria-label="Next photo"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-sm bg-[#0A0A0A]/70 backdrop-blur border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:border-[#D4AF37]/40"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-sm bg-white/90 backdrop-blur border border-[#E5E5E5] text-[#1A1A1A] flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:border-[#C8A93E]/40"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
-            <div className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5 rounded-sm bg-[#0A0A0A]/80 text-secondary">
+            <div className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5 rounded-sm bg-white/90 border border-[#E5E5E5] text-[#1A1A1A]">
               {active + 1} / {safe.length}
             </div>
           </>
@@ -115,9 +113,9 @@ export function ListingGallery({
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={`relative aspect-[4/3] rounded-sm overflow-hidden bg-[#121212] border ${
-                i === active ? "border-[#D4AF37]" : "border-white/8"
-              } hover:border-[#D4AF37]/40`}
+              className={`relative aspect-[4/3] rounded-sm overflow-hidden bg-[#F4F4F4] border ${
+                i === active ? "border-[#C8A93E]" : "border-[#E5E5E5]"
+              } hover:border-[#C8A93E]/40`}
             >
               {src && (
                 <Image

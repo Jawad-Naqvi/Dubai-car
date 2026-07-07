@@ -29,16 +29,16 @@ export default async function AdminRevenuePage() {
             { label: "Active subscriptions", value: String(activeSubs) },
             { label: "ARPU", value: formatAED(arpu) },
           ].map((k) => (
-            <div key={k.label} className="rounded-sm bg-[#161616] border border-white/8 p-5">
+            <div key={k.label} className="rounded-lg bg-white shadow-card border border-[#E5E5E5] p-5">
               <div className="text-base font-bold text-gradient-gold">{k.value}</div>
               <div className="text-xs text-muted mt-2">{k.label}</div>
             </div>
           ))}
         </div>
 
-        <div className="rounded bg-[#161616] border border-white/8 p-4">
+        <div className="rounded-lg bg-white shadow-card border border-[#E5E5E5] p-4">
           <Eyebrow tone="gold">MRR TREND</Eyebrow>
-          <h3 className="mt-3 text-xs font-semibold">Last 6 months (projected)</h3>
+          <h3 className="mt-3 text-xs font-semibold text-[#1A1A1A]">Last 6 months (projected)</h3>
           <div className="mt-6 flex items-end justify-between gap-3 h-64 px-2">
             {trend.map((m) => (
               <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
@@ -46,7 +46,7 @@ export default async function AdminRevenuePage() {
                   {formatAED(m.value)}
                 </div>
                 <div
-                  className="w-full rounded-t-lg bg-gradient-to-t from-[#8C7220] via-[#D4AF37] to-[#F0CE5C]"
+                  className="w-full rounded-t-lg bg-gradient-to-t from-[#A98F2E] to-[#D8B84E]"
                   style={{ height: `${(m.value / max) * 80}%` }}
                 />
                 <div className="text-xs text-muted">{m.month}</div>
@@ -56,16 +56,16 @@ export default async function AdminRevenuePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <div className="rounded bg-[#161616] border border-white/8 p-4">
+          <div className="rounded-lg bg-white shadow-card border border-[#E5E5E5] p-4">
             <Eyebrow tone="emerald">SUBSCRIPTION SPLIT</Eyebrow>
             <div className="mt-5 space-y-3">
               {revenue.subscriptionSplit.map((row) => (
                 <div
                   key={row.tier}
-                  className="flex items-center justify-between py-3 border-b border-white/5 last:border-0"
+                  className="flex items-center justify-between py-3 border-b border-[#E5E5E5] last:border-0"
                 >
                   <div>
-                    <div className="font-semibold text-xs">{row.tier}</div>
+                    <div className="font-semibold text-xs text-[#1A1A1A]">{row.tier}</div>
                     <div className="text-xs text-muted">
                       {row.count} {row.count === 1 ? "dealer" : "dealers"}
                     </div>
@@ -76,7 +76,7 @@ export default async function AdminRevenuePage() {
             </div>
           </div>
 
-          <div className="rounded bg-[#161616] border border-white/8 p-4">
+          <div className="rounded-lg bg-white shadow-card border border-[#E5E5E5] p-4">
             <Eyebrow tone="gold">REVENUE STREAMS</Eyebrow>
             <div className="mt-5 space-y-3">
               {revenue.streams.map((s) => {
@@ -84,12 +84,12 @@ export default async function AdminRevenuePage() {
                 return (
                   <div key={s.label}>
                     <div className="flex justify-between text-xs mb-1.5">
-                      <span className="font-semibold">{s.label}</span>
-                      <span className="text-[#F0CE5C]">{formatAED(s.amount)}</span>
+                      <span className="font-semibold text-[#1A1A1A]">{s.label}</span>
+                      <span className="text-[#C8A93E]">{formatAED(s.amount)}</span>
                     </div>
-                    <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                    <div className="h-2 rounded-full bg-[#F4F4F4] overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F0CE5C]"
+                        className="h-full bg-gradient-to-r from-[#D8B84E] to-[#A98F2E]"
                         style={{ width: `${Math.round((s.amount / maxAmt) * 100)}%` }}
                       />
                     </div>

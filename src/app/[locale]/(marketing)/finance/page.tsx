@@ -40,7 +40,7 @@ export default function FinancePage() {
           </div>
 
           <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="rounded bg-[#161616] border border-white/8 p-5">
+            <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5">
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -54,7 +54,7 @@ export default function FinancePage() {
                     step={5000}
                     value={price}
                     onChange={(e) => setPrice(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#C8A93E]"
                   />
                 </div>
                 <div>
@@ -68,7 +68,7 @@ export default function FinancePage() {
                     max={50}
                     value={down}
                     onChange={(e) => setDown(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#C8A93E]"
                   />
                 </div>
                 <div>
@@ -82,7 +82,7 @@ export default function FinancePage() {
                     max={7}
                     value={years}
                     onChange={(e) => setYears(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#C8A93E]"
                   />
                 </div>
                 <div>
@@ -97,16 +97,16 @@ export default function FinancePage() {
                     step={0.1}
                     value={apr}
                     onChange={(e) => setApr(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#C8A93E]"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="rounded bg-bento-dark border border-[#D4AF37]/25 p-5 relative overflow-hidden grain">
+            <div className="rounded-xl bg-white border border-[#C8A93E]/25 shadow-card p-5 relative overflow-hidden grain">
               <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-40" />
               <div className="relative">
-                <Calculator className="h-6 w-6 text-[#F0CE5C]" />
+                <Calculator className="h-6 w-6 text-[#C8A93E]" />
                 <div className="mt-4 text-sm text-secondary">Monthly payment</div>
                 <div className="mt-2 text-sm lg:text-2xl font-bold text-gradient-gold leading-none">
                   {formatAED(emi)}
@@ -121,7 +121,7 @@ export default function FinancePage() {
                   ].map((r) => (
                     <div
                       key={r.label}
-                      className="flex justify-between text-sm border-b border-white/5 pb-2"
+                      className="flex justify-between text-sm border-b border-[#E5E5E5] pb-2"
                     >
                       <span className="text-secondary">{r.label}</span>
                       <span className="font-semibold">{r.value}</span>
@@ -146,9 +146,9 @@ export default function FinancePage() {
               {banks.map((b) => (
                 <div
                   key={b.name}
-                  className="rounded bg-[#161616] border border-white/8 p-6 hover:border-[#D4AF37]/30 transition-colors"
+                  className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-6 hover:border-[#C8A93E]/30 hover:shadow-card-hover transition-colors"
                 >
-                  <div className="h-12 w-12 rounded-sm bg-gradient-to-br from-[#D4AF37]/30 to-[#1A1A1A] flex items-center justify-center text-xs font-bold mb-4">
+                  <div className="h-12 w-12 rounded-sm bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] text-white flex items-center justify-center text-xs font-bold mb-4">
                     {b.logo}
                   </div>
                   <h3 className="font-semibold">{b.name}</h3>

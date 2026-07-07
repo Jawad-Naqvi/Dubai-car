@@ -32,10 +32,10 @@ export default async function BillingPage() {
           />
 
           {/* Payment method */}
-          <div className="rounded bg-[#161616] border border-white/8 p-7">
+          <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-7">
             <Eyebrow tone="emerald">PAYMENT METHOD</Eyebrow>
             <div className="mt-4 flex items-center gap-4">
-              <div className="h-12 w-16 rounded-sm bg-gradient-to-br from-[#1A1A1A] to-[#D4AF37] flex items-center justify-center">
+              <div className="h-12 w-16 rounded-sm bg-gradient-to-br from-[#1A1A1A] to-[#C8A93E] flex items-center justify-center">
                 <CreditCard className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -50,8 +50,8 @@ export default async function BillingPage() {
         </div>
 
         {/* Invoices */}
-        <div className="rounded bg-[#161616] border border-white/8 overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5]">
             <div>
               <Eyebrow tone="gold">INVOICES</Eyebrow>
               <h2 className="mt-2 text-xs font-semibold">Billing history</h2>
@@ -64,7 +64,7 @@ export default async function BillingPage() {
             <div className="p-8 text-center text-xs text-muted">No invoices yet.</div>
           ) : (
             <table className="w-full">
-              <thead className="bg-[#121212] text-[10px] uppercase tracking-widest text-muted">
+              <thead className="bg-[#F4F4F4] text-[10px] uppercase tracking-widest text-muted">
                 <tr>
                   <th className="text-start p-4 font-medium">Invoice</th>
                   <th className="text-start p-4 font-medium">Description</th>
@@ -75,7 +75,7 @@ export default async function BillingPage() {
               </thead>
               <tbody>
                 {invoices.map((inv) => (
-                  <tr key={inv.id} className="border-t border-white/5 hover:bg-white/[0.02]">
+                  <tr key={inv.id} className="border-t border-[#E5E5E5] hover:bg-[#F8F8F8]">
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <Receipt className="h-4 w-4 text-muted" />

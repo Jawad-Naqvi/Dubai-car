@@ -17,32 +17,32 @@ export default function AnalyticsPage() {
           ].map((k) => (
             <div
               key={k.label}
-              className="rounded-sm bg-[#161616] border border-white/8 p-5"
+              className="rounded-lg bg-white border border-[#E5E5E5] shadow-card p-5"
             >
-              <k.icon className="h-5 w-5 text-[#F0CE5C]" />
+              <k.icon className="h-5 w-5 text-[#C8A93E]" />
               <div className="mt-4 text-base font-bold">{k.value}</div>
               <div className="flex items-center justify-between mt-1">
                 <div className="text-xs text-muted">{k.label}</div>
-                <div className="text-xs text-[#F0CE5C]">{k.delta}</div>
+                <div className="text-xs text-[#C8A93E]">{k.delta}</div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Chart placeholder */}
-        <div className="rounded bg-[#161616] border border-white/8 p-4">
+        <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4">
           <Eyebrow tone="gold">VIEWS & LEADS TREND</Eyebrow>
           <h3 className="mt-3 text-xs font-semibold">Last 30 days</h3>
           <div className="mt-6 h-64 relative">
             <svg viewBox="0 0 600 200" className="w-full h-full">
               <defs>
                 <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#C8A93E" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#C8A93E" stopOpacity="0" />
                 </linearGradient>
                 <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F0CE5C" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#F0CE5C" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#C8A93E" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#C8A93E" stopOpacity="0" />
                 </linearGradient>
               </defs>
               <path
@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
               />
               <path
                 d="M0,130 C50,120 80,95 130,105 C190,118 250,80 300,72 C360,65 410,90 470,75 C530,62 580,55 600,42"
-                stroke="#F0CE5C"
+                stroke="#C8A93E"
                 strokeWidth="2"
                 fill="none"
               />
@@ -61,18 +61,18 @@ export default function AnalyticsPage() {
               />
               <path
                 d="M0,170 C50,165 90,160 140,155 C200,150 260,145 320,140 C380,135 430,135 480,130 C530,125 570,123 600,120"
-                stroke="#F0CE5C"
+                stroke="#C8A93E"
                 strokeWidth="2"
                 fill="none"
               />
             </svg>
             <div className="absolute top-2 left-2 flex gap-4 text-xs">
               <span className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-[#F0CE5C]" />
+                <div className="h-2 w-2 rounded-full bg-[#C8A93E]" />
                 Views
               </span>
               <span className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-[#F0CE5C]" />
+                <div className="h-2 w-2 rounded-full bg-[#C8A93E]" />
                 Leads
               </span>
             </div>
@@ -111,7 +111,7 @@ export default function AnalyticsPage() {
           ].map((card) => (
             <div
               key={card.title}
-              className="rounded bg-[#161616] border border-white/8 p-4"
+              className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4"
             >
               <h3 className="font-semibold">{card.title}</h3>
               <div className="mt-5 space-y-3">
@@ -119,11 +119,11 @@ export default function AnalyticsPage() {
                   <div key={item.label}>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-secondary">{item.label}</span>
-                      <span className="text-white font-semibold">{item.value}%</span>
+                      <span className="text-[#1A1A1A] font-semibold">{item.value}%</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-[#F4F4F4] overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F0CE5C]"
+                        className="h-full bg-[#C8A93E]"
                         style={{ width: `${item.value}%` }}
                       />
                     </div>

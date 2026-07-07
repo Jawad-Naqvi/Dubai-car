@@ -32,12 +32,12 @@ export function ContactPaywall({
   return (
     <div className={cn("space-y-2", className)}>
       <SignedOut>
-        <div className="relative rounded bg-[#121212] border border-[#D4AF37]/25 p-3 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 via-transparent to-[#1A1A1A]/40 pointer-events-none" />
+        <div className="relative rounded-xl bg-white border border-[#C8A93E]/25 shadow-card p-3 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#C8A93E]/10 via-transparent to-transparent pointer-events-none" />
           <div className="relative">
             <div className="flex items-center gap-1.5 mb-2">
-              <Lock className="h-3 w-3 text-[#F0CE5C]" />
-              <span className="text-[10px] uppercase tracking-widest text-[#F0CE5C] font-semibold">
+              <Lock className="h-3 w-3 text-[#C8A93E]" />
+              <span className="text-[10px] uppercase tracking-widest text-[#A98F2E] font-semibold">
                 Unlock seller contact
               </span>
             </div>
@@ -54,7 +54,7 @@ export function ContactPaywall({
             </div>
             <Link
               href={`/sign-up?redirect_url=${encodeURIComponent(`/listings/${listingId}`)}`}
-              className="flex items-center justify-center gap-1.5 h-9 rounded-sm bg-[#F0CE5C] text-[#1A1208] text-xs font-semibold hover:bg-[#FFE08A] transition-colors w-full"
+              className="flex items-center justify-center gap-1.5 h-9 rounded-sm bg-[#C8A93E] text-white text-xs font-semibold hover:bg-[#B4972F] transition-colors w-full"
             >
               Sign up free to unlock →
             </Link>
@@ -68,7 +68,7 @@ export function ContactPaywall({
       <SignedIn>
         <a
           href={`tel:+${dealerPhone}`}
-          className="flex items-center justify-center gap-1.5 h-9 rounded-sm bg-[#F0CE5C] text-[#1A1208] text-xs font-semibold hover:bg-[#FFE08A] transition-colors w-full"
+          className="flex items-center justify-center gap-1.5 h-9 rounded-sm bg-[#C8A93E] text-white text-xs font-semibold hover:bg-[#B4972F] transition-colors w-full"
         >
           <Phone className="h-3 w-3" />
           Call seller
@@ -77,7 +77,7 @@ export function ContactPaywall({
           href={whatsappLink(dealerWhatsapp, whatsappMsg)}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 h-9 rounded-sm bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#8C7220] transition-colors w-full"
+          className="flex items-center justify-center gap-1.5 h-9 rounded-sm bg-[#1A7A4A] text-white text-xs font-semibold hover:bg-[#15633C] transition-colors w-full"
         >
           <MessageCircle className="h-3 w-3" />
           WhatsApp seller

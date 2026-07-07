@@ -10,13 +10,13 @@ type BadgeTone =
   | "neutral";
 
 const toneStyles: Record<BadgeTone, string> = {
-  verified: "bg-white/10 text-white ring-1 ring-white/30",
-  reserved: "bg-[#F59E0B]/15 text-[#FCD34D] ring-1 ring-[#F59E0B]/40",
-  new: "bg-gradient-to-r from-[#F0CE5C] to-[#D4AF37] text-[#1A1208] font-bold",
-  export: "bg-[#D4AF37]/15 text-[#F0CE5C] ring-1 ring-[#D4AF37]/50",
-  inspected: "bg-white/5 text-white ring-1 ring-white/25",
-  featured: "bg-gradient-to-r from-[#D4AF37] to-[#F0CE5C] text-[#1A1208] font-bold",
-  neutral: "bg-white/5 text-white ring-1 ring-white/10",
+  verified: "bg-[#1A7A4A] text-white shadow-sm",
+  reserved: "bg-[#B7791F]/12 text-[#8A5A12] ring-1 ring-[#B7791F]/30",
+  new: "bg-[#1B4FA0] text-white shadow-sm",
+  export: "bg-[#C8A93E] text-white shadow-sm",
+  inspected: "bg-[#1A7A4A]/12 text-[#1A7A4A] ring-1 ring-[#1A7A4A]/25",
+  featured: "bg-[#C8A93E] text-white shadow-sm",
+  neutral: "bg-[#F4F4F4] text-[#6B6B6B] ring-1 ring-[#E5E5E5]",
 };
 
 export function Badge({

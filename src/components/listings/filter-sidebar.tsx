@@ -36,12 +36,12 @@ function FilterGroup({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-white/5 py-3">
+    <div className="border-b border-[#E5E5E5] py-3">
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center justify-between w-full text-left"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-white">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#1A1A1A]">
           {title}
         </span>
         <ChevronDown
@@ -69,13 +69,13 @@ function CheckRow({
 }) {
   return (
     <label className="flex items-center justify-between cursor-pointer group">
-      <span className="flex items-center gap-1.5 text-xs text-secondary group-hover:text-white">
+      <span className="flex items-center gap-1.5 text-xs text-secondary group-hover:text-[#1A1A1A]">
         <input
           type="checkbox"
           checked={!!checked}
           onChange={(e) => onChange?.(e.target.checked)}
           suppressHydrationWarning
-          className="h-3 w-3 rounded-sm border-white/20 bg-transparent text-[#D4AF37] focus:ring-[#D4AF37]/40"
+          className="h-3 w-3 rounded-sm border-[#D4D4D4] bg-transparent text-[#C8A93E] focus:ring-[#C8A93E]/40"
         />
         {label}
       </span>
@@ -172,15 +172,15 @@ export function FilterSidebar({
 
   return (
     <aside className={cn("w-full", className)}>
-      <div className="rounded bg-[#121212] border border-white/8 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+      <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5]">
           <div className="flex items-center gap-1.5">
-            <SlidersHorizontal className="h-3 w-3 text-[#F0CE5C]" />
+            <SlidersHorizontal className="h-3 w-3 text-[#C8A93E]" />
             <span className="text-xs font-semibold">{t("title")}</span>
           </div>
           <button
             onClick={reset}
-            className="flex items-center gap-1 text-[10px] text-muted hover:text-white"
+            className="flex items-center gap-1 text-[10px] text-muted hover:text-[#1A1A1A]"
           >
             <RotateCw className="h-2.5 w-2.5" />
             {t("reset")}
@@ -221,7 +221,7 @@ export function FilterSidebar({
                 placeholder="Min"
                 inputMode="numeric"
                 suppressHydrationWarning
-                className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
+                className="h-7 rounded-sm bg-white border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder:text-muted px-2 focus:outline-none focus:border-[#C8A93E]"
               />
               <input
                 value={priceMax}
@@ -230,7 +230,7 @@ export function FilterSidebar({
                 placeholder="Max"
                 inputMode="numeric"
                 suppressHydrationWarning
-                className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
+                className="h-7 rounded-sm bg-white border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder:text-muted px-2 focus:outline-none focus:border-[#C8A93E]"
               />
             </div>
             <div className="flex flex-wrap gap-1 mt-2">
@@ -238,7 +238,7 @@ export function FilterSidebar({
                 <button
                   key={p}
                   onClick={() => setPriceMax(String(p))}
-                  className="text-[10px] px-1.5 py-0.5 rounded-sm bg-white/5 border border-white/10 text-secondary hover:border-[#D4AF37]/30"
+                  className="text-[10px] px-1.5 py-0.5 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40"
                 >
                   &lt; {p / 1000}k
                 </button>
@@ -255,7 +255,7 @@ export function FilterSidebar({
                 placeholder="From"
                 inputMode="numeric"
                 suppressHydrationWarning
-                className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
+                className="h-7 rounded-sm bg-white border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder:text-muted px-2 focus:outline-none focus:border-[#C8A93E]"
               />
               <input
                 value={yearMax}
@@ -264,7 +264,7 @@ export function FilterSidebar({
                 placeholder="To"
                 inputMode="numeric"
                 suppressHydrationWarning
-                className="h-7 rounded-sm bg-[#161616] border border-white/10 text-xs text-white placeholder:text-muted px-2 focus:outline-none focus:border-[#D4AF37]/40"
+                className="h-7 rounded-sm bg-white border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder:text-muted px-2 focus:outline-none focus:border-[#C8A93E]"
               />
             </div>
           </FilterGroup>
@@ -329,10 +329,10 @@ export function FilterSidebar({
           </div>
         </div>
 
-        <div className="p-3 border-t border-white/5">
+        <div className="p-3 border-t border-[#E5E5E5]">
           <button
             onClick={apply}
-            className="w-full h-9 rounded-sm bg-[#F0CE5C] text-[#1A1208] text-xs font-semibold hover:bg-[#FFE08A] transition-colors"
+            className="w-full h-9 rounded-lg bg-[#C8A93E] text-white text-xs font-semibold hover:bg-[#B4972F] transition-colors"
           >
             {t("apply")}
           </button>

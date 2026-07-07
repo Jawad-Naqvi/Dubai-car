@@ -12,10 +12,10 @@ export default function SignUpPage() {
 
       <div className="relative w-full max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-black text-sm">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-black text-sm">
             DXB
           </div>
-          <span className="text-white font-bold text-xl">{brand.name}</span>
+          <span className="text-[#1A1A1A] font-bold text-xl">{brand.name}</span>
         </Link>
         <SignUp appearance={{ elements: { rootBox: "mx-auto" } }} />
       </div>
