@@ -17,6 +17,13 @@ function multi(v: string | string[] | undefined): string[] | undefined {
   return cleaned.length ? cleaned : undefined;
 }
 
+function multiNum(v: string | string[] | undefined): number[] | undefined {
+  const arr = multi(v);
+  if (!arr) return undefined;
+  const nums = arr.map(Number).filter((n) => Number.isFinite(n));
+  return nums.length ? nums : undefined;
+}
+
 function num(v: string | string[] | undefined): number | undefined {
   const s = Array.isArray(v) ? v[0] : v;
   if (s == null || s === "") return undefined;
@@ -45,6 +52,12 @@ export function parseListingParams(raw: RawParams): ListingSearchParams {
     transmission: multi(raw.transmission),
     regionalSpec: multi(raw.regionalSpec),
     emirate: multi(raw.emirate),
+    condition: multi(raw.condition),
+    color: multi(raw.color),
+    interiorColor: multi(raw.interiorColor),
+    cylinders: multiNum(raw.cylinders),
+    doors: multiNum(raw.doors),
+    sellerType: str(raw.sellerType),
     priceMin: num(raw.priceMin),
     priceMax: num(raw.priceMax),
     yearMin: num(raw.yearMin),
@@ -52,6 +65,7 @@ export function parseListingParams(raw: RawParams): ListingSearchParams {
     kmsMax: num(raw.kmsMax),
     exportReady: bool(raw.exportReady),
     inspected: bool(raw.inspected),
+    withPhotos: bool(raw.withPhotos),
     featured: bool(raw.featured),
     dealerSlug: str(raw.dealerSlug),
     sort: sortRaw && SORTS.includes(sortRaw) ? sortRaw : undefined,

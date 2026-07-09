@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { ListingCard } from "@/components/listings/listing-card";
 import { FilterSidebar } from "@/components/listings/filter-sidebar";
+import { ActiveFilters } from "@/components/listings/active-filters";
 import {
   ListingSearchBar,
   ListingSortBar,
@@ -48,7 +49,11 @@ export default async function BuyPage({
 
       <div className="mx-auto max-w-7xl px-4 lg:px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-5">
-          <FilterSidebar className="hidden lg:block" facets={result.facets} />
+          <FilterSidebar
+            className="hidden lg:block"
+            facets={result.facets}
+            total={result.total}
+          />
 
           <div>
             {/* Toolbar */}
@@ -66,6 +71,8 @@ export default async function BuyPage({
               </div>
               <ListingSortBar />
             </div>
+
+            <ActiveFilters />
 
             {/* Listing grid */}
             {result.items.length > 0 ? (
