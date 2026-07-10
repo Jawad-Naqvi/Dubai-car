@@ -42,7 +42,7 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap"
         />
         {isRTL && (
           <link
@@ -55,19 +55,19 @@ export default async function LocaleLayout({
         className="bg-page text-[#1A1A1A] antialiased"
         style={{
           fontFamily: isRTL
-            ? '"Tajawal", "Inter", ui-sans-serif, system-ui, sans-serif'
-            : '"Inter", "Tajawal", ui-sans-serif, system-ui, sans-serif',
+            ? '"Tajawal", "DM Sans", ui-sans-serif, system-ui, sans-serif'
+            : '"DM Sans", "Tajawal", ui-sans-serif, system-ui, sans-serif',
         }}
       >
         <ClerkProvider
           appearance={{
             variables: {
-              colorPrimary: "#C8A93E",
+              colorPrimary: "#141414",
               colorBackground: "#FFFFFF",
               colorInputBackground: "#FFFFFF",
-              colorInputText: "#1A1A1A",
-              colorText: "#1A1A1A",
-              borderRadius: "0.75rem",
+              colorInputText: "#141414",
+              colorText: "#141414",
+              borderRadius: "1rem",
             },
           }}
         >
@@ -79,7 +79,7 @@ export default async function LocaleLayout({
               toastOptions={{
                 style: {
                   background: "#FFFFFF",
-                  border: "1px solid #E5E5E5",
+                  border: "1px solid #E7E4DA",
                   color: "#1A1A1A",
                 },
               }}

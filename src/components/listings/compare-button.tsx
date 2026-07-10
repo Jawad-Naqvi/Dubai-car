@@ -22,10 +22,10 @@ export function CompareButton({
         onClick={() => toggle(listingId)}
         suppressHydrationWarning
         className={cn(
-          "flex items-center justify-center gap-1.5 h-9 rounded-sm border text-xs font-semibold transition-colors",
+          "flex items-center justify-center gap-1.5 h-9 rounded-full border text-xs font-semibold transition-colors",
           active
-            ? "border-[#C8A93E]/50 bg-[#C8A93E]/10 text-[#A98F2E]"
-            : "border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40 hover:text-[#1A1A1A]",
+            ? "border-[#F0941F]/50 bg-[#F0941F]/10 text-[#C97612]"
+            : "border-[#141414]/20 text-[#141414] hover:bg-[#F3F1E9]",
           className,
         )}
       >
@@ -46,10 +46,10 @@ export function CompareButton({
       title="Compare"
       suppressHydrationWarning
       className={cn(
-        "h-7 w-7 rounded-lg bg-white/90 backdrop-blur border flex items-center justify-center transition-colors",
+        "h-7 w-7 rounded-full bg-white/90 backdrop-blur border flex items-center justify-center transition-colors",
         active
-          ? "border-[#C8A93E]/50 text-[#C8A93E]"
-          : "border-[#E5E5E5] text-[#1A1A1A] hover:border-[#C8A93E]/40",
+          ? "border-[#F0941F]/50 text-[#F0941F]"
+          : "border-[#E7E4DA] text-[#141414] hover:bg-white",
         className,
       )}
     >

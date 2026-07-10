@@ -22,8 +22,8 @@ export default async function DealersPage({
         <RadialGlow color="gold" size="lg" className="-top-20 -right-20 opacity-20" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
           <Eyebrow tone="gold">VERIFIED DEALER DIRECTORY</Eyebrow>
-          <h1 className="mt-6 text-sm lg:text-2xl font-bold tracking-tight leading-[1.05] max-w-3xl">
-            {dealers.length} verified yards across the UAE
+          <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05] max-w-3xl">
+            {dealers.length} <span className="font-extrabold">verified yards</span> across the UAE
           </h1>
           <p className="mt-6 text-sm text-secondary max-w-xl">
             All dealers carry valid trade licenses and pass our verification
@@ -39,10 +39,9 @@ export default async function DealersPage({
               <Link
                 key={d.id}
                 href={`/dealers/${d.slug}`}
-                className="group rounded-xl bg-white border border-[#E5E5E5] overflow-hidden shadow-card hover:shadow-card-hover hover:border-[#C8A93E]/40 transition-all hover:-translate-y-1"
+                className="group rounded-3xl bg-white border border-[#E7E4DA] overflow-hidden shadow-card hover:shadow-card-hover hover:border-[#D8D4C6] transition-all hover:-translate-y-1"
               >
-                <div className="aspect-[16/9] bg-[#F4F4F4] relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.3),transparent_55%)]" />
+                <div className="aspect-[16/9] bg-[#FBE7D4] relative overflow-hidden">
                   {d.isFeatured && (
                     <Badge tone="featured" className="absolute top-3 left-3">
                       Featured
@@ -50,23 +49,23 @@ export default async function DealersPage({
                   )}
                 </div>
                 <div className="p-6 -mt-10 relative">
-                  <div className="h-16 w-16 rounded-sm bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-bold text-sm border-4 border-white">
+                  <div className="h-16 w-16 rounded-full bg-[#181C30] flex items-center justify-center text-white font-bold text-sm border-4 border-white">
                     {d.name.charAt(0)}
                   </div>
                   <div className="mt-4 flex items-center gap-1.5">
-                    <h3 className="font-semibold text-sm truncate group-hover:text-[#A98F2E] transition-colors">
+                    <h3 className="font-semibold text-sm truncate text-[#141414]">
                       {d.name}
                     </h3>
                     {d.isVerified && (
-                      <BadgeCheck className="h-4 w-4 text-[#C8A93E] flex-shrink-0" />
+                      <BadgeCheck className="h-4 w-4 text-[#F0941F] flex-shrink-0" />
                     )}
                   </div>
                   <p className="mt-2 text-sm text-secondary line-clamp-2">
                     {d.tagline}
                   </p>
-                  <div className="mt-5 pt-5 border-t border-[#E5E5E5] grid grid-cols-3 gap-2 text-xs">
+                  <div className="mt-5 pt-5 border-t border-[#E7E4DA] grid grid-cols-3 gap-2 text-xs">
                     <div className="flex items-center gap-1 text-secondary">
-                      <Star className="h-3 w-3 fill-[#C8A93E] text-[#C8A93E]" />
+                      <Star className="h-3 w-3 fill-[#F0941F] text-[#F0941F]" />
                       {d.rating}
                     </div>
                     <div className="flex items-center gap-1 text-secondary">

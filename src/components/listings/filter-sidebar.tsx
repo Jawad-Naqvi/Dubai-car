@@ -46,12 +46,12 @@ function FilterGroup({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-[#E5E5E5] py-3">
+    <div className="border-b border-[#E7E4DA] py-3">
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center justify-between w-full text-left"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#1A1A1A]">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#141414]">
           {title}
         </span>
         <ChevronDown
@@ -79,13 +79,13 @@ function CheckRow({
 }) {
   return (
     <label className="flex items-center justify-between cursor-pointer group">
-      <span className="flex items-center gap-1.5 text-xs text-secondary group-hover:text-[#1A1A1A]">
+      <span className="flex items-center gap-1.5 text-xs text-secondary group-hover:text-[#141414]">
         <input
           type="checkbox"
           checked={!!checked}
           onChange={(e) => onChange?.(e.target.checked)}
           suppressHydrationWarning
-          className="h-3 w-3 rounded-sm border-[#D4D4D4] bg-transparent text-[#C8A93E] focus:ring-[#C8A93E]/40"
+          className="h-3 w-3 rounded-sm border-[#D8D4C6] bg-transparent text-[#141414] focus:ring-[#141414]/20"
         />
         {label}
       </span>
@@ -110,11 +110,11 @@ function ColorRow({
 }) {
   return (
     <label className="flex items-center justify-between cursor-pointer group">
-      <span className="flex items-center gap-2 text-xs text-secondary group-hover:text-[#1A1A1A]">
+      <span className="flex items-center gap-2 text-xs text-secondary group-hover:text-[#141414]">
         <span
           className={cn(
             "relative h-4 w-4 rounded-full border flex items-center justify-center",
-            color.light ? "border-[#D4D4D4]" : "border-transparent",
+            color.light ? "border-[#D8D4C6]" : "border-transparent",
           )}
           style={{ backgroundColor: color.hex }}
         >
@@ -122,7 +122,7 @@ function ColorRow({
             <Check
               className={cn(
                 "h-2.5 w-2.5",
-                color.light ? "text-[#1A1A1A]" : "text-white",
+                color.light ? "text-[#141414]" : "text-white",
               )}
               strokeWidth={3}
             />
@@ -158,10 +158,10 @@ function Pill({
     <button
       onClick={onClick}
       className={cn(
-        "text-[11px] px-2.5 py-1 rounded-sm border transition-colors",
+        "text-[11px] px-3 py-1 rounded-full border transition-colors",
         active
-          ? "bg-[#C8A93E] border-[#C8A93E] text-white"
-          : "bg-[#F4F4F4] border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40",
+          ? "bg-[#141414] border-[#141414] text-white"
+          : "bg-white border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white",
       )}
     >
       {label}
@@ -170,7 +170,7 @@ function Pill({
 }
 
 const inputCls =
-  "h-7 rounded-sm bg-white border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder:text-muted px-2 focus:outline-none focus:border-[#C8A93E]";
+  "h-7 rounded-lg bg-white border border-[#E7E4DA] text-xs text-[#141414] placeholder:text-muted px-2 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
 
 export function FilterSidebar({
   className,
@@ -303,10 +303,10 @@ export function FilterSidebar({
 
   return (
     <aside className={cn("w-full", className)}>
-      <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5]">
+      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E7E4DA]">
           <div className="flex items-center gap-1.5">
-            <SlidersHorizontal className="h-3 w-3 text-[#C8A93E]" />
+            <SlidersHorizontal className="h-3 w-3 text-[#F0941F]" />
             <span className="text-xs font-semibold">{t("title")}</span>
             {total !== undefined && (
               <span className="text-[10px] text-muted">
@@ -316,7 +316,7 @@ export function FilterSidebar({
           </div>
           <button
             onClick={reset}
-            className="flex items-center gap-1 text-[10px] text-muted hover:text-[#1A1A1A]"
+            className="flex items-center gap-1 text-[10px] text-muted hover:text-[#141414]"
           >
             <RotateCw className="h-2.5 w-2.5" />
             {t("reset")}
@@ -349,7 +349,7 @@ export function FilterSidebar({
             {makeList.length > 8 && (
               <button
                 onClick={() => setShowAllMakes((v) => !v)}
-                className="text-[10px] text-[#A98F2E] font-semibold hover:underline pt-0.5"
+                className="text-[10px] text-[#C97612] font-semibold hover:underline pt-0.5"
               >
                 {showAllMakes ? t("showLess") : t("showMore")}
               </button>
@@ -394,7 +394,7 @@ export function FilterSidebar({
                 <button
                   key={p}
                   onClick={() => setPriceMax(String(p))}
-                  className="text-[10px] px-1.5 py-0.5 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40"
+                  className="text-[10px] px-2 py-0.5 rounded-full border border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white transition-colors"
                 >
                   &lt; {p / 1000}k
                 </button>
@@ -417,7 +417,7 @@ export function FilterSidebar({
                 <button
                   key={p}
                   onClick={() => setKmsMax(String(p))}
-                  className="text-[10px] px-1.5 py-0.5 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40"
+                  className="text-[10px] px-2 py-0.5 rounded-full border border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white transition-colors"
                 >
                   &lt; {p / 1000}k
                 </button>
@@ -544,21 +544,21 @@ export function FilterSidebar({
           </FilterGroup>
 
           <FilterGroup title={t("sellerType")} defaultOpen={false}>
-            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#1A1A1A]">
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#141414]">
               <input
                 type="radio"
                 name="sellerType"
                 checked={sellerType === ""}
                 onChange={() => setSellerType("")}
                 suppressHydrationWarning
-                className="h-3 w-3 border-[#D4D4D4] text-[#C8A93E] focus:ring-[#C8A93E]/40"
+                className="h-3 w-3 border-[#D8D4C6] text-[#141414] focus:ring-[#141414]/20"
               />
               All
             </label>
             {sellerTypes.map((s) => (
               <label
                 key={s.id}
-                className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#1A1A1A]"
+                className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#141414]"
               >
                 <input
                   type="radio"
@@ -566,7 +566,7 @@ export function FilterSidebar({
                   checked={sellerType === s.id}
                   onChange={() => setSellerType(s.id)}
                   suppressHydrationWarning
-                  className="h-3 w-3 border-[#D4D4D4] text-[#C8A93E] focus:ring-[#C8A93E]/40"
+                  className="h-3 w-3 border-[#D8D4C6] text-[#141414] focus:ring-[#141414]/20"
                 />
                 {s.label}
               </label>
@@ -603,10 +603,10 @@ export function FilterSidebar({
           </div>
         </div>
 
-        <div className="p-3 border-t border-[#E5E5E5]">
+        <div className="p-3 border-t border-[#E7E4DA]">
           <button
             onClick={apply}
-            className="w-full h-9 rounded-lg bg-[#C8A93E] text-white text-xs font-semibold hover:bg-[#B4972F] transition-colors"
+            className="w-full h-9 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#141414]/90 transition-colors"
           >
             {t("apply")}
           </button>

@@ -12,7 +12,8 @@
     "contact": "Contact",
     "signIn": "Sign in",
     "requestDemo": "Request a Demo",
-    "listYourCar": "List Your Car"
+    "listYourCar": "List Your Car",
+    "newCars": "New Cars"
   },
   "hero": {
     "eyebrow": "DUBAI AUTOMOTIVE MARKETPLACE",
@@ -60,20 +61,48 @@
     "eyebrow": "WHY DXB MOTORS",
     "title": "Built around the four user types Dubai's market actually has.",
     "items": [
-      { "title": "Car Yards & Dealers", "desc": "Upload inventory in bulk, manage listings, receive qualified leads, and track subscriptions." },
-      { "title": "Private Sellers", "desc": "List your car in minutes with photos, specs, and direct WhatsApp leads." },
-      { "title": "Local Buyers", "desc": "Search, compare up to 3 cars, save searches, get price-drop alerts." },
-      { "title": "International Importers", "desc": "Browse export-ready inventory, request documents, coordinate shipping." }
+      {
+        "title": "Car Yards & Dealers",
+        "desc": "Upload inventory in bulk, manage listings, receive qualified leads, and track subscriptions."
+      },
+      {
+        "title": "Private Sellers",
+        "desc": "List your car in minutes with photos, specs, and direct WhatsApp leads."
+      },
+      {
+        "title": "Local Buyers",
+        "desc": "Search, compare up to 3 cars, save searches, get price-drop alerts."
+      },
+      {
+        "title": "International Importers",
+        "desc": "Browse export-ready inventory, request documents, coordinate shipping."
+      }
     ]
   },
   "market": {
     "eyebrow": "MARKET OPPORTUNITY",
     "title": "A USD 20–35 billion market with no dedicated yard-forward platform.",
     "stats": [
-      { "value": "USD 35.78B", "label": "UAE used-car market projection by 2030", "source": "Mordor Intelligence" },
-      { "value": "+42%", "label": "Increase in online car demand in H1 2025 vs H1 2024", "source": "DubiCars" },
-      { "value": "1.44M", "label": "Registered vehicles in Dubai alone", "source": "Dubai Statistics Center" },
-      { "value": "11.73%", "label": "CAGR through 2030", "source": "Nexdigm Research" }
+      {
+        "value": "USD 35.78B",
+        "label": "UAE used-car market projection by 2030",
+        "source": "Mordor Intelligence"
+      },
+      {
+        "value": "+42%",
+        "label": "Increase in online car demand in H1 2025 vs H1 2024",
+        "source": "DubiCars"
+      },
+      {
+        "value": "1.44M",
+        "label": "Registered vehicles in Dubai alone",
+        "source": "Dubai Statistics Center"
+      },
+      {
+        "value": "11.73%",
+        "label": "CAGR through 2030",
+        "source": "Nexdigm Research"
+      }
     ]
   },
   "cta": {
@@ -90,7 +119,8 @@
       "marketplace": "Marketplace",
       "platform": "Platform",
       "company": "Company",
-      "trust": "Trust"
+      "trust": "Trust",
+      "follow": "Follow Us"
     },
     "trust": {
       "verified": "Verified Dealers",
@@ -204,5 +234,144 @@
     "filter": "Filter",
     "all": "All",
     "viewAll": "View all"
+  },
+  "home": {
+    "hero": {
+      "titlePre": "Access to high-quality,",
+      "titleHighlight": "Export-Ready",
+      "titlePost": "cars and services",
+      "contact": "Contact Us",
+      "customersCount": "500+",
+      "customersLabel": "Happy Customers",
+      "promos": [
+        {
+          "label": "Get up to 20% off dealer plans",
+          "cta": "View Plans",
+          "href": "/pricing"
+        },
+        {
+          "label": "GCC-spec SUVs, inspection backed",
+          "cta": "Browse",
+          "href": "/buy"
+        },
+        {
+          "label": "Yard-direct exports, docs handled",
+          "cta": "Explore",
+          "href": "/export"
+        }
+      ]
+    },
+    "featuredWork": "Featured Inventory",
+    "topSelling": {
+      "chip": "See more inventory",
+      "title": "Top-Selling Cars of the year Collection",
+      "note": "We don't divide our stock into seasons — new cars land from Dubai's yards every week, priced to move locally or for export.",
+      "cta": "Shop Now"
+    },
+    "why": {
+      "title": "Why Choose Us",
+      "desc": "We pride ourselves on listing cars that meet the highest standards of quality. Each one is carefully inspected, verified, and documented to ensure durability and buyer confidence.",
+      "items": [
+        {
+          "q": "Unrivaled Quality",
+          "a": "Every car passes a multi-point inspection with photos and reports attached directly to the listing."
+        },
+        {
+          "q": "Verified Dealers",
+          "a": "Every yard and dealer is trade-license verified before their first listing goes live."
+        },
+        {
+          "q": "Unrivaled Variety",
+          "a": "We believe in offering great value — from budget runabouts to collector-grade exotics, across every emirate."
+        },
+        {
+          "q": "Legacy of Excellence",
+          "a": "A decade of Dubai export know-how: RTA deregistration, export certificates, and RoRo shipping handled."
+        }
+      ]
+    },
+    "values": [
+      {
+        "title": "100% Verified Cars",
+        "desc": "Every listing carries a verified inspection report, so you know exactly what you're buying.",
+        "cta": "See More",
+        "href": "/buy"
+      },
+      {
+        "title": "Free & Easy Export",
+        "desc": "Documentation, deregistration, and shipping quotes handled in one place — completely hassle-free.",
+        "cta": "See More",
+        "href": "/export"
+      },
+      {
+        "title": "Safe Payments",
+        "desc": "Escrow options and fraud-screened transactions keep high-value deals protected end to end.",
+        "cta": "See More",
+        "href": "/finance"
+      }
+    ],
+    "offer": {
+      "discount": "20% OFF",
+      "line1": "Export",
+      "line2": "Season"
+    },
+    "collection": {
+      "title": "Best Luxury SUV Collection For You",
+      "desc": "For those who prefer commanding, comfortable, and export-ready options.",
+      "cta": "Shop Now"
+    },
+    "all": {
+      "title": "Our All Cars",
+      "desc": "This stock rotates weekly based on demand and fresh arrivals from the yards.",
+      "categories": [
+        "SUV",
+        "Sedan",
+        "Sports",
+        "Pickup"
+      ]
+    },
+    "clients": {
+      "title": "Our happy clients",
+      "items": [
+        {
+          "name": "Ahmed Al Mansoori",
+          "date": "02 February",
+          "title": "A Cut Above the Rest",
+          "body": "I bought my Land Cruiser through DXB Motors and the experience was seamless. The inspection report matched the car perfectly, and the dealer was verified and responsive."
+        },
+        {
+          "name": "Chidi Okonkwo",
+          "date": "14 March",
+          "title": "Export Done Right",
+          "body": "I've imported four cars to Lagos through this platform. Documentation, deregistration, and shipping quotes all in one place — it just works, every single time."
+        },
+        {
+          "name": "Priya Sharma",
+          "date": "27 January",
+          "title": "Fair Prices, Zero Stress",
+          "body": "The valuation tool told me exactly what my Civic was worth, and I sold it within a week for that price. No haggling games, no time wasters."
+        },
+        {
+          "name": "Omar Haddad",
+          "date": "09 April",
+          "title": "Dealer Tools That Deliver",
+          "body": "As a yard owner, the dashboard changed how we sell. Leads come in qualified, analytics show what's working, and our stock moves faster than ever."
+        }
+      ]
+    }
+  },
+  "catalog": {
+    "chip": "Auto-updated from official vehicle databases",
+    "titlePre": "Every new model,",
+    "titleHighlight": "the day it launches",
+    "subtitle": "Our catalog syncs automatically with official manufacturer registrations — every make, model, year, photo, and spec sheet, with zero manual entry.",
+    "allMakes": "All Makes",
+    "empty": "The catalog is syncing — check back in a moment.",
+    "backToCatalog": "Back to catalog",
+    "modelYears": "Model years",
+    "specifications": "Specifications",
+    "specsPending": "Full specifications sync in the next catalog update.",
+    "findUsed": "Find used {model} in UAE",
+    "askConcierge": "Ask our concierge"
   }
 }

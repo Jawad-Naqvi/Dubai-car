@@ -5,6 +5,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { BentoCard, BentoTitle, BentoDesc } from "@/components/marketing/bento-card";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import { QuickStartCard } from "@/components/sell/quick-start-card";
+import { Reveal } from "@/components/marketing/home/reveal";
 import {
   Camera,
   Sparkles,
@@ -38,12 +39,13 @@ export default async function SellPage({
       <section className="relative pt-12 pb-24 overflow-hidden">
         <RadialGlow color="gold" size="xl" className="-top-40 -left-40 opacity-30" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
-          <div className="relative rounded bg-hero-panel ring-1 ring-[#C8A93E]/25 px-5 py-8 lg:px-6 lg:py-10 grain overflow-hidden">
+          <div className="relative rounded-3xl bg-[#F3F1E9] border border-[#E7E4DA] px-5 py-8 lg:px-10 lg:py-12 overflow-hidden">
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 items-center">
               <div>
                 <Eyebrow tone="gold">LIST YOUR CAR</Eyebrow>
-                <h1 className="mt-6 text-sm lg:text-2xl font-bold tracking-tight leading-[1.05]">
-                  Sell your car in Dubai — typically within 19 days.
+                <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05]">
+                  Sell your car in Dubai — typically{" "}
+                  <span className="font-extrabold">within 19 days</span>.
                 </h1>
                 <p className="mt-6 text-sm text-secondary max-w-xl leading-relaxed">
                   Free listings. Reach 2M+ buyers across the UAE. WhatsApp leads
@@ -68,7 +70,7 @@ export default async function SellPage({
                     { label: "2M+", desc: "Active buyers" },
                   ].map((s) => (
                     <div key={s.label}>
-                      <div className="text-2xl font-bold text-gradient-gold">
+                      <div className="text-2xl font-extrabold tracking-tight text-[#141414]">
                         {s.label}
                       </div>
                       <div className="text-xs text-secondary mt-1">{s.desc}</div>
@@ -84,10 +86,10 @@ export default async function SellPage({
       </section>
 
       <section className="py-10">
-        <div className="mx-auto max-w-7xl px-6 lg:px-6">
+        <Reveal className="mx-auto max-w-7xl px-6 lg:px-6">
           <div className="max-w-3xl">
             <Eyebrow tone="emerald">HOW IT WORKS</Eyebrow>
-            <h2 className="mt-4 text-sm font-bold tracking-tight leading-[1.1]">
+            <h2 className="mt-4 text-2xl lg:text-3xl font-bold tracking-tight leading-[1.1]">
               Four steps. About 5 minutes.
             </h2>
           </div>
@@ -96,12 +98,12 @@ export default async function SellPage({
             {steps.map((s, i) => (
               <div
                 key={s.title}
-                className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4 relative overflow-hidden hover:shadow-card-hover hover:border-[#C8A93E]/30 transition-colors"
+                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 relative overflow-hidden hover:shadow-card-hover hover:border-[#D8D4C6] transition-all"
               >
-                <div className="text-2xl font-bold text-gradient-gold/30 absolute top-4 right-4 opacity-30">
+                <div className="text-2xl font-extrabold text-[#141414]/10 absolute top-4 right-4">
                   0{i + 1}
                 </div>
-                <s.icon className="h-7 w-7 text-[#C8A93E] mb-4" />
+                <s.icon className="h-7 w-7 text-[#F0941F] mb-4" />
                 <h3 className="font-semibold">{s.title}</h3>
                 <p className="mt-2 text-sm text-secondary leading-relaxed">
                   {s.desc}
@@ -109,11 +111,11 @@ export default async function SellPage({
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <section className="py-10">
-        <div className="mx-auto max-w-7xl px-6 lg:px-6">
+        <Reveal className="mx-auto max-w-7xl px-6 lg:px-6">
           <div className="grid grid-cols-12 gap-5 auto-rows-[220px]">
             <BentoCard variant="gold" className="col-span-12 md:col-span-7 row-span-2">
               <Wallet className="h-7 w-7 text-white mb-5" />
@@ -127,7 +129,7 @@ export default async function SellPage({
               </p>
             </BentoCard>
             <BentoCard variant="dark" className="col-span-12 md:col-span-5">
-              <Users className="h-7 w-7 text-[#C8A93E] mb-4" />
+              <Users className="h-7 w-7 text-[#F0941F] mb-4" />
               <BentoTitle className="text-sm">
                 Direct WhatsApp leads — no spam.
               </BentoTitle>
@@ -136,7 +138,7 @@ export default async function SellPage({
               </BentoDesc>
             </BentoCard>
             <BentoCard variant="emerald" className="col-span-12 md:col-span-5">
-              <Clock className="h-7 w-7 text-[#C8A93E] mb-4" />
+              <Clock className="h-7 w-7 text-[#F0941F] mb-4" />
               <BentoTitle className="text-sm">
                 Most cars sell within 19 days.
               </BentoTitle>
@@ -145,7 +147,7 @@ export default async function SellPage({
               </p>
             </BentoCard>
           </div>
-        </div>
+        </Reveal>
       </section>
     </>
   );

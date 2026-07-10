@@ -377,3 +377,97 @@ export type Dealer = typeof dealers.$inferSelect;
 export type Listing = typeof listings.$inferSelect;
 export type ListingMedia = typeof listingMedia.$inferSelect;
 export type Lead = typeof leads.$inferSelect;
+
+/* === Vehicle Catalog (auto-synced from public car-data APIs) ===
+ * Populated by src/lib/catalog/sync.ts — vPIC for makes/models (live, incl.
+ * next-model-year vehicles), Wikimedia/IMAGIN for imagery, API-Ninjas/CarAPI
+ * for spec enrichment. Zero manual data entry.
+ */
+export const catalogMakes = pgTable(
+  "catalog_makes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: varchar("name", { length: 96 }).notNull(),
+    slug: varchar("slug", { length: 96 }).notNull(),
+    country: varchar("country", { length: 64 }),
+    isPopular: boolean("is_popular").default(false).notNull(),
+    vpicMakeId: integer("vpic_make_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("catalog_makes_slug_idx").on(t.slug)],
+);
+
+export const catalogModels = pgTable(
+  "catalog_models",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    makeId: uuid("make_id")
+      .references(() => catalogMakes.id, { onDelete: "cascade" })
+      .notNull(),
+    name: varchar("name", { length: 128 }).notNull(),
+    slug: varchar("slug", { length: 128 }).notNull(),
+    bodyType: varchar("body_type", { length: 48 }),
+    /** newest model year seen for this model */
+    latestYear: integer("latest_year"),
+    /** first model year this model appeared in the catalog */
+    firstSeenYear: integer("first_seen_year"),
+    imageUrl: text("image_url"),
+    imageSource: varchar("image_source", { length: 32 }),
+    vpicModelId: integer("vpic_model_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("catalog_models_make_slug_idx").on(t.makeId, t.slug),
+    index("catalog_models_latest_year_idx").on(t.latestYear),
+  ],
+);
+
+export const catalogTrims = pgTable(
+  "catalog_trims",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    modelId: uuid("model_id")
+      .references(() => catalogModels.id, { onDelete: "cascade" })
+      .notNull(),
+    year: integer("year").notNull(),
+    trimName: varchar("trim_name", { length: 128 }).default("Base").notNull(),
+    /** normalized spec payload from the enrichment providers */
+    specs: jsonb("specs"),
+    specSource: varchar("spec_source", { length: 32 }),
+    imageUrl: text("image_url"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("catalog_trims_unique_idx").on(t.modelId, t.year, t.trimName),
+    index("catalog_trims_year_idx").on(t.year),
+  ],
+);
+
+export const catalogSyncRuns = pgTable("catalog_sync_runs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  status: varchar("status", { length: 16 }).default("running").notNull(),
+  trigger: varchar("trigger", { length: 16 }).default("cron").notNull(),
+  stats: jsonb("stats"),
+  error: text("error"),
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  finishedAt: timestamp("finished_at"),
+});
+
+export const catalogMakesRelations = relations(catalogMakes, ({ many }) => ({
+  models: many(catalogModels),
+}));
+export const catalogModelsRelations = relations(catalogModels, ({ one, many }) => ({
+  make: one(catalogMakes, { fields: [catalogModels.makeId], references: [catalogMakes.id] }),
+  trims: many(catalogTrims),
+}));
+export const catalogTrimsRelations = relations(catalogTrims, ({ one }) => ({
+  model: one(catalogModels, { fields: [catalogTrims.modelId], references: [catalogModels.id] }),
+}));
+
+export type CatalogMake = typeof catalogMakes.$inferSelect;
+export type CatalogModel = typeof catalogModels.$inferSelect;
+export type CatalogTrim = typeof catalogTrims.$inferSelect;
+export type CatalogSyncRun = typeof catalogSyncRuns.$inferSelect;

@@ -2,7 +2,7 @@
 
 Dubai's yard-forward B2B/B2C automotive marketplace platform.
 
-A re-skin of the gocommotion.com/products/ai-os visual language — dark base, bento grid, gradient hero — in a **Dubai gold + deep emerald** palette, applied to a full multi-sided marketplace per the project proposal.
+A warm-ivory e-commerce design language (Meher-inspired) — cream base, ink pill CTAs, amber accents, pastel product tiles, dark-navy footer — applied end-to-end across the full multi-sided marketplace per the project proposal.
 
 ## Stack
 
@@ -47,6 +47,16 @@ A re-skin of the gocommotion.com/products/ai-os visual language — dark base, b
 - `/admin/users` — user role manager
 - `/admin/revenue` — MRR trend bars + subscription split + gateway health
 
+### Auto-updating vehicle catalog
+- `/new-cars` — every make/model on the market, auto-synced (no manual data entry)
+- `/new-cars/[make]/[model]` — model detail with years, photo, spec sheet
+- `/admin/catalog` — sync dashboard + manual trigger
+- `app/api/catalog` — public makes/models/specs JSON (also powers sell-form prefill)
+- `app/api/catalog/sync` — cron-protected sync (see `vercel.json`, daily 03:00)
+- Providers: NHTSA vPIC (models, keyless), Wikimedia Commons (photos, keyless),
+  API-Ninjas + CarAPI (spec enrichment, optional keys), IMAGIN.studio (studio renders, optional key)
+- `src/lib/catalog/seed-catalog.json` — live-generated snapshot so demo mode works without a DB
+
 ### API + infra
 - `app/api/webhooks/clerk` — Svix-verified user sync to DB
 - `app/api/search` — search proxy (mock-data now, Meilisearch ready)
@@ -89,10 +99,11 @@ Visit:
 All colours are CSS variables in `src/app/globals.css` `@theme` block. Swap the palette in one place:
 
 ```css
---color-bg-page: #07120E;          /* near-black emerald base */
---color-gold: #D4AF37;             /* primary accent */
---color-gold-bright: #F0CE5C;      /* CTA pill fill */
---color-emerald-700: #0B3B2E;      /* gradient stop */
+--color-bg-page: #F1EFE9;          /* warm ivory base */
+--color-ink: #141414;              /* primary CTAs are black pills */
+--color-gold: #F0941F;             /* amber accent (icons, stars, badges) */
+--color-navy: #181C30;             /* footer / dark tiles */
+--color-tint-peach: #FBE7D4;       /* pastel product-image tints */
 ```
 
 ## Brand

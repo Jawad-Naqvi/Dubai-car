@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { BadgeCheck, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import { SaveButton } from "./save-button";
@@ -34,7 +35,7 @@ export function ListingGallery({
         await navigator.share({ title, url });
       } else {
         await navigator.clipboard.writeText(url);
-        alert("Link copied to clipboard");
+        toast.success("Link copied");
       }
     } catch {
       /* user cancelled */
@@ -46,7 +47,7 @@ export function ListingGallery({
 
   return (
     <div>
-      <div className="relative rounded-xl overflow-hidden bg-[#F4F4F4] border border-[#E5E5E5] shadow-card aspect-[16/10] group">
+      <div className="relative rounded-3xl overflow-hidden bg-[#F3F1E9] border border-[#E7E4DA] shadow-card aspect-[16/10] group">
         {current ? (
           <Image
             src={current}
@@ -78,7 +79,7 @@ export function ListingGallery({
           <button
             onClick={share}
             aria-label="Share"
-            className="h-8 w-8 rounded-sm bg-white/90 backdrop-blur border border-[#E5E5E5] text-[#1A1A1A] flex items-center justify-center hover:border-[#C8A93E]/40"
+            className="h-8 w-8 rounded-full bg-white/90 backdrop-blur border border-[#E7E4DA] text-[#141414] flex items-center justify-center hover:bg-white transition-colors"
           >
             <Share2 className="h-3.5 w-3.5" />
           </button>
@@ -89,18 +90,18 @@ export function ListingGallery({
             <button
               onClick={() => go(-1)}
               aria-label="Previous photo"
-              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-sm bg-white/90 backdrop-blur border border-[#E5E5E5] text-[#1A1A1A] flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:border-[#C8A93E]/40"
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/90 backdrop-blur border border-[#E7E4DA] text-[#141414] flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:bg-white"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => go(1)}
               aria-label="Next photo"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-sm bg-white/90 backdrop-blur border border-[#E5E5E5] text-[#1A1A1A] flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:border-[#C8A93E]/40"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/90 backdrop-blur border border-[#E7E4DA] text-[#141414] flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:bg-white"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
-            <div className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5 rounded-sm bg-white/90 border border-[#E5E5E5] text-[#1A1A1A]">
+            <div className="absolute bottom-2 right-2 text-[10px] px-2 py-0.5 rounded-full bg-white/90 border border-[#E7E4DA] text-[#141414]">
               {active + 1} / {safe.length}
             </div>
           </>
@@ -113,9 +114,9 @@ export function ListingGallery({
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={`relative aspect-[4/3] rounded-sm overflow-hidden bg-[#F4F4F4] border ${
-                i === active ? "border-[#C8A93E]" : "border-[#E5E5E5]"
-              } hover:border-[#C8A93E]/40`}
+              className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F3F1E9] border ${
+                i === active ? "border-[#141414]" : "border-[#E7E4DA]"
+              } hover:border-[#141414]/40 transition-colors`}
             >
               {src && (
                 <Image

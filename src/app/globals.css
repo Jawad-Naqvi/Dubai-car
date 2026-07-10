@@ -1,41 +1,64 @@
 @import "tailwindcss";
 
 @theme {
-  /* === DXB Motors — Clean Light / Gold (cars.com-inspired) === */
-  --color-bg-page: #F8F8F8;
+  /* === DXB Motors — Warm Ivory / Ink / Amber (Meher-inspired) === */
+  --color-bg-page: #F1EFE9;
   --color-bg-surface: #FFFFFF;
   --color-bg-card: #FFFFFF;
-  --color-bg-card-soft: #F4F4F4;
+  --color-bg-card-soft: #F3F1E9;
   --color-bg-elevated: #FFFFFF;
 
-  --color-gold: #C8A93E;
-  --color-gold-bright: #D8B84E;
+  /* Amber-orange accent (was gold) */
+  --color-gold: #F0941F;
+  --color-gold-bright: #F5AE4C;
   --color-gold-ink: #FFFFFF;
-  --color-gold-deep: #A98F2E;
-  --color-cream: #F3EAC9;
+  --color-gold-deep: #C97612;
+  --color-cream: #FBEAD3;
 
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #6B6B6B;
-  --color-text-muted: #9A9A9A;
+  /* Deep navy — footer, dark tiles, primary pills */
+  --color-navy: #181C30;
+  --color-navy-soft: #23283F;
+  --color-ink: #141414;
 
-  --color-line: #E5E5E5;
+  /* Pastel tint blocks for product imagery */
+  --color-tint-peach: #FBE7D4;
+  --color-tint-sky: #CFE3F3;
+  --color-tint-mint: #DFEDE0;
+  --color-tint-lilac: #E6E1F2;
+  --color-tint-lemon: #F6C244;
+  --color-tint-olive: #C6CD87;
+  --color-tint-blush: #F6DDD3;
+
+  --color-text-primary: #141414;
+  --color-text-secondary: #64625B;
+  --color-text-muted: #98958B;
+
+  --color-line: #E7E4DA;
 
   --color-success: #1A7A4A;
   --color-info: #1B4FA0;
   --color-warning: #B7791F;
   --color-danger: #DC2626;
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", "Tajawal", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Sans", "Tajawal", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 0.75rem;
-  --radius-card-lg: 0.75rem;
-  --radius-panel: 0.75rem;
+  /* Rounder geometry across the board */
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-card: 1.25rem;
+  --radius-card-lg: 1.5rem;
+  --radius-panel: 1.5rem;
 
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-card-hover: 0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-  --shadow-nav: 0 1px 0 rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-gold-glow: 0 10px 30px -8px rgba(200, 169, 62, 0.35);
+  --shadow-card: 0 1px 3px rgba(24, 22, 15, 0.05), 0 1px 2px rgba(24, 22, 15, 0.03);
+  --shadow-card-hover: 0 14px 34px -10px rgba(24, 22, 15, 0.14), 0 3px 8px rgba(24, 22, 15, 0.05);
+  --shadow-nav: 0 1px 0 rgba(24, 22, 15, 0.04);
+  --shadow-gold-glow: 0 10px 30px -8px rgba(240, 148, 31, 0.35);
 }
 
 @layer base {
@@ -54,60 +77,55 @@
     font-family: var(--font-sans);
   }
   ::selection {
-    background-color: rgba(200, 169, 62, 0.28);
-    color: #1A1A1A;
+    background-color: rgba(240, 148, 31, 0.25);
+    color: #141414;
   }
 }
 
 @layer utilities {
+  /* Bare `rounded` reads softer on this design language */
+  .rounded { border-radius: 0.875rem; }
+
   .bg-page { background-color: var(--color-bg-page); }
   .bg-surface { background-color: var(--color-bg-surface); }
   .bg-card { background-color: var(--color-bg-card); }
   .bg-card-soft { background-color: var(--color-bg-card-soft); }
   .bg-elevated { background-color: var(--color-bg-elevated); }
+  .bg-navy { background-color: var(--color-navy); }
   .text-secondary { color: var(--color-text-secondary); }
   .text-muted { color: var(--color-text-muted); }
   .border-line { border-color: var(--color-line); }
-  .ring-gold { box-shadow: 0 0 0 1px rgba(200, 169, 62, 0.35); }
+  .ring-gold { box-shadow: 0 0 0 1px rgba(240, 148, 31, 0.35); }
   .glow-gold { box-shadow: var(--shadow-gold-glow); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-card-hover { box-shadow: var(--shadow-card-hover); }
   .shadow-nav { box-shadow: var(--shadow-nav); }
 
-  /* Solid gold text (keeps legacy class name working on the light theme) */
+  /* Solid accent text (legacy class name kept) */
   .text-gradient-gold {
-    color: var(--color-gold);
+    color: var(--color-gold-deep);
     -webkit-background-clip: initial;
     background-clip: initial;
   }
 
-  /* Light hero panel — soft off-white with a faint gold wash */
+  /* Flat surfaces only — no background gradients anywhere in the app */
   .bg-hero-panel {
-    background:
-      radial-gradient(circle at 85% 10%, rgba(200, 169, 62, 0.10), transparent 55%),
-      radial-gradient(circle at 10% 90%, rgba(200, 169, 62, 0.06), transparent 50%),
-      linear-gradient(180deg, #FFFFFF 0%, #F8F8F8 100%);
+    background: #FFFFFF;
   }
 
   .bg-bento-dark {
     background-color: var(--color-bg-card);
-    background-image: radial-gradient(circle at 0% 0%, rgba(200, 169, 62, 0.08), transparent 55%);
   }
 
   .bg-bento-gold {
-    background:
-      radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.6), transparent 60%),
-      linear-gradient(135deg, #C8A93E 0%, #A98F2E 100%);
+    background: #F0941F;
   }
 
   .bg-bento-black {
     background-color: #FFFFFF;
-    background-image:
-      radial-gradient(circle at 100% 0%, rgba(200, 169, 62, 0.10), transparent 60%),
-      linear-gradient(135deg, #FFFFFF 0%, #F4F4F4 100%);
   }
 
-  /* Grain disabled on the light theme (kept as a no-op so class refs stay safe) */
+  /* Grain disabled (kept as safe no-op) */
   .grain::before {
     content: "";
     position: absolute;
@@ -116,6 +134,7 @@
     opacity: 0;
   }
 
+  /* ===== Motion ===== */
   @keyframes float-slow {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-12px); }
@@ -128,6 +147,67 @@
   }
   .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
 
+  @keyframes reveal-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-reveal-up { animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  @keyframes marquee-x {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .animate-marquee { animation: marquee-x 30s linear infinite; }
+  .animate-marquee:hover { animation-play-state: paused; }
+
+  @keyframes spin-slow {
+    to { transform: rotate(360deg); }
+  }
+  .animate-spin-slow { animation: spin-slow 14s linear infinite; }
+
+  /* Hide scrollbars on horizontal carousels */
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Underlined nav link (Meher header) */
+  .nav-underline {
+    position: relative;
+  }
+  .nav-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 100%;
+    bottom: -2px;
+    height: 1.5px;
+    background: currentColor;
+    transition: right 0.25s ease;
+  }
+  .nav-underline:hover::after,
+  .nav-underline[data-active="true"]::after {
+    right: 0;
+  }
+
+  /* Starburst offer badge shape */
+  .starburst {
+    clip-path: polygon(
+      50% 0%, 59% 12%, 72% 5%, 75% 19%, 90% 18%, 86% 32%, 100% 38%,
+      89% 50%, 100% 62%, 86% 68%, 90% 82%, 75% 81%, 72% 95%, 59% 88%,
+      50% 100%, 41% 88%, 28% 95%, 25% 81%, 10% 82%, 14% 68%, 0% 62%,
+      11% 50%, 0% 38%, 14% 32%, 10% 18%, 25% 19%, 28% 5%, 41% 12%
+    );
+  }
+
   /* RTL helpers */
   [dir="rtl"] .rtl-flip { transform: scaleX(-1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float-slow,
+    .animate-pulse-glow,
+    .animate-reveal-up,
+    .animate-marquee,
+    .animate-spin-slow {
+      animation: none;
+    }
+  }
 }

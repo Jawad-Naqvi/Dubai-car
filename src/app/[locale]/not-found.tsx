@@ -10,8 +10,8 @@ export default function NotFound() {
       <RadialGlow color="gold" size="xl" className="-top-40 -right-40 opacity-30" />
       <div className="relative text-center max-w-xl">
         <Eyebrow tone="gold">404</Eyebrow>
-        <h1 className="mt-6 text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
-          This car has been sold.
+        <h1 className="mt-6 text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
+          This car has been <span className="font-extrabold">sold</span>.
         </h1>
         <p className="mt-6 text-secondary text-lg">
           The page you were looking for doesn't exist or has been moved.

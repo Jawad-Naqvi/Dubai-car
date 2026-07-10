@@ -26,16 +26,16 @@ export function MockListingCard({
   return (
     <div
       className={cn(
-        "rounded-xl bg-white border border-[#E5E5E5] p-3.5 shadow-card",
+        "rounded-2xl bg-white border border-[#E7E4DA] p-3.5 shadow-card",
         className,
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-[9px] uppercase tracking-widest text-[#A98F2E] font-semibold">
+          <div className="text-[9px] uppercase tracking-widest text-[#C97612] font-semibold">
             Listing
           </div>
-          <div className="mt-0.5 text-xs font-semibold text-[#1A1A1A] truncate">
+          <div className="mt-0.5 text-xs font-semibold text-[#141414] truncate">
             {title}
           </div>
           {subtitle && (
@@ -54,7 +54,7 @@ export function MockListingCard({
           <div className="text-[9px] text-muted uppercase tracking-wider">
             Price
           </div>
-          <div className="text-base font-bold text-gradient-gold">
+          <div className="text-base font-bold text-[#141414]">
             {formatAED(priceAED)}
           </div>
         </div>

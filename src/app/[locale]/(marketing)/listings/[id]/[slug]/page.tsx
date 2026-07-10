@@ -110,17 +110,17 @@ export default async function ListingDetailPage({
         <RadialGlow color="gold" size="xl" className="-top-40 -right-40 opacity-15" />
 
         {/* Breadcrumb */}
-        <div className="border-b border-[#E5E5E5] bg-white relative">
+        <div className="border-b border-[#E7E4DA] bg-white relative">
           <div className="mx-auto max-w-7xl px-4 lg:px-6 py-2 overflow-x-auto whitespace-nowrap flex items-center gap-1.5 text-[10px] text-muted">
-            <Link href="/" className="hover:text-[#1A1A1A]">Home</Link>
+            <Link href="/" className="hover:text-[#141414]">Home</Link>
             <span>/</span>
-            <Link href="/buy" className="hover:text-[#1A1A1A]">Buy</Link>
+            <Link href="/buy" className="hover:text-[#141414]">Buy</Link>
             <span>/</span>
-            <Link href={`/buy?make=${listing.make}`} className="hover:text-[#1A1A1A]">
+            <Link href={`/buy?make=${listing.make}`} className="hover:text-[#141414]">
               {listing.make}
             </Link>
             <span>/</span>
-            <span className="text-[#1A1A1A]">{listingTitle}</span>
+            <span className="text-[#141414]">{listingTitle}</span>
           </div>
         </div>
 
@@ -153,7 +153,7 @@ export default async function ListingDetailPage({
                   )}
                 </div>
                 <div className="text-right">
-                  <div className="text-xl lg:text-2xl font-bold text-gradient-gold leading-none">
+                  <div className="text-xl lg:text-2xl font-bold text-[#141414] leading-none">
                     {formatAED(listing.priceAED, locale as "en" | "ar")}
                   </div>
                   <div className="mt-1 text-[10px] text-muted">
@@ -166,19 +166,19 @@ export default async function ListingDetailPage({
               <div className="mt-6">
                 <div className="flex items-center gap-2 mb-3">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("specs")}</h2>
-                  <div className="h-px bg-[#E5E5E5] flex-1" />
+                  <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {specs.map((s) => (
                     <div
                       key={s.label}
-                      className="rounded-lg bg-white border border-[#E5E5E5] shadow-card p-2.5"
+                      className="rounded-xl bg-white border border-[#E7E4DA] shadow-card p-2.5"
                     >
-                      <s.icon className="h-3 w-3 text-[#C8A93E] mb-2" />
+                      <s.icon className="h-3 w-3 text-[#F0941F] mb-2" />
                       <div className="text-[9px] text-muted uppercase tracking-wider">
                         {s.label}
                       </div>
-                      <div className="mt-0.5 text-xs font-semibold text-[#1A1A1A] truncate">
+                      <div className="mt-0.5 text-xs font-semibold text-[#141414] truncate">
                         {s.value}
                       </div>
                     </div>
@@ -190,7 +190,7 @@ export default async function ListingDetailPage({
               <div className="mt-6">
                 <div className="flex items-center gap-2 mb-3">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("description")}</h2>
-                  <div className="h-px bg-[#E5E5E5] flex-1" />
+                  <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
                 <p className="text-xs text-secondary leading-relaxed">
                   {listing.description}
@@ -201,15 +201,15 @@ export default async function ListingDetailPage({
               <div className="mt-6">
                 <div className="flex items-center gap-2 mb-3">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("features")}</h2>
-                  <div className="h-px bg-[#E5E5E5] flex-1" />
+                  <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                   {listing.features.map((f) => (
                     <div
                       key={f}
-                      className="flex items-center gap-2 rounded-lg bg-white border border-[#E5E5E5] shadow-card px-3 py-2"
+                      className="flex items-center gap-2 rounded-xl bg-white border border-[#E7E4DA] shadow-card px-3 py-2"
                     >
-                      <CheckCircle2 className="h-3 w-3 text-[#C8A93E]" />
+                      <CheckCircle2 className="h-3 w-3 text-[#F0941F]" />
                       <span className="text-xs">{f}</span>
                     </div>
                   ))}
@@ -227,20 +227,20 @@ export default async function ListingDetailPage({
             {/* RIGHT — Sticky paywall + dealer */}
             <div className="lg:sticky lg:top-16 lg:self-start space-y-3">
               {/* Dealer card */}
-              <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4 grain relative overflow-hidden">
+              <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4 relative overflow-hidden">
                 <div className="flex items-start gap-2.5">
-                  <div className="h-10 w-10 rounded-sm bg-gradient-to-br from-[#D8B84E] to-[#A98F2E] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-[#181C30] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {listing.dealer.name.charAt(0)}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1">
                       <h3 className="font-semibold text-xs truncate">{listing.dealer.name}</h3>
                       {listing.dealer.isVerified && (
-                        <BadgeCheck className="h-3 w-3 text-[#C8A93E] flex-shrink-0" />
+                        <BadgeCheck className="h-3 w-3 text-[#F0941F] flex-shrink-0" />
                       )}
                     </div>
                     <div className="flex items-center gap-1 text-[10px] text-secondary mt-0.5">
-                      <Star className="h-2.5 w-2.5 fill-[#C8A93E] text-[#C8A93E]" />
+                      <Star className="h-2.5 w-2.5 fill-[#F0941F] text-[#F0941F]" />
                       {listing.dealer.rating} · {listing.dealer.reviewCount} reviews
                     </div>
                     <div className="flex items-center gap-1 text-[10px] text-muted mt-0.5">
@@ -259,7 +259,7 @@ export default async function ListingDetailPage({
 
                 <Link
                   href={`/dealers/${listing.dealer.slug}`}
-                  className="mt-2 flex items-center justify-center gap-1 h-7 w-full text-[10px] text-secondary hover:text-[#A98F2E] transition-colors"
+                  className="mt-2 flex items-center justify-center gap-1 h-7 w-full text-[10px] text-secondary hover:text-[#141414] transition-colors"
                 >
                   View storefront →
                 </Link>
@@ -267,9 +267,9 @@ export default async function ListingDetailPage({
 
               {/* Export panel */}
               {listing.isExportReady && (
-                <div className="rounded-xl bg-white border border-[#C8A93E]/30 shadow-card p-4 relative overflow-hidden">
+                <div className="rounded-2xl bg-[#FBE7D4] border border-[#E7E4DA] shadow-card p-4 relative overflow-hidden">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Ship className="h-3.5 w-3.5 text-[#C8A93E]" />
+                    <Ship className="h-3.5 w-3.5 text-[#F0941F]" />
                     <Eyebrow tone="gold">EXPORT READY</Eyebrow>
                   </div>
                   <h3 className="text-sm font-semibold">Ship worldwide</h3>
@@ -285,18 +285,18 @@ export default async function ListingDetailPage({
               )}
 
               {/* Trust strip */}
-              <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-3">
+              <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-3">
                 <div className="space-y-1.5 text-[11px]">
                   <div className="flex items-center gap-1.5 text-secondary">
-                    <ShieldCheck className="h-3 w-3 text-[#C8A93E]" />
+                    <ShieldCheck className="h-3 w-3 text-[#F0941F]" />
                     Verified dealer
                   </div>
                   <div className="flex items-center gap-1.5 text-secondary">
-                    <FileText className="h-3 w-3 text-[#C8A93E]" />
+                    <FileText className="h-3 w-3 text-[#F0941F]" />
                     Full service history
                   </div>
                   <div className="flex items-center gap-1.5 text-secondary">
-                    <Sparkles className="h-3 w-3 text-[#C8A93E]" />
+                    <Sparkles className="h-3 w-3 text-[#F0941F]" />
                     Inspection on request
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default async function ListingDetailPage({
                 </div>
                 <Link
                   href="/buy"
-                  className="text-xs text-[#A98F2E] hover:underline"
+                  className="text-xs font-semibold text-[#141414] underline underline-offset-2 hover:opacity-70"
                 >
                   View all →
                 </Link>

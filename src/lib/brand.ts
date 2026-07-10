@@ -129,7 +129,7 @@ export interface ColorOption {
 
 export const exteriorColors: ColorOption[] = [
   { name: "Black", hex: "#1A1A1A" },
-  { name: "White", hex: "#F4F4F4", light: true },
+  { name: "White", hex: "#F3F1E9", light: true },
   { name: "Silver", hex: "#C7CBD1", light: true },
   { name: "Grey", hex: "#8B9099" },
   { name: "Blue", hex: "#2456C7" },
@@ -137,7 +137,7 @@ export const exteriorColors: ColorOption[] = [
   { name: "Green", hex: "#1F7A3D" },
   { name: "Brown", hex: "#6B4423" },
   { name: "Beige", hex: "#DCC9A0", light: true },
-  { name: "Gold", hex: "#C8A93E" },
+  { name: "Gold", hex: "#F0941F" },
   { name: "Orange", hex: "#E8791E" },
   { name: "Yellow", hex: "#ECC526", light: true },
   { name: "Purple", hex: "#6C2E9C" },
@@ -150,7 +150,7 @@ export const interiorColors: ColorOption[] = [
   { name: "Brown", hex: "#6B4423" },
   { name: "Tan", hex: "#B8946A" },
   { name: "Red", hex: "#CE2A2A" },
-  { name: "White", hex: "#F4F4F4", light: true },
+  { name: "White", hex: "#F3F1E9", light: true },
 ];
 
 export const cylinderOptions = [3, 4, 5, 6, 8, 10, 12] as const;

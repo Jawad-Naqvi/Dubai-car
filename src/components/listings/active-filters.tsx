@@ -37,7 +37,7 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <button
       onClick={onRemove}
-      className="flex items-center gap-1 h-6 pl-2 pr-1.5 rounded-full bg-[#F4EFDD] border border-[#C8A93E]/40 text-[10px] text-[#8A6D18] hover:bg-[#EDE4C4] transition-colors"
+      className="flex items-center gap-1 h-6 pl-2.5 pr-1.5 rounded-full bg-[#141414] text-[10px] font-semibold text-white hover:bg-[#141414]/85 transition-colors"
     >
       {label}
       <X className="h-2.5 w-2.5" />
@@ -91,7 +91,7 @@ export function ActiveFilters() {
       {chips.length > 1 && (
         <button
           onClick={clearAll}
-          className="text-[10px] text-muted hover:text-[#1A1A1A] underline underline-offset-2 ml-1"
+          className="text-[10px] text-muted hover:text-[#141414] underline underline-offset-2 ml-1"
         >
           {t("clearAll")}
         </button>

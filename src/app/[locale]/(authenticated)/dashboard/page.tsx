@@ -74,9 +74,9 @@ export default async function DealerOverview() {
           {kpis.map((k) => (
             <div
               key={k.label}
-              className="rounded-lg bg-white border border-[#E5E5E5] shadow-card p-5 hover:border-[#C8A93E]/30 hover:shadow-card-hover transition-colors"
+              className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
             >
-              <k.icon className="h-5 w-5 text-[#C8A93E]" />
+              <k.icon className="h-5 w-5 text-[#F0941F]" />
               <div className="mt-4 text-base font-bold tracking-tight">{k.value}</div>
               <div className="text-xs text-muted mt-1">{k.label}</div>
             </div>
@@ -85,8 +85,8 @@ export default async function DealerOverview() {
 
         <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
           {/* Leads */}
-          <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5]">
+          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
               <div>
                 <Eyebrow tone="gold">RECENT LEADS</Eyebrow>
                 <h2 className="mt-2 text-xs font-semibold">
@@ -105,8 +105,9 @@ export default async function DealerOverview() {
                 No leads yet. They&apos;ll appear here when buyers inquire.
               </div>
             ) : (
+              <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-[#F4F4F4] text-[10px] uppercase tracking-widest text-muted">
+                <thead className="bg-[#F3F1E9] text-[10px] uppercase tracking-widest text-muted">
                   <tr>
                     <th className="text-start px-4 py-3 font-medium">Buyer</th>
                     <th className="text-start px-4 py-3 font-medium">Type</th>
@@ -116,7 +117,7 @@ export default async function DealerOverview() {
                 </thead>
                 <tbody>
                   {leads.slice(0, 6).map((l) => (
-                    <tr key={l.id} className="border-t border-[#E5E5E5] hover:bg-[#F8F8F8]">
+                    <tr key={l.id} className="border-t border-[#E7E4DA] hover:bg-[#F1EFE9]">
                       <td className="px-4 py-2.5">
                         <div className="font-semibold text-xs">{l.buyerName}</div>
                         <div className="text-xs text-muted">{timeAgo(l.createdAt)}</div>
@@ -124,7 +125,7 @@ export default async function DealerOverview() {
                       <td className="px-4 py-2.5 text-xs text-secondary">
                         {LEAD_LABELS[l.type] ?? l.type}
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-[#C8A93E]">
+                      <td className="px-4 py-2.5 text-xs text-[#F0941F]">
                         {l.feeAED ? formatAED(l.feeAED) : "—"}
                       </td>
                       <td className="px-4 py-2.5">
@@ -136,12 +137,13 @@ export default async function DealerOverview() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
 
           {/* Plan + quick actions */}
           <div className="space-y-5">
-            <div className="rounded-xl bg-bento-dark border border-[#C8A93E]/25 shadow-card p-4 relative overflow-hidden grain">
+            <div className="rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-4 relative overflow-hidden grain">
               <Eyebrow tone="gold">PLAN</Eyebrow>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-base font-bold">{ctx.tierName}</span>
@@ -153,9 +155,9 @@ export default async function DealerOverview() {
                 {ctx.listingsUsed} /{" "}
                 {ctx.listingQuota === Infinity ? "∞" : ctx.listingQuota} listings used
               </div>
-              <div className="mt-2 h-2 rounded-full bg-[#E5E5E5] overflow-hidden">
+              <div className="mt-2 h-2 rounded-full bg-[#E7E4DA] overflow-hidden">
                 <div
-                  className="h-full bg-[#C8A93E]"
+                  className="h-full bg-[#F0941F]"
                   style={{ width: `${quotaPct}%` }}
                 />
               </div>
@@ -164,7 +166,7 @@ export default async function DealerOverview() {
               </Button>
             </div>
 
-            <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4">
+            <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
               <h3 className="font-semibold">Quick actions</h3>
               <div className="mt-4 space-y-2">
                 <Button asChild variant="gold" size="md" className="w-full justify-start">
@@ -185,8 +187,8 @@ export default async function DealerOverview() {
         </div>
 
         {/* Top performing inventory */}
-        <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5]">
+        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
             <div>
               <Eyebrow tone="emerald">TOP PERFORMERS</Eyebrow>
               <h2 className="mt-2 text-xs font-semibold">Your highest-traffic listings</h2>
@@ -198,10 +200,10 @@ export default async function DealerOverview() {
               </Link>
             </Button>
           </div>
-          <div className="divide-y divide-[#E5E5E5]">
+          <div className="divide-y divide-[#E7E4DA]">
             {topPerformers.map((l) => (
-              <div key={l.id} className="flex items-center gap-4 p-5 hover:bg-[#F8F8F8]">
-                <div className="relative h-14 w-20 rounded-sm overflow-hidden bg-[#F4F4F4] flex-shrink-0">
+              <div key={l.id} className="flex items-center gap-4 p-5 hover:bg-[#F1EFE9]">
+                <div className="relative h-14 w-20 rounded-lg overflow-hidden bg-[#F3F1E9] flex-shrink-0">
                   <Image src={l.imageUrl} alt="" fill sizes="80px" className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -216,7 +218,7 @@ export default async function DealerOverview() {
                   <MessageCircle className="h-3.5 w-3.5 text-muted" />
                   {l.inquiryCount}
                 </div>
-                <div className="text-base font-bold text-gradient-gold">
+                <div className="text-base font-bold text-[#141414]">
                   {formatAED(l.priceAED)}
                 </div>
               </div>
