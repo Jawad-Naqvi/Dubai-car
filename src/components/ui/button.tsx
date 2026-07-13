@@ -4,28 +4,31 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-semibold tracking-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0CE5C]/60 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]/30 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
       variant: {
-        gold: "bg-[#F0CE5C] text-[#1A1208] hover:bg-[#FFE08A]",
+        /* Primary CTA — solid ink pill (reference "Contact Us" / "Buy Now") */
+        gold: "bg-[#141414] text-white shadow-sm hover:bg-[#2E2C28] hover:shadow-card-hover",
         gold_outline:
-          "border border-[#D4AF37]/50 text-[#F0CE5C] hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]",
+          "border border-[#141414]/25 text-[#141414] bg-transparent hover:bg-[#141414] hover:text-white hover:border-[#141414]",
         ghost:
-          "border border-white/15 text-white hover:bg-white/5 hover:border-white/30",
-        dark: "bg-[#161616] text-white border border-white/10 hover:border-white/25",
+          "border border-[#E7E4DA] bg-white text-[#141414] hover:bg-[#F3F1E9] hover:border-[#D8D4C6]",
+        dark: "bg-[#181C30] text-white border border-[#181C30] hover:bg-[#23283F]",
+        /* Amber accent pill for promos */
+        accent: "bg-[#F0941F] text-white shadow-sm hover:bg-[#D6821A]",
         emerald:
-          "bg-[#1A1A1A] text-white border border-[#D4AF37]/30 hover:bg-[#1F1F1F]",
-        link: "text-[#F0CE5C] underline-offset-4 hover:underline",
-        danger: "bg-[#EF4444] text-white hover:bg-[#DC2626]",
+          "bg-white text-[#141414] border border-[#E7E4DA] hover:bg-[#F3F1E9]",
+        link: "text-[#141414] underline-offset-4 hover:underline",
+        danger: "bg-[#DC2626] text-white hover:bg-[#B91C1C]",
       },
       size: {
-        xs: "h-7 px-2.5 text-[11px] rounded-sm",
-        sm: "h-8 px-3 text-xs rounded-sm",
-        md: "h-9 px-4 text-xs rounded",
-        lg: "h-10 px-5 text-sm rounded",
-        xl: "h-11 px-6 text-sm rounded",
-        icon: "h-8 w-8 rounded-sm",
+        xs: "h-7 px-3 text-[11px] rounded-full",
+        sm: "h-8 px-3.5 text-xs rounded-full",
+        md: "h-9 px-4 text-xs rounded-full",
+        lg: "h-10 px-6 text-sm rounded-full",
+        xl: "h-12 px-7 text-sm rounded-full",
+        icon: "h-8 w-8 rounded-full",
       },
     },
     defaultVariants: {

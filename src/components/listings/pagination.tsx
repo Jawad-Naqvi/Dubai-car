@@ -26,7 +26,7 @@ export function Pagination({
       <button
         onClick={() => go(page - 1)}
         disabled={page <= 1}
-        className="h-8 px-3 rounded-sm border border-white/10 text-xs text-secondary hover:border-[#D4AF37]/30 disabled:opacity-40 disabled:pointer-events-none"
+        className="h-8 px-3.5 rounded-full border border-[#141414]/20 text-xs font-semibold text-[#141414] hover:bg-[#141414] hover:text-white transition-colors disabled:opacity-40 disabled:pointer-events-none"
       >
         Prev
       </button>
@@ -35,10 +35,10 @@ export function Pagination({
           key={p}
           onClick={() => go(p)}
           className={cn(
-            "h-8 w-8 rounded-sm text-xs",
+            "h-8 w-8 rounded-full text-xs transition-colors",
             p === page
-              ? "bg-[#F0CE5C] text-[#1A1208] font-semibold"
-              : "border border-white/10 text-secondary hover:border-[#D4AF37]/30",
+              ? "bg-[#141414] text-white font-semibold"
+              : "border border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white",
           )}
         >
           {p}
@@ -47,7 +47,7 @@ export function Pagination({
       <button
         onClick={() => go(page + 1)}
         disabled={page >= totalPages}
-        className="h-8 px-3 rounded-sm border border-white/10 text-xs text-secondary hover:border-[#D4AF37]/30 disabled:opacity-40 disabled:pointer-events-none"
+        className="h-8 px-3.5 rounded-full border border-[#141414]/20 text-xs font-semibold text-[#141414] hover:bg-[#141414] hover:text-white transition-colors disabled:opacity-40 disabled:pointer-events-none"
       >
         Next
       </button>

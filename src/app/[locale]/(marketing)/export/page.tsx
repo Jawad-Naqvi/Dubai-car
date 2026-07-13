@@ -59,13 +59,13 @@ export default async function ExportPage({
         <RadialGlow color="emerald" size="lg" className="-bottom-40 -left-40" />
 
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
-          <div className="relative rounded bg-hero-panel ring-1 ring-[#D4AF37]/30 px-5 py-8 lg:px-6 lg:py-10 grain overflow-hidden">
+          <div className="relative rounded-3xl bg-[#F3F1E9] border border-[#E7E4DA] px-5 py-8 lg:px-10 lg:py-12 overflow-hidden">
             <div className="relative z-10 max-w-4xl">
               <Eyebrow tone="gold">{t("eyebrow")}</Eyebrow>
-              <h1 className="mt-6 text-sm lg:text-2xl font-bold tracking-tight leading-[1.05]">
+              <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05]">
                 {t("title")}
               </h1>
-              <p className="mt-6 text-sm lg:text-sm text-[#C4D1CB] max-w-2xl leading-relaxed">
+              <p className="mt-6 text-sm text-secondary max-w-2xl leading-relaxed">
                 {t("subtitle")}
               </p>
 
@@ -91,10 +91,10 @@ export default async function ExportPage({
                 {destinations.map((d) => (
                   <div
                     key={d.country}
-                    className="rounded-sm bg-[#161616]/80 backdrop-blur border border-white/10 p-4 text-center hover:border-[#D4AF37]/40 transition-colors"
+                    className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4 text-center hover:shadow-card-hover hover:border-[#D8D4C6] transition-all"
                   >
                     <div className="text-2xl mb-2">{d.flag}</div>
-                    <div className="text-xs text-white font-semibold">
+                    <div className="text-xs text-[#141414] font-semibold">
                       {d.country}
                     </div>
                     <div className="mt-1 text-[10px] text-muted">
@@ -113,17 +113,17 @@ export default async function ExportPage({
         <div className="mx-auto max-w-7xl px-6 lg:px-6">
           <div className="max-w-3xl">
             <Eyebrow tone="gold">HOW IT WORKS</Eyebrow>
-            <h2 className="mt-4 text-sm lg:text-sm font-bold tracking-tight leading-[1.1]">
+            <h2 className="mt-4 text-2xl lg:text-3xl font-bold tracking-tight leading-[1.1]">
               From verified buyer to vehicle shipped — in one workflow.
             </h2>
           </div>
 
           <div className="mt-16 grid grid-cols-12 gap-5 auto-rows-[240px]">
             <BentoCard variant="dark" className="col-span-12 md:col-span-4">
-              <div className="text-[10px] uppercase tracking-widest text-[#F0CE5C]/70 mb-3">
+              <div className="text-[10px] uppercase tracking-widest text-[#F0941F]/70 mb-3">
                 Step 01
               </div>
-              <Building2 className="h-7 w-7 text-[#F0CE5C] mb-4" />
+              <Building2 className="h-7 w-7 text-[#F0941F] mb-4" />
               <BentoTitle className="text-sm">Register as a B2B buyer</BentoTitle>
               <BentoDesc className="text-sm mt-2">
                 Upload your trade licence. Our team verifies in under 24 hours.
@@ -131,10 +131,10 @@ export default async function ExportPage({
             </BentoCard>
 
             <BentoCard variant="dark" className="col-span-12 md:col-span-4">
-              <div className="text-[10px] uppercase tracking-widest text-[#F0CE5C]/70 mb-3">
+              <div className="text-[10px] uppercase tracking-widest text-[#F0941F]/70 mb-3">
                 Step 02
               </div>
-              <Boxes className="h-7 w-7 text-[#F0CE5C] mb-4" />
+              <Boxes className="h-7 w-7 text-[#F0941F] mb-4" />
               <BentoTitle className="text-sm">Browse export-ready stock</BentoTitle>
               <BentoDesc className="text-sm mt-2">
                 Filter by destination country, model, and quantity. Bulk-select up to 50.
@@ -142,10 +142,10 @@ export default async function ExportPage({
             </BentoCard>
 
             <BentoCard variant="emerald" className="col-span-12 md:col-span-4">
-              <div className="text-[10px] uppercase tracking-widest text-[#F0CE5C]/80 mb-3">
+              <div className="text-[10px] uppercase tracking-widest text-[#F0941F]/80 mb-3">
                 Step 03
               </div>
-              <Ship className="h-7 w-7 text-[#F0CE5C] mb-4" />
+              <Ship className="h-7 w-7 text-[#F0941F] mb-4" />
               <BentoTitle className="text-sm">Ship — RoRo or container</BentoTitle>
               <BentoDesc className="text-sm mt-2">
                 Coordinated through approved freight partners ex Jebel Ali.
@@ -155,11 +155,11 @@ export default async function ExportPage({
             <BentoCard variant="gold" className="col-span-12">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 h-full">
                 <div className="max-w-xl">
-                  <Truck className="h-7 w-7 text-[#1A1208] mb-4" />
-                  <BentoTitle className="text-[#1A1208]">
+                  <Truck className="h-7 w-7 text-white mb-4" />
+                  <BentoTitle className="text-white">
                     RoRo to Africa: ~AED 2,000–3,500 per vehicle.
                   </BentoTitle>
-                  <p className="mt-3 text-[#1A1208]/80">
+                  <p className="mt-3 text-white/80">
                     Jebel Ali — the largest port in MENA — gives us direct routes
                     to Mombasa, Dar es Salaam, Lagos, and Karachi.
                   </p>
@@ -179,7 +179,7 @@ export default async function ExportPage({
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
           <div className="max-w-3xl">
             <Eyebrow tone="gold">DOCUMENTATION</Eyebrow>
-            <h2 className="mt-4 text-sm font-bold tracking-tight leading-[1.1]">
+            <h2 className="mt-4 text-2xl lg:text-3xl font-bold tracking-tight leading-[1.1]">
               Every document buyers need — coordinated with the seller.
             </h2>
           </div>
@@ -188,9 +188,9 @@ export default async function ExportPage({
             {docs.map((d) => (
               <div
                 key={d.title}
-                className="rounded bg-[#161616] border border-white/8 p-6 hover:border-[#D4AF37]/30 transition-colors"
+                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-6 hover:shadow-card-hover hover:border-[#D8D4C6] transition-all"
               >
-                <d.icon className="h-6 w-6 text-[#F0CE5C] mb-4" />
+                <d.icon className="h-6 w-6 text-[#F0941F] mb-4" />
                 <h3 className="text-sm font-semibold">{d.title}</h3>
                 <p className="mt-2 text-xs text-secondary leading-relaxed">
                   {d.desc}
@@ -207,7 +207,7 @@ export default async function ExportPage({
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div>
               <Eyebrow tone="gold">EXPORT-READY INVENTORY</Eyebrow>
-              <h2 className="mt-4 text-sm lg:text-sm font-bold tracking-tight">
+              <h2 className="mt-4 text-2xl lg:text-3xl font-bold tracking-tight">
                 Hand-picked cars cleared for export
               </h2>
             </div>
@@ -231,22 +231,27 @@ export default async function ExportPage({
       {/* CTA */}
       <section className="relative pb-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-6">
-          <div className="rounded bg-hero-panel ring-1 ring-[#D4AF37]/30 px-5 py-8 lg:px-6 lg:py-8 text-center grain relative overflow-hidden">
-            <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-40" />
+          <div className="rounded-3xl bg-[#181C30] px-5 py-10 lg:px-6 lg:py-14 text-center relative overflow-hidden">
             <div className="relative z-10 max-w-3xl mx-auto">
-              <ShieldCheck className="h-10 w-10 text-[#F0CE5C] mx-auto mb-6" />
-              <h2 className="text-sm lg:text-sm font-bold tracking-tight">
-                Ready to source UAE inventory at scale?
+              <ShieldCheck className="h-10 w-10 text-[#F0941F] mx-auto mb-6" />
+              <h2 className="text-2xl lg:text-4xl font-light tracking-tight text-white">
+                Ready to source UAE inventory{" "}
+                <span className="font-extrabold">at scale?</span>
               </h2>
-              <p className="mt-6 text-secondary text-sm">
+              <p className="mt-6 text-white/70 text-sm">
                 Bulk orders, dedicated account manager, container or RoRo. We
                 handle the connection — yards handle the rest.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <Button asChild variant="gold" size="xl">
+                <Button asChild variant="emerald" size="xl">
                   <Link href="/export/register">Register as B2B buyer</Link>
                 </Button>
-                <Button asChild variant="ghost" size="xl">
+                <Button
+                  asChild
+                  variant="gold_outline"
+                  size="xl"
+                  className="border-white/40 text-white hover:bg-white hover:text-[#141414] hover:border-white"
+                >
                   <Link href="/contact">Talk to sales</Link>
                 </Button>
               </div>

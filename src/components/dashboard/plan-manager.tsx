@@ -51,7 +51,7 @@ export function PlanManager({
 
   return (
     <>
-      <div className="lg:col-span-2 rounded bg-bento-dark border border-[#D4AF37]/25 p-7 relative overflow-hidden grain">
+      <div className="lg:col-span-2 rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-7 relative overflow-hidden grain">
         <Eyebrow tone="gold">CURRENT PLAN</Eyebrow>
         <div className="mt-4 flex items-baseline gap-3 flex-wrap">
           <span className="text-base font-bold">{active?.name ?? "Free"}</span>
@@ -83,15 +83,15 @@ export function PlanManager({
             return (
               <div
                 key={t.id}
-                className={`rounded-md border p-4 ${
-                  isCurrent ? "border-[#D4AF37]/50 bg-[#D4AF37]/5" : "border-white/10"
+                className={`rounded-xl border p-4 ${
+                  isCurrent ? "border-[#F0941F]/50 bg-[#F0941F]/10" : "border-[#E7E4DA]"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold">{t.name}</span>
                   {t.recommended && <Badge tone="featured">POPULAR</Badge>}
                 </div>
-                <div className="mt-1 text-lg font-bold text-gradient-gold">
+                <div className="mt-1 text-lg font-bold text-[#141414]">
                   {t.monthlyAED ? formatAED(t.monthlyAED) : "Free"}
                   {t.monthlyAED > 0 && (
                     <span className="text-[10px] text-muted font-normal"> /mo</span>
@@ -103,7 +103,7 @@ export function PlanManager({
                 <ul className="mt-3 space-y-1">
                   {t.features.slice(0, 3).map((f) => (
                     <li key={f} className="flex items-start gap-1.5 text-[11px] text-secondary">
-                      <Check className="h-3 w-3 text-[#F0CE5C] mt-0.5 flex-shrink-0" />
+                      <Check className="h-3 w-3 text-[#F0941F] mt-0.5 flex-shrink-0" />
                       {f}
                     </li>
                   ))}

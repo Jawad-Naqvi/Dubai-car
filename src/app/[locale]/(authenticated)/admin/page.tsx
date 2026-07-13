@@ -84,19 +84,19 @@ export default async function AdminOverview() {
                 key={i}
                 className={
                   a.tone === "danger"
-                    ? "rounded-sm bg-[#7F1D1D]/30 border border-[#EF4444]/30 px-5 py-3 flex items-center gap-3"
+                    ? "rounded-2xl bg-[#DC2626]/10 border border-[#DC2626]/30 px-5 py-3 flex items-center gap-3"
                     : a.tone === "warn"
-                      ? "rounded-sm bg-[#78350F]/30 border border-[#F59E0B]/30 px-5 py-3 flex items-center gap-3"
-                      : "rounded-sm bg-[#1A1A1A] border border-[#D4AF37]/30 px-5 py-3 flex items-center gap-3"
+                      ? "rounded-2xl bg-[#F0941F]/10 border border-[#F0941F]/25 px-5 py-3 flex items-center gap-3"
+                      : "rounded-2xl bg-white shadow-card border border-[#E7E4DA] px-5 py-3 flex items-center gap-3"
                 }
               >
                 <ShieldAlert
                   className={
                     a.tone === "danger"
-                      ? "h-4 w-4 text-[#EF4444]"
+                      ? "h-4 w-4 text-[#DC2626]"
                       : a.tone === "warn"
-                        ? "h-4 w-4 text-[#F59E0B]"
-                        : "h-4 w-4 text-[#F0CE5C]"
+                        ? "h-4 w-4 text-[#C97612]"
+                        : "h-4 w-4 text-[#F0941F]"
                   }
                 />
                 <span className="text-xs">{a.text}</span>
@@ -107,29 +107,29 @@ export default async function AdminOverview() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((k) => (
-            <div key={k.label} className="rounded-sm bg-[#161616] border border-white/8 p-5">
-              <k.icon className="h-5 w-5 text-[#F0CE5C]" />
-              <div className="mt-4 text-base font-bold">{k.value}</div>
+            <div key={k.label} className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-5 hover:shadow-card-hover transition-shadow">
+              <k.icon className="h-5 w-5 text-[#F0941F]" />
+              <div className="mt-4 text-base font-bold text-[#141414]">{k.value}</div>
               <div className="text-xs text-muted mt-1">{k.label}</div>
-              <div className="text-[10px] text-[#F0CE5C] mt-1">{k.sub}</div>
+              <div className="text-[10px] text-[#F0941F] mt-1">{k.sub}</div>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <div className="rounded bg-[#161616] border border-white/8 p-4">
+          <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-4">
             <Eyebrow tone="gold">REVENUE BY STREAM</Eyebrow>
-            <h3 className="mt-3 text-xs font-semibold">This period</h3>
+            <h3 className="mt-3 text-xs font-semibold text-[#141414]">This period</h3>
             <div className="mt-5 space-y-3">
               {revenue.streams.map((row) => (
                 <div key={row.label}>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-secondary">{row.label}</span>
-                    <span className="font-semibold">{formatAED(row.amount)}</span>
+                    <span className="font-semibold text-[#141414]">{formatAED(row.amount)}</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-1.5 rounded-full bg-[#F3F1E9] overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F0CE5C]"
+                      className="h-full bg-[#F0941F]"
                       style={{ width: `${Math.round((row.amount / maxStream) * 100)}%` }}
                     />
                   </div>
@@ -138,9 +138,9 @@ export default async function AdminOverview() {
             </div>
           </div>
 
-          <div className="rounded bg-[#161616] border border-white/8 p-4">
+          <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-4">
             <Eyebrow tone="emerald">TOP EXPORT DESTINATIONS</Eyebrow>
-            <h3 className="mt-3 text-xs font-semibold">From export inquiries</h3>
+            <h3 className="mt-3 text-xs font-semibold text-[#141414]">From export inquiries</h3>
             {destinations.length === 0 ? (
               <p className="mt-5 text-xs text-muted">
                 No export inquiries yet. They appear here as buyers submit them.
@@ -150,16 +150,16 @@ export default async function AdminOverview() {
                 {destinations.map((row, i) => (
                   <div
                     key={row.country}
-                    className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
+                    className="flex items-center justify-between py-2 border-b border-[#E7E4DA] last:border-0"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-muted w-6">#{i + 1}</span>
-                      <Ship className="h-4 w-4 text-[#F0CE5C]" />
-                      <span className="text-xs">
+                      <Ship className="h-4 w-4 text-[#F0941F]" />
+                      <span className="text-xs text-[#141414]">
                         {row.country} {FLAGS[row.country] ?? ""}
                       </span>
                     </div>
-                    <span className="text-xs font-semibold">
+                    <span className="text-xs font-semibold text-[#141414]">
                       {row.count} {row.count === 1 ? "inquiry" : "inquiries"}
                     </span>
                   </div>

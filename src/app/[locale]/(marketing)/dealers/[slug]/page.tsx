@@ -1,6 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { getDealerBySlug } from "@/lib/data/dealers";
+import { brand } from "@/lib/brand";
+import { whatsappLink } from "@/lib/utils";
 import { searchListings } from "@/lib/data/listings";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Badge } from "@/components/ui/badge";
@@ -35,24 +38,23 @@ export default async function DealerStorefront({
   return (
     <>
       <section className="relative">
-        <div className="h-48 lg:h-64 bg-gradient-to-br from-[#1A1A1A] via-[#161616] to-[#121212] relative overflow-hidden">
+        <div className="h-48 lg:h-64 bg-[#FBE7D4] relative overflow-hidden">
           <RadialGlow color="gold" size="xl" className="-top-40 -right-40 opacity-30" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.2),transparent_55%)]" />
         </div>
 
         <div className="mx-auto max-w-7xl px-6 lg:px-6 -mt-20">
-          <div className="rounded bg-[#161616] border border-white/8 p-5 lg:p-6 relative overflow-hidden grain">
+          <div className="rounded-3xl bg-white border border-[#E7E4DA] shadow-card p-5 lg:p-6 relative overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-start gap-6">
-              <div className="h-24 w-24 lg:h-28 lg:w-28 rounded bg-gradient-to-br from-[#F0CE5C] via-[#D4AF37] to-[#8C7220] flex items-center justify-center text-[#1A1208] font-black text-sm flex-shrink-0 ring-4 ring-[#161616]">
+              <div className="h-24 w-24 lg:h-28 lg:w-28 rounded-full bg-[#181C30] flex items-center justify-center text-white font-black text-2xl flex-shrink-0 ring-4 ring-white">
                 {dealer.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-sm lg:text-sm font-bold tracking-tight">
+                  <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
                     {dealer.name}
                   </h1>
                   {dealer.isVerified && (
-                    <BadgeCheck className="h-6 w-6 text-[#F0CE5C]" />
+                    <BadgeCheck className="h-6 w-6 text-[#F0941F]" />
                   )}
                   {dealer.isFeatured && <Badge tone="featured">Featured</Badge>}
                 </div>
@@ -60,7 +62,7 @@ export default async function DealerStorefront({
 
                 <div className="mt-5 flex flex-wrap gap-5 text-sm">
                   <div className="flex items-center gap-1.5">
-                    <Star className="h-4 w-4 fill-[#F0CE5C] text-[#F0CE5C]" />
+                    <Star className="h-4 w-4 fill-[#F0941F] text-[#F0941F]" />
                     <span className="font-semibold">{dealer.rating}</span>
                     <span className="text-muted">({dealer.reviewCount} reviews)</span>
                   </div>
@@ -76,17 +78,30 @@ export default async function DealerStorefront({
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <Button variant="gold" size="md">
-                  <Phone className="h-4 w-4" />
-                  Call
+                <Button asChild variant="gold" size="md">
+                  <a href={`tel:${dealer.phone ?? brand.whatsapp}`}>
+                    <Phone className="h-4 w-4" />
+                    Call
+                  </a>
                 </Button>
-                <Button variant="emerald" size="md">
-                  <MessageCircle className="h-4 w-4" />
-                  WhatsApp
+                <Button asChild variant="emerald" size="md">
+                  <a
+                    href={whatsappLink(
+                      dealer.whatsapp ?? brand.whatsapp,
+                      `Hi ${dealer.name}, I found your showroom on ${brand.name} and I'd like to know more about your inventory.`,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    WhatsApp
+                  </a>
                 </Button>
-                <Button variant="ghost" size="md">
-                  <Mail className="h-4 w-4" />
-                  Message
+                <Button asChild variant="ghost" size="md">
+                  <Link href="/contact">
+                    <Mail className="h-4 w-4" />
+                    Message
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -99,14 +114,14 @@ export default async function DealerStorefront({
           <div className="flex items-center justify-between mb-8">
             <div>
               <Eyebrow tone="gold">INVENTORY</Eyebrow>
-              <h2 className="mt-3 text-2xl lg:text-sm font-bold tracking-tight">
+              <h2 className="mt-3 text-2xl lg:text-3xl font-bold tracking-tight">
                 {inventory.length} active listings
               </h2>
             </div>
           </div>
 
           {inventory.length === 0 ? (
-            <div className="rounded bg-[#161616] border border-white/8 p-6 text-center text-muted">
+            <div className="rounded-3xl bg-white border border-[#E7E4DA] shadow-card p-6 text-center text-muted">
               No active listings yet.
             </div>
           ) : (

@@ -60,7 +60,7 @@ export function ImageUploader({
           handleFiles(e.dataTransfer.files);
         }}
         onClick={() => inputRef.current?.click()}
-        className="cursor-pointer rounded border border-dashed border-white/15 bg-[#0F0F0F] hover:border-[#D4AF37]/40 transition-colors p-8 text-center"
+        className="cursor-pointer rounded-2xl border border-dashed border-[#D8D4C6] bg-[#F3F1E9] hover:border-[#141414]/30 transition-colors p-8 text-center"
       >
         <input
           ref={inputRef}
@@ -71,12 +71,12 @@ export function ImageUploader({
           onChange={(e) => handleFiles(e.target.files)}
         />
         {uploading ? (
-          <Loader2 className="h-6 w-6 text-[#F0CE5C] mx-auto animate-spin" />
+          <Loader2 className="h-6 w-6 text-[#F0941F] mx-auto animate-spin" />
         ) : (
-          <Upload className="h-6 w-6 text-[#F0CE5C] mx-auto" />
+          <Upload className="h-6 w-6 text-[#F0941F] mx-auto" />
         )}
         <p className="mt-3 text-xs text-secondary">
-          Drag &amp; drop photos, or <span className="text-[#F0CE5C]">browse</span>
+          Drag &amp; drop photos, or <span className="font-semibold text-[#141414] underline underline-offset-2">browse</span>
         </p>
         <p className="mt-1 text-[10px] text-muted">
           Add 6+ photos. First photo is the cover.
@@ -88,11 +88,11 @@ export function ImageUploader({
           {value.map((src, i) => (
             <div
               key={i}
-              className="relative aspect-[4/3] rounded-sm overflow-hidden bg-[#121212] border border-white/8 group"
+              className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F3F1E9] border border-[#E7E4DA] group"
             >
               <Image src={src} alt="" fill sizes="160px" className="object-cover" />
               {i === 0 && (
-                <span className="absolute top-1 left-1 text-[9px] px-1 py-0.5 rounded-sm bg-[#F0CE5C] text-[#1A1208] font-semibold">
+                <span className="absolute top-1 left-1 text-[9px] px-1.5 py-0.5 rounded-full bg-[#F0941F] text-white font-semibold">
                   Cover
                 </span>
               )}
@@ -102,16 +102,16 @@ export function ImageUploader({
                     type="button"
                     onClick={() => makeHero(i)}
                     title="Make cover"
-                    className="h-6 w-6 rounded-sm bg-black/70 grid place-items-center hover:bg-black"
+                    className="h-6 w-6 rounded-full bg-black/70 grid place-items-center hover:bg-black"
                   >
-                    <Star className="h-3 w-3 text-[#F0CE5C]" />
+                    <Star className="h-3 w-3 text-[#F0941F]" />
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => remove(i)}
                   title="Remove"
-                  className="h-6 w-6 rounded-sm bg-black/70 grid place-items-center hover:bg-black"
+                  className="h-6 w-6 rounded-full bg-black/70 grid place-items-center hover:bg-black"
                 >
                   <X className="h-3 w-3" />
                 </button>

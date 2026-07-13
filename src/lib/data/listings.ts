@@ -1,6 +1,20 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
-import { and, asc, desc, eq, gte, ilike, inArray, lte, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  exists,
+  gte,
+  ilike,
+  inArray,
+  isNull,
+  lte,
+  not,
+  or,
+  sql,
+} from "drizzle-orm";
 import { db } from "@/lib/db";
 import { listings, dealers, listingMedia, type Listing } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
@@ -33,6 +47,14 @@ export interface ListingSearchParams {
   transmission?: string[];
   regionalSpec?: string[];
   emirate?: string[];
+  condition?: string[];
+  /** Exterior colour families (substring match against free-text colour). */
+  color?: string[];
+  interiorColor?: string[];
+  cylinders?: number[];
+  doors?: number[];
+  /** "dealer" | "private" */
+  sellerType?: string;
   priceMin?: number;
   priceMax?: number;
   yearMin?: number;
@@ -40,6 +62,7 @@ export interface ListingSearchParams {
   kmsMax?: number;
   exportReady?: boolean;
   inspected?: boolean;
+  withPhotos?: boolean;
   featured?: boolean;
   dealerSlug?: string;
   dealerId?: string;
@@ -61,6 +84,8 @@ export interface ListingSearchResult {
     bodyTypes: { value: string; count: number }[];
     emirates: { value: string; count: number }[];
     fuels: { value: string; count: number }[];
+    colors: { value: string; count: number }[];
+    conditions: { value: string; count: number }[];
   };
 }
 
@@ -130,11 +155,57 @@ function matchMulti(value: string, selected?: string[]) {
   return selected.some((s) => s.toLowerCase() === value.toLowerCase());
 }
 
+/** Colours are free-text, so match the selected family as a substring. */
+function matchColor(value: string | undefined, families?: string[]) {
+  if (!families || families.length === 0) return true;
+  if (!value) return false;
+  const v = value.toLowerCase();
+  return families.some((f) => v.includes(f.toLowerCase()));
+}
+
+/** Bucket a free-text colour into a known family name for facet counts. */
+function colorFamily(value: string | undefined, families: string[]) {
+  if (!value) return undefined;
+  const v = value.toLowerCase();
+  return families.find((f) => v.includes(f.toLowerCase()));
+}
+
+const EXTERIOR_COLOR_FAMILIES = [
+  "Black",
+  "White",
+  "Silver",
+  "Grey",
+  "Blue",
+  "Red",
+  "Green",
+  "Brown",
+  "Beige",
+  "Gold",
+  "Orange",
+  "Yellow",
+  "Purple",
+];
+
+/** New/Used/CPO. Mock rows only carry an isNew flag, so map accordingly. */
+function matchCondition(l: MockListing, selected?: string[]) {
+  if (!selected || selected.length === 0) return true;
+  return selected.some((s) =>
+    s === "New" ? l.isNew : !l.isNew,
+  );
+}
+
+function matchSellerType(l: MockListing, sellerType?: string) {
+  if (!sellerType) return true;
+  const isPrivate =
+    l.dealer.id === "private" || l.dealer.slug === "private-seller";
+  return sellerType === "private" ? isPrivate : !isPrivate;
+}
+
 function filterMock(p: ListingSearchParams): MockListing[] {
   let items = demoUniverse().filter((l) => {
     if (p.q) {
       const hay =
-        `${l.year} ${l.make} ${l.model} ${l.trim ?? ""} ${l.exteriorColor} ${l.bodyType}`.toLowerCase();
+        `${l.year} ${l.make} ${l.model} ${l.trim ?? ""} ${l.exteriorColor} ${l.bodyType} ${l.description} ${(l.features ?? []).join(" ")}`.toLowerCase();
       if (!hay.includes(p.q.toLowerCase())) return false;
     }
     if (!matchMulti(l.make, p.make)) return false;
@@ -143,6 +214,9 @@ function filterMock(p: ListingSearchParams): MockListing[] {
     if (!matchMulti(l.transmission, p.transmission)) return false;
     if (!matchMulti(l.regionalSpec, p.regionalSpec)) return false;
     if (!matchMulti(l.emirate, p.emirate)) return false;
+    if (!matchCondition(l, p.condition)) return false;
+    if (!matchColor(l.exteriorColor, p.color)) return false;
+    if (!matchSellerType(l, p.sellerType)) return false;
     if (p.priceMin != null && l.priceAED < p.priceMin) return false;
     if (p.priceMax != null && l.priceAED > p.priceMax) return false;
     if (p.yearMin != null && l.year < p.yearMin) return false;
@@ -150,6 +224,8 @@ function filterMock(p: ListingSearchParams): MockListing[] {
     if (p.kmsMax != null && l.kms > p.kmsMax) return false;
     if (p.exportReady && !l.isExportReady) return false;
     if (p.inspected && !l.isInspected) return false;
+    if (p.withPhotos && !(l.imageUrl || (l.imageUrls?.length ?? 0) > 0))
+      return false;
     if (p.featured && !l.isFeatured) return false;
     if (p.dealerSlug && l.dealer.slug !== p.dealerSlug) return false;
     if (p.dealerId && l.dealer.id !== p.dealerId) return false;
@@ -237,6 +313,16 @@ async function runSearchListings(
           (l) => l.emirate,
         ),
         fuels: facetCounts(filterMock({ ...p, fuel: undefined }), (l) => l.fuel),
+        colors: facetCounts(
+          filterMock({ ...p, color: undefined }).filter((l) =>
+            colorFamily(l.exteriorColor, EXTERIOR_COLOR_FAMILIES),
+          ),
+          (l) => colorFamily(l.exteriorColor, EXTERIOR_COLOR_FAMILIES)!,
+        ),
+        conditions: facetCounts(
+          filterMock({ ...p, condition: undefined }),
+          (l) => (l.isNew ? "New" : "Used"),
+        ),
       },
     };
   }
@@ -313,11 +399,13 @@ async function runSearchListings(
       bodyType: listings.bodyType,
       emirate: listings.emirate,
       fuel: listings.fuel,
+      colorExterior: listings.colorExterior,
+      condition: listings.condition,
     })
     .from(listings)
     .where(and(...conds))) as Pick<
     Listing,
-    "make" | "bodyType" | "emirate" | "fuel"
+    "make" | "bodyType" | "emirate" | "fuel" | "colorExterior" | "condition"
   >[];
 
   const tally = (vals: (string | null)[]) => {
@@ -339,6 +427,13 @@ async function runSearchListings(
       bodyTypes: tally(facetRows.map((r) => r.bodyType)),
       emirates: tally(facetRows.map((r) => r.emirate)),
       fuels: tally(facetRows.map((r) => r.fuel)),
+      colors: tally(
+        facetRows.map((r) =>
+          colorFamily(r.colorExterior ?? undefined, EXTERIOR_COLOR_FAMILIES) ??
+          null,
+        ),
+      ),
+      conditions: tally(facetRows.map((r) => r.condition)),
     },
   };
 }
@@ -355,6 +450,8 @@ function buildConditions(p: ListingSearchParams) {
         ilike(listings.trim, term),
         ilike(listings.colorExterior, term),
         ilike(listings.bodyType, term),
+        ilike(listings.description, term),
+        sql`${listings.features}::text ilike ${term}`,
       )!,
     );
   }
@@ -366,6 +463,34 @@ function buildConditions(p: ListingSearchParams) {
   if (p.regionalSpec?.length)
     conds.push(inArray(listings.regionalSpec, p.regionalSpec));
   if (p.emirate?.length) conds.push(inArray(listings.emirate, p.emirate));
+  if (p.condition?.length) conds.push(inArray(listings.condition, p.condition));
+  if (p.color?.length) {
+    conds.push(
+      or(
+        ...p.color.map((c) => ilike(listings.colorExterior, `%${c}%`)),
+      )!,
+    );
+  }
+  if (p.interiorColor?.length) {
+    conds.push(
+      or(
+        ...p.interiorColor.map((c) => ilike(listings.colorInterior, `%${c}%`)),
+      )!,
+    );
+  }
+  if (p.cylinders?.length) conds.push(inArray(listings.cylinders, p.cylinders));
+  if (p.doors?.length) conds.push(inArray(listings.doors, p.doors));
+  if (p.sellerType === "private") conds.push(isNull(listings.dealerId));
+  if (p.sellerType === "dealer") conds.push(not(isNull(listings.dealerId)));
+  if (p.withPhotos)
+    conds.push(
+      exists(
+        db
+          .select({ x: sql`1` })
+          .from(listingMedia)
+          .where(eq(listingMedia.listingId, listings.id)),
+      ),
+    );
   if (p.priceMin != null) conds.push(gte(listings.priceAED, p.priceMin));
   if (p.priceMax != null) conds.push(lte(listings.priceAED, p.priceMax));
   if (p.yearMin != null) conds.push(gte(listings.year, p.yearMin));

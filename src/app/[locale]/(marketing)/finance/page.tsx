@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { RadialGlow } from "@/components/marketing/radial-glow";
@@ -31,8 +32,8 @@ export default function FinancePage() {
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
           <div className="max-w-3xl">
             <Eyebrow tone="gold">CAR LOAN CALCULATOR</Eyebrow>
-            <h1 className="mt-6 text-sm lg:text-2xl font-bold tracking-tight leading-[1.05]">
-              Estimate your monthly car payment in AED.
+            <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05]">
+              Estimate your <span className="font-extrabold">monthly car payment</span> in AED.
             </h1>
             <p className="mt-6 text-sm text-secondary max-w-xl">
               Adjust price, down payment, and term. Compare bank rates side-by-side.
@@ -40,7 +41,7 @@ export default function FinancePage() {
           </div>
 
           <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="rounded bg-[#161616] border border-white/8 p-5">
+            <div className="rounded-3xl bg-white border border-[#E7E4DA] shadow-card p-5">
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -54,7 +55,7 @@ export default function FinancePage() {
                     step={5000}
                     value={price}
                     onChange={(e) => setPrice(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#141414]"
                   />
                 </div>
                 <div>
@@ -68,7 +69,7 @@ export default function FinancePage() {
                     max={50}
                     value={down}
                     onChange={(e) => setDown(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#141414]"
                   />
                 </div>
                 <div>
@@ -82,7 +83,7 @@ export default function FinancePage() {
                     max={7}
                     value={years}
                     onChange={(e) => setYears(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#141414]"
                   />
                 </div>
                 <div>
@@ -97,18 +98,17 @@ export default function FinancePage() {
                     step={0.1}
                     value={apr}
                     onChange={(e) => setApr(Number(e.target.value))}
-                    className="w-full accent-[#D4AF37]"
+                    className="w-full accent-[#141414]"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="rounded bg-bento-dark border border-[#D4AF37]/25 p-5 relative overflow-hidden grain">
-              <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-40" />
+            <div className="rounded-3xl bg-[#FBE7D4] border border-[#E7E4DA] shadow-card p-5 relative overflow-hidden">
               <div className="relative">
-                <Calculator className="h-6 w-6 text-[#F0CE5C]" />
+                <Calculator className="h-6 w-6 text-[#F0941F]" />
                 <div className="mt-4 text-sm text-secondary">Monthly payment</div>
-                <div className="mt-2 text-sm lg:text-2xl font-bold text-gradient-gold leading-none">
+                <div className="mt-2 text-2xl lg:text-3xl font-extrabold tracking-tight text-[#141414] leading-none">
                   {formatAED(emi)}
                 </div>
 
@@ -121,7 +121,7 @@ export default function FinancePage() {
                   ].map((r) => (
                     <div
                       key={r.label}
-                      className="flex justify-between text-sm border-b border-white/5 pb-2"
+                      className="flex justify-between text-sm border-b border-[#141414]/10 pb-2"
                     >
                       <span className="text-secondary">{r.label}</span>
                       <span className="font-semibold">{r.value}</span>
@@ -129,8 +129,8 @@ export default function FinancePage() {
                   ))}
                 </div>
 
-                <Button variant="gold" size="lg" className="mt-6 w-full">
-                  Get pre-approved
+                <Button asChild variant="gold" size="lg" className="mt-6 w-full">
+                  <Link href="/contact">Get pre-approved</Link>
                 </Button>
               </div>
             </div>
@@ -139,27 +139,27 @@ export default function FinancePage() {
           {/* Bank rates */}
           <div className="mt-24">
             <Eyebrow tone="emerald">BANK PARTNERS</Eyebrow>
-            <h2 className="mt-4 text-sm font-bold tracking-tight">
+            <h2 className="mt-4 text-2xl lg:text-3xl font-bold tracking-tight">
               Live rates from UAE banks
             </h2>
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {banks.map((b) => (
                 <div
                   key={b.name}
-                  className="rounded bg-[#161616] border border-white/8 p-6 hover:border-[#D4AF37]/30 transition-colors"
+                  className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-6 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
                 >
-                  <div className="h-12 w-12 rounded-sm bg-gradient-to-br from-[#D4AF37]/30 to-[#1A1A1A] flex items-center justify-center text-xs font-bold mb-4">
+                  <div className="h-12 w-12 rounded-full bg-[#181C30] text-white flex items-center justify-center text-xs font-bold mb-4">
                     {b.logo}
                   </div>
                   <h3 className="font-semibold">{b.name}</h3>
                   <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-sm font-bold text-gradient-gold">
+                    <span className="text-lg font-extrabold tracking-tight text-[#141414]">
                       {b.aprFrom}%
                     </span>
                     <span className="text-xs text-muted">APR from</span>
                   </div>
-                  <Button variant="ghost" size="sm" className="mt-4 w-full">
-                    Apply →
+                  <Button asChild variant="ghost" size="sm" className="mt-4 w-full">
+                    <Link href="/contact">Apply →</Link>
                   </Button>
                 </div>
               ))}

@@ -37,22 +37,22 @@ export function B2BVerifications({ buyers }: { buyers: B2BBuyerView[] }) {
   if (pending.length === 0) return null;
 
   return (
-    <div className="rounded bg-[#161616] border border-white/8 overflow-hidden">
-      <div className="p-4 border-b border-white/5">
+    <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] overflow-hidden">
+      <div className="p-4 border-b border-[#E7E4DA]">
         <Eyebrow tone="emerald">B2B BUYER VERIFICATIONS</Eyebrow>
-        <h2 className="mt-2 text-xs font-semibold">{pending.length} awaiting approval</h2>
+        <h2 className="mt-2 text-xs font-semibold text-[#141414]">{pending.length} awaiting approval</h2>
       </div>
-      <div className="divide-y divide-white/5">
+      <div className="divide-y divide-[#E7E4DA]">
         {pending.map((b) => (
           <div
             key={b.id}
             className={`flex items-center gap-4 p-4 ${busy === b.id ? "opacity-50" : ""}`}
           >
-            <div className="h-9 w-9 rounded-sm bg-gradient-to-br from-[#D4AF37]/30 to-[#1A1A1A] grid place-items-center flex-shrink-0">
-              <Building2 className="h-4 w-4 text-[#F0CE5C]" />
+            <div className="h-9 w-9 rounded-full bg-[#F0941F]/10 grid place-items-center flex-shrink-0">
+              <Building2 className="h-4 w-4 text-[#F0941F]" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-xs truncate">{b.companyName}</div>
+              <div className="font-semibold text-xs truncate text-[#141414]">{b.companyName}</div>
               <div className="text-[11px] text-muted flex items-center gap-1">
                 <Globe className="h-3 w-3" /> {b.country}
                 {b.contactPhone ? ` · ${b.contactPhone}` : ""}

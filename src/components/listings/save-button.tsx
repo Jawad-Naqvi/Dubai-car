@@ -22,14 +22,14 @@ export function SaveButton({
         onClick={() => toggle(listingId)}
         suppressHydrationWarning
         className={cn(
-          "flex items-center justify-center gap-1.5 h-9 rounded-sm border text-xs font-semibold transition-colors",
+          "flex items-center justify-center gap-1.5 h-9 rounded-full border text-xs font-semibold transition-colors",
           saved
-            ? "border-[#D4AF37]/50 bg-[#D4AF37]/10 text-[#F0CE5C]"
-            : "border-white/10 text-secondary hover:border-[#D4AF37]/40 hover:text-white",
+            ? "border-[#F0941F]/50 bg-[#F0941F]/10 text-[#C97612]"
+            : "border-[#141414]/20 text-[#141414] hover:bg-[#F3F1E9]",
           className,
         )}
       >
-        <Heart className={cn("h-3.5 w-3.5", saved && "fill-[#F0CE5C]")} />
+        <Heart className={cn("h-3.5 w-3.5", saved && "fill-[#F0941F]")} />
         {saved ? "Saved" : "Save"}
       </button>
     );
@@ -45,14 +45,14 @@ export function SaveButton({
       aria-label={saved ? "Remove from saved" : "Save"}
       suppressHydrationWarning
       className={cn(
-        "h-8 w-8 rounded-sm bg-[#0A0A0A]/80 backdrop-blur border flex items-center justify-center transition-colors",
+        "h-8 w-8 rounded-full bg-white/90 backdrop-blur border flex items-center justify-center transition-colors",
         saved
-          ? "border-[#D4AF37]/50 text-[#F0CE5C]"
-          : "border-white/10 text-white hover:border-[#D4AF37]/40",
+          ? "border-[#F0941F]/50 text-[#F0941F]"
+          : "border-[#E7E4DA] text-[#141414] hover:bg-white",
         className,
       )}
     >
-      <Heart className={cn("h-3.5 w-3.5", saved && "fill-[#F0CE5C]")} />
+      <Heart className={cn("h-3.5 w-3.5", saved && "fill-[#F0941F]")} />
     </button>
   );
 }

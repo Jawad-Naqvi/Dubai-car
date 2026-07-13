@@ -20,8 +20,8 @@ export function ListingSearchBar({ className }: { className?: string }) {
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-1.5 bg-[#0A0A0A]/80 backdrop-blur-xl border border-white/15 rounded p-1 pl-3">
-        <Search className="h-3.5 w-3.5 text-[#F0CE5C]" />
+      <div className="flex items-center gap-1.5 bg-white border border-[#E7E4DA] rounded-full shadow-card p-1 pl-3">
+        <Search className="h-3.5 w-3.5 text-[#F0941F]" />
         <input
           type="text"
           value={value}
@@ -29,7 +29,7 @@ export function ListingSearchBar({ className }: { className?: string }) {
           onKeyDown={(e) => e.key === "Enter" && push({ q: value || null })}
           placeholder="Make, model, or keyword"
           suppressHydrationWarning
-          className="flex-1 bg-transparent text-white placeholder:text-muted text-xs outline-none py-1.5"
+          className="flex-1 bg-transparent text-[#141414] placeholder:text-muted text-xs outline-none py-1.5"
         />
         <Button variant="gold" size="md" onClick={() => push({ q: value || null })}>
           Search
@@ -51,7 +51,7 @@ export function ListingSortBar() {
           value={emirate}
           onChange={(e) => push({ emirate: e.target.value || null })}
           suppressHydrationWarning
-          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-sm bg-[#161616] border border-white/10 text-[10px] text-secondary hover:border-[#D4AF37]/30 focus:outline-none cursor-pointer"
+          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E7E4DA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer"
         >
           <option value="">All emirates</option>
           {emirates.map((e) => (
@@ -67,7 +67,7 @@ export function ListingSortBar() {
           value={sort}
           onChange={(e) => push({ sort: e.target.value })}
           suppressHydrationWarning
-          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-sm bg-[#161616] border border-white/10 text-[10px] text-secondary hover:border-[#D4AF37]/30 focus:outline-none cursor-pointer"
+          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E7E4DA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer"
         >
           {Object.entries(SORT_LABELS).map(([k, label]) => (
             <option key={k} value={k}>

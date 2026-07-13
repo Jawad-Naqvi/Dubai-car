@@ -17,7 +17,7 @@ export function SendMessageButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center gap-1.5 h-9 rounded-sm border border-white/15 text-xs font-semibold hover:bg-white/5 transition-colors w-full"
+        className="flex items-center justify-center gap-1.5 h-9 rounded-full border border-[#141414]/20 text-[#141414] text-xs font-semibold hover:bg-[#F3F1E9] transition-colors w-full"
       >
         <Mail className="h-3 w-3" />
         Send message

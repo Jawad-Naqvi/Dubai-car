@@ -42,44 +42,39 @@ export interface MockListing {
  */
 const u = (id: string) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`;
+void u; // kept for any future one-off additions
+
+/* Model-accurate photos resolved from Wikimedia Commons via the same API the
+   catalog sync uses (filenames verified to match the actual model). */
+const w = (path: string) =>
+  `https://upload.wikimedia.org/wikipedia/commons/thumb/${path}`;
 
 const STOCK_PHOTOS: Record<string, string> = {
-  // SUV — Toyota Land Cruiser (white off-roader)
-  "Toyota Land Cruiser": u("1583121274602-3e2820c69888"),
-  // SUV — Nissan Patrol (silver SUV)
-  "Nissan Patrol": u("1593941707882-a5bba14938c7"),
-  // SUV/coupe — Mercedes G63 / AMG yellow
-  "Mercedes-Benz G63": u("1605559424843-9e4c228bf1c2"),
-  // Coupe — BMW M4
-  "BMW M4": u("1555215695-3004980ad54e"),
-  // SUV — Porsche Cayenne (dark Porsche)
-  "Porsche Cayenne Turbo": u("1606664515524-ed2f786a0bd6"),
-  // Coupe — Porsche 911
-  "Porsche 911 Carrera S": u("1503376780353-7e6692767b70"),
-  Porsche: u("1503376780353-7e6692767b70"),
-  // SUV — Range Rover
-  "Land Rover Range Rover": u("1494976388531-d1058494cdd8"),
-  "Land Rover": u("1494976388531-d1058494cdd8"),
-  // SUV — Lexus LX 600
-  "Lexus LX 600": u("1568844293986-8d0400bd4745"),
-  Lexus: u("1568844293986-8d0400bd4745"),
-  // Pickup — Toyota Hilux
-  "Toyota Hilux": u("1565891741441-64926e441838"),
-  // Coupe — Ford Mustang
-  "Ford Mustang": u("1567808291548-fc3ee04dbcf0"),
-  // Wagon — Audi RS6
-  "Audi RS6": u("1606220588913-b3aacb4d2f46"),
-  Audi: u("1606220588913-b3aacb4d2f46"),
+  "Toyota Land Cruiser": w("7/7c/2023_Toyota_Land_Cruiser_300_3.4_VX_V6_in_Precious_White_Pearl%2C_06-12-2024.jpg/1280px-2023_Toyota_Land_Cruiser_300_3.4_VX_V6_in_Precious_White_Pearl%2C_06-12-2024.jpg"),
+  "Nissan Patrol": w("7/7c/NISSAN_PATROL_Y62_China_%282%29.jpg/1280px-NISSAN_PATROL_Y62_China_%282%29.jpg"),
+  "Mercedes-Benz G63": w("b/b6/Mercedes-Benz_W463_G_63_AMG_6%C3%976_MYLE_Festival_2025_DSC_9406.jpg/1280px-Mercedes-Benz_W463_G_63_AMG_6%C3%976_MYLE_Festival_2025_DSC_9406.jpg"),
+  "BMW M4": w("c/c8/BMW_M4_CS_%28G82%29_VR46_Edition_IAA_2025_DSC_1308.jpg/1280px-BMW_M4_CS_%28G82%29_VR46_Edition_IAA_2025_DSC_1308.jpg"),
+  "Porsche Cayenne Turbo": w("4/49/Porsche_Cayenne%2C_IAA_2017_%281Y7A2256%29.jpg/1280px-Porsche_Cayenne%2C_IAA_2017_%281Y7A2256%29.jpg"),
+  "Porsche 911 Carrera S": w("5/5d/2025_Porsche_992_Carrera_convertible_DSC_7026_%28cropped%29.jpg/1280px-2025_Porsche_992_Carrera_convertible_DSC_7026_%28cropped%29.jpg"),
+  Porsche: w("5/5d/2025_Porsche_992_Carrera_convertible_DSC_7026_%28cropped%29.jpg/1280px-2025_Porsche_992_Carrera_convertible_DSC_7026_%28cropped%29.jpg"),
+  "Land Rover Range Rover": w("e/eb/LAND_ROVER_RANGE_ROVER_%28L460%29_China.jpg/1280px-LAND_ROVER_RANGE_ROVER_%28L460%29_China.jpg"),
+  "Land Rover": w("e/eb/LAND_ROVER_RANGE_ROVER_%28L460%29_China.jpg/1280px-LAND_ROVER_RANGE_ROVER_%28L460%29_China.jpg"),
+  "Lexus LX 600": w("c/c2/Lexus_LX_600_VJA310_Atomic_Silver_%282%29.jpg/1280px-Lexus_LX_600_VJA310_Atomic_Silver_%282%29.jpg"),
+  Lexus: w("c/c2/Lexus_LX_600_VJA310_Atomic_Silver_%282%29.jpg/1280px-Lexus_LX_600_VJA310_Atomic_Silver_%282%29.jpg"),
+  "Toyota Hilux": w("1/13/Toyota_Hilux_at_the_2022_Essen_Motor_Show.jpg/1280px-Toyota_Hilux_at_the_2022_Essen_Motor_Show.jpg"),
+  "Ford Mustang": w("a/ad/Ford_Mustang_GT_Convertible_%2898060%29.jpg/1280px-Ford_Mustang_GT_Convertible_%2898060%29.jpg"),
+  "Audi RS6": w("0/00/Audi_RS6_Avant_C8_1X7A0305.jpg/1280px-Audi_RS6_Avant_C8_1X7A0305.jpg"),
+  Audi: w("0/00/Audi_RS6_Avant_C8_1X7A0305.jpg/1280px-Audi_RS6_Avant_C8_1X7A0305.jpg"),
 
   // Generic make fallbacks
-  Toyota: u("1621007947382-bb3c3994e3fb"),
-  Nissan: u("1612825173281-9a193378527e"),
-  "Mercedes-Benz": u("1605559424843-9e4c228bf1c2"),
-  BMW: u("1555215695-3004980ad54e"),
-  Ford: u("1567808291548-fc3ee04dbcf0"),
+  Toyota: w("7/7c/2023_Toyota_Land_Cruiser_300_3.4_VX_V6_in_Precious_White_Pearl%2C_06-12-2024.jpg/1280px-2023_Toyota_Land_Cruiser_300_3.4_VX_V6_in_Precious_White_Pearl%2C_06-12-2024.jpg"),
+  Nissan: w("9/9e/2023_Nissan_Altima_SR.png/1280px-2023_Nissan_Altima_SR.png"),
+  "Mercedes-Benz": w("7/77/Mercedes-Benz_W223_IAA_2021_1X7A0206.jpg/1280px-Mercedes-Benz_W223_IAA_2021_1X7A0206.jpg"),
+  BMW: w("8/86/BMW_G60_520i_1X7A2443.jpg/1280px-BMW_G60_520i_1X7A2443.jpg"),
+  Ford: w("a/ad/Ford_Mustang_GT_Convertible_%2898060%29.jpg/1280px-Ford_Mustang_GT_Convertible_%2898060%29.jpg"),
 
   // Last-resort default
-  default: u("1568605114967-8130f3a36994"),
+  default: w("c/c2/Lexus_LX_600_VJA310_Atomic_Silver_%282%29.jpg/1280px-Lexus_LX_600_VJA310_Atomic_Silver_%282%29.jpg"),
 };
 
 function img(make: string, model: string) {

@@ -22,8 +22,8 @@ export default function DashboardError({
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-6">
       <div className="max-w-md text-center">
-        <div className="h-12 w-12 rounded-full bg-[#78350F]/30 border border-[#F59E0B]/30 grid place-items-center mx-auto">
-          <AlertTriangle className="h-6 w-6 text-[#F59E0B]" />
+        <div className="h-12 w-12 rounded-full bg-[#F0941F]/10 border border-[#F0941F]/25 grid place-items-center mx-auto">
+          <AlertTriangle className="h-6 w-6 text-[#C97612]" />
         </div>
         <h2 className="mt-4 text-base font-bold">Something went wrong loading this page</h2>
         <p className="mt-2 text-xs text-muted">

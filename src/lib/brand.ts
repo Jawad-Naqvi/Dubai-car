@@ -114,3 +114,52 @@ export const fuelTypes = ["Petrol", "Diesel", "Hybrid", "Electric"] as const;
 export const transmissions = ["Automatic", "Manual"] as const;
 export const regionalSpecs = ["GCC", "American", "European", "Japanese", "Canadian", "Other"] as const;
 export const conditions = ["New", "Used", "Certified Pre-Owned"] as const;
+
+/**
+ * Colour families used by the exterior/interior colour filters. Listing colours
+ * are free-text (e.g. "Nardo Grey", "Pearl White"), so filtering matches the
+ * family name as a substring rather than an exact value.
+ */
+export interface ColorOption {
+  name: string;
+  hex: string;
+  /** Light swatch that needs a visible ring to read on white. */
+  light?: boolean;
+}
+
+export const exteriorColors: ColorOption[] = [
+  { name: "Black", hex: "#1A1A1A" },
+  { name: "White", hex: "#F3F1E9", light: true },
+  { name: "Silver", hex: "#C7CBD1", light: true },
+  { name: "Grey", hex: "#8B9099" },
+  { name: "Blue", hex: "#2456C7" },
+  { name: "Red", hex: "#CE2A2A" },
+  { name: "Green", hex: "#1F7A3D" },
+  { name: "Brown", hex: "#6B4423" },
+  { name: "Beige", hex: "#DCC9A0", light: true },
+  { name: "Gold", hex: "#F0941F" },
+  { name: "Orange", hex: "#E8791E" },
+  { name: "Yellow", hex: "#ECC526", light: true },
+  { name: "Purple", hex: "#6C2E9C" },
+];
+
+export const interiorColors: ColorOption[] = [
+  { name: "Black", hex: "#1A1A1A" },
+  { name: "Beige", hex: "#DCC9A0", light: true },
+  { name: "Grey", hex: "#8B9099" },
+  { name: "Brown", hex: "#6B4423" },
+  { name: "Tan", hex: "#B8946A" },
+  { name: "Red", hex: "#CE2A2A" },
+  { name: "White", hex: "#F3F1E9", light: true },
+];
+
+export const cylinderOptions = [3, 4, 5, 6, 8, 10, 12] as const;
+export const doorOptions = [2, 3, 4, 5] as const;
+
+export const sellerTypes = [
+  { id: "dealer", label: "Dealership" },
+  { id: "private", label: "Private Seller" },
+] as const;
+
+/** Preset mileage ceilings (km) for the quick-select mileage chips. */
+export const mileagePresets = [25000, 50000, 100000, 150000] as const;

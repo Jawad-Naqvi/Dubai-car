@@ -11,7 +11,7 @@ import type { BannerView } from "@/lib/data/banners";
 import { Plus, Trash2, ImageOff, Loader2 } from "lucide-react";
 
 const field =
-  "w-full h-10 rounded-sm bg-[#0F0F0F] border border-white/10 px-3 text-sm text-white placeholder:text-muted focus:outline-none focus:border-[#D4AF37]/40";
+  "w-full h-10 rounded-xl bg-white border border-[#E7E4DA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[#141414]/20";
 const labelCls = "text-[11px] uppercase tracking-wider text-muted mb-1.5 block";
 
 const PLACEMENTS = ["homepage_hero", "homepage_strip", "category_top", "sidebar"];
@@ -73,9 +73,9 @@ export function BannersManager({ banners }: { banners: BannerView[] }) {
       </div>
 
       {banners.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center py-24 rounded bg-[#161616] border border-white/8">
+        <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white shadow-card border border-[#E7E4DA]">
           <ImageOff className="h-8 w-8 text-muted mb-3" />
-          <h3 className="text-sm font-semibold">No banners yet</h3>
+          <h3 className="text-sm font-semibold text-[#141414]">No banners yet</h3>
           <p className="mt-1 text-xs text-muted">
             Create homepage or category ad placements to sell to dealers.
           </p>
@@ -83,8 +83,8 @@ export function BannersManager({ banners }: { banners: BannerView[] }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {banners.map((b) => (
-            <div key={b.id} className="rounded bg-[#161616] border border-white/8 overflow-hidden">
-              <div className="relative aspect-[16/6] bg-[#121212]">
+            <div key={b.id} className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] overflow-hidden">
+              <div className="relative aspect-[16/6] bg-[#F3F1E9]">
                 {b.imageUrl && (
                   <Image src={b.imageUrl} alt={b.title} fill sizes="400px" className="object-cover" />
                 )}
@@ -92,7 +92,7 @@ export function BannersManager({ banners }: { banners: BannerView[] }) {
               <div className="p-4">
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="font-semibold text-xs truncate">{b.title}</div>
+                    <div className="font-semibold text-xs truncate text-[#141414]">{b.title}</div>
                     <div className="text-[10px] text-muted">{b.placement}</div>
                   </div>
                   <Badge tone={b.isActive ? "verified" : "neutral"}>

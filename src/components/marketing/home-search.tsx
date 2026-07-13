@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Sparkles, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -40,11 +40,10 @@ export function HomeSearch() {
   };
 
   return (
-    <div className="mt-6 max-w-xl mx-auto">
+    <div className="mt-8 max-w-2xl mx-auto">
       <div className="relative">
-        <div className="absolute inset-0 rounded bg-gradient-to-r from-[#D4AF37]/30 via-[#F0CE5C]/40 to-[#D4AF37]/30 blur-lg opacity-50" />
-        <div className="relative flex items-center gap-1.5 bg-[#0A0A0A]/80 backdrop-blur-xl border border-white/15 rounded p-1 pl-3">
-          <Sparkles className="h-3.5 w-3.5 text-[#F0CE5C] flex-shrink-0" />
+        <div className="relative flex items-center gap-2 bg-white border border-[#E7E4DA] rounded-full shadow-card hover:shadow-card-hover transition-shadow p-1.5 pl-5">
+          <Search className="h-5 w-5 text-[#F0941F] flex-shrink-0" />
           <input
             type="text"
             value={value}
@@ -52,10 +51,10 @@ export function HomeSearch() {
             onKeyDown={(e) => e.key === "Enter" && go()}
             placeholder={t("hero.searchPlaceholder")}
             suppressHydrationWarning
-            className="flex-1 bg-transparent text-white placeholder:text-muted text-xs outline-none py-1.5"
+            className="flex-1 bg-transparent text-[#141414] placeholder:text-muted text-sm outline-none py-2.5"
           />
-          <Button variant="gold" size="md" onClick={go}>
-            <Search className="h-3 w-3" />
+          <Button variant="gold" size="lg" className="rounded-full px-6" onClick={go}>
+            <Search className="h-4 w-4" />
             {t("common.search")}
           </Button>
         </div>

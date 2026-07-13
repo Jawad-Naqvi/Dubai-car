@@ -36,13 +36,13 @@ export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
 
   if (items !== null && items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-24 rounded bg-[#121212] border border-white/8">
+      <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
         <GitCompare className="h-8 w-8 text-muted mb-3" />
         <h3 className="text-sm font-semibold">Nothing to compare yet</h3>
         <p className="mt-1 text-xs text-muted max-w-xs">
           Add up to 3 cars using the compare icon on any listing.
         </p>
-        <Link href="/buy" className="mt-4 text-xs text-[#F0CE5C] hover:underline">
+        <Link href="/buy" className="mt-4 text-xs font-semibold text-[#141414] underline underline-offset-2 hover:opacity-70">
           Browse inventory →
         </Link>
       </div>
@@ -80,36 +80,36 @@ export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <p className="text-xs text-secondary">
-          Comparing <span className="text-white font-semibold">{items.length}</span> cars
+          Comparing <span className="text-[#141414] font-semibold">{items.length}</span> cars
         </p>
         <button
           onClick={clear}
-          className="text-[10px] text-muted hover:text-white"
+          className="text-[10px] text-muted hover:text-[#141414]"
         >
           Clear all
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded border border-white/8">
+      <div className="overflow-x-auto rounded-2xl border border-[#E7E4DA] bg-white shadow-card">
         <table className="w-full text-xs border-collapse min-w-[640px]">
           <thead>
             <tr>
-              <th className="w-32 bg-[#121212] sticky left-0" />
+              <th className="w-32 bg-white sticky left-0" />
               {items.map((l) => (
-                <th key={l.id} className="p-3 bg-[#161616] border-l border-white/5 align-top text-left font-normal">
-                  <div className="relative aspect-[4/3] rounded-sm overflow-hidden bg-[#121212] mb-2">
+                <th key={l.id} className="p-3 bg-white border-l border-[#E7E4DA] align-top text-left font-normal">
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F3F1E9] mb-2">
                     <Image src={l.imageUrl} alt={l.model} fill sizes="200px" className="object-cover" />
                     <button
                       onClick={() => toggle(l.id)}
                       aria-label="Remove"
-                      className="absolute top-1 right-1 h-6 w-6 rounded-sm bg-black/70 grid place-items-center hover:bg-black"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full bg-white/90 border border-[#E7E4DA] text-[#141414] grid place-items-center hover:bg-white"
                     >
                       <X className="h-3 w-3" />
                     </button>
                   </div>
                   <Link
                     href={`/listings/${l.id}/${l.slug}`}
-                    className="block font-semibold text-white hover:text-[#F0CE5C] leading-snug"
+                    className="block font-semibold text-[#141414] hover:underline leading-snug"
                   >
                     {l.year} {l.make} {l.model}
                   </Link>
@@ -122,15 +122,15 @@ export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
             {rows.map((row) => {
               const winner = bestIndex(row);
               return (
-                <tr key={row.label} className="border-t border-white/5">
-                  <td className="p-3 bg-[#121212] sticky left-0 text-muted text-[10px] uppercase tracking-wider">
+                <tr key={row.label} className="border-t border-[#E7E4DA]">
+                  <td className="p-3 bg-white sticky left-0 text-muted text-[10px] uppercase tracking-wider">
                     {row.label}
                   </td>
                   {items.map((l, i) => (
                     <td
                       key={l.id}
-                      className={`p-3 border-l border-white/5 ${
-                        winner === i ? "text-[#F0CE5C] font-semibold" : "text-secondary"
+                      className={`p-3 border-l border-[#E7E4DA] ${
+                        winner === i ? "text-[#C97612] font-semibold" : "text-secondary"
                       }`}
                     >
                       <span className="inline-flex items-center gap-1">

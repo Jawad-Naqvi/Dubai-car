@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#141414"/>
+  <g fill="none" stroke="#F0941F" stroke-width="26" stroke-linecap="round">
+    <path d="M118 316h276"/>
+    <path d="M142 316c8-52 40-92 96-100l84-4c56 8 88 44 104 104"/>
+    <circle cx="186" cy="326" r="30" fill="#F1EFE9" stroke="#F0941F"/>
+    <circle cx="340" cy="326" r="30" fill="#F1EFE9" stroke="#F0941F"/>
+  </g>
+  <text x="256" y="430" font-family="Arial, sans-serif" font-size="64" font-weight="800" fill="#F1EFE9" text-anchor="middle">DXB</text>
+</svg>

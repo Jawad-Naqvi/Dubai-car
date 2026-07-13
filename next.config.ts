@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "cdn.dxbmotors.ae" },
       { protocol: "https", hostname: "api.dicebear.com" },
+      { protocol: "https", hostname: "cdn.imagin.studio" },
+      { protocol: "https", hostname: "upload.wikimedia.org" },
     ],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 86400, // cache optimized images for 24h

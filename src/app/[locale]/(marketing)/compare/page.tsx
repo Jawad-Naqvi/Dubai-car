@@ -13,8 +13,8 @@ export default async function ComparePage({
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-6 py-8">
       <Eyebrow tone="gold">SIDE BY SIDE</Eyebrow>
-      <h1 className="mt-2 text-xl lg:text-2xl font-bold tracking-tight">
-        Compare cars
+      <h1 className="mt-2 text-2xl lg:text-3xl font-light tracking-tight">
+        Compare <span className="font-extrabold">cars</span>
       </h1>
       <p className="mt-1.5 text-xs text-secondary max-w-xl mb-6">
         Up to 3 vehicles, head to head. The best value in each row is highlighted.
