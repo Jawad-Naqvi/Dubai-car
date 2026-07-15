@@ -8,6 +8,8 @@ import {
   bodyTypes,
   fuelTypes,
   transmissions,
+  drivetrains,
+  dealRatings,
   regionalSpecs,
   emirates,
   conditions,
@@ -29,11 +31,14 @@ interface Facet {
 export interface Facets {
   makes: Facet[];
   models?: Facet[];
+  trims?: Facet[];
   bodyTypes: Facet[];
   emirates: Facet[];
   fuels: Facet[];
+  drivetrains?: Facet[];
   colors: Facet[];
   conditions: Facet[];
+  dealRatings?: Facet[];
 }
 
 function FilterGroup({
@@ -190,10 +195,14 @@ export function FilterSidebar({
 
   // Draft state seeded from the URL; committed on Apply.
   const [makes, setMakes] = useState<string[]>([]);
+  const [modelSel, setModelSel] = useState<string[]>([]);
+  const [trimSel, setTrimSel] = useState<string[]>([]);
   const [emirateSel, setEmirateSel] = useState<string[]>([]);
   const [body, setBody] = useState<string[]>([]);
   const [fuel, setFuel] = useState<string[]>([]);
   const [trans, setTrans] = useState<string[]>([]);
+  const [drivetrainSel, setDrivetrainSel] = useState<string[]>([]);
+  const [dealRatingSel, setDealRatingSel] = useState<string[]>([]);
   const [spec, setSpec] = useState<string[]>([]);
   const [condition, setCondition] = useState<string[]>([]);
   const [color, setColor] = useState<string[]>([]);
@@ -215,10 +224,14 @@ export function FilterSidebar({
   // Re-seed whenever the URL changes (back/forward, links).
   useEffect(() => {
     setMakes(params.getAll("make"));
+    setModelSel(params.getAll("model"));
+    setTrimSel(params.getAll("trim"));
     setEmirateSel(params.getAll("emirate"));
     setBody(params.getAll("bodyType"));
     setFuel(params.getAll("fuel"));
     setTrans(params.getAll("transmission"));
+    setDrivetrainSel(params.getAll("drivetrain"));
+    setDealRatingSel(params.getAll("dealRating"));
     setSpec(params.getAll("regionalSpec"));
     setCondition(params.getAll("condition"));
     setColor(params.getAll("color"));
@@ -246,10 +259,14 @@ export function FilterSidebar({
   const apply = () => {
     push({
       make: makes,
+      model: modelSel,
+      trim: trimSel,
       emirate: emirateSel,
       bodyType: body,
       fuel,
       transmission: trans,
+      drivetrain: drivetrainSel,
+      dealRating: dealRatingSel,
       regionalSpec: spec,
       condition,
       color,
@@ -273,10 +290,14 @@ export function FilterSidebar({
   const reset = () => {
     push({
       make: null,
+      model: null,
+      trim: null,
       emirate: null,
       bodyType: null,
       fuel: null,
       transmission: null,
+      drivetrain: null,
+      dealRating: null,
       regionalSpec: null,
       condition: null,
       color: null,
@@ -368,6 +389,36 @@ export function FilterSidebar({
             )}
           </FilterGroup>
 
+          {/* Model — dependent on make (populated from facets). */}
+          {facets?.models && facets.models.length > 0 && (
+            <FilterGroup title={t("model")}>
+              {facets.models.map((m) => (
+                <CheckRow
+                  key={m.value}
+                  label={m.value}
+                  count={m.count}
+                  checked={modelSel.includes(m.value)}
+                  onChange={() => toggle(modelSel, setModelSel)(m.value)}
+                />
+              ))}
+            </FilterGroup>
+          )}
+
+          {/* Trim — dependent on model. */}
+          {facets?.trims && facets.trims.length > 0 && modelSel.length > 0 && (
+            <FilterGroup title={t("trim")}>
+              {facets.trims.map((tr) => (
+                <CheckRow
+                  key={tr.value}
+                  label={tr.value}
+                  count={tr.count}
+                  checked={trimSel.includes(tr.value)}
+                  onChange={() => toggle(trimSel, setTrimSel)(tr.value)}
+                />
+              ))}
+            </FilterGroup>
+          )}
+
           <FilterGroup title={t("condition")}>
             {conditions.map((c) => (
               <CheckRow
@@ -376,6 +427,18 @@ export function FilterSidebar({
                 count={countFor(facets?.conditions, c)}
                 checked={condition.includes(c)}
                 onChange={() => toggle(condition, setCondition)(c)}
+              />
+            ))}
+          </FilterGroup>
+
+          <FilterGroup title={t("dealRating")}>
+            {dealRatings.map((d) => (
+              <CheckRow
+                key={d.id}
+                label={d.label}
+                count={countFor(facets?.dealRatings, d.id)}
+                checked={dealRatingSel.includes(d.id)}
+                onChange={() => toggle(dealRatingSel, setDealRatingSel)(d.id)}
               />
             ))}
           </FilterGroup>
@@ -514,6 +577,18 @@ export function FilterSidebar({
                 label={tr}
                 checked={trans.includes(tr)}
                 onChange={() => toggle(trans, setTrans)(tr)}
+              />
+            ))}
+          </FilterGroup>
+
+          <FilterGroup title={t("drivetrain")}>
+            {drivetrains.map((d) => (
+              <CheckRow
+                key={d}
+                label={d}
+                count={countFor(facets?.drivetrains, d)}
+                checked={drivetrainSel.includes(d)}
+                onChange={() => toggle(drivetrainSel, setDrivetrainSel)(d)}
               />
             ))}
           </FilterGroup>

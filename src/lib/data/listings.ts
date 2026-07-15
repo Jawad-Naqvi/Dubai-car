@@ -23,6 +23,8 @@ import {
   mockListings,
   type MockListing,
 } from "@/lib/mock-data";
+import { deriveDrivetrain, computeDealRating } from "@/lib/vehicle-derive";
+import type { DealRating } from "@/lib/brand";
 import { demoStore } from "./demo-store";
 
 /** Public universe in demo mode: seeded mock cars + approved user-created cars. */
@@ -44,9 +46,13 @@ export interface ListingSearchParams {
   q?: string;
   make?: string[];
   model?: string[];
+  trim?: string[];
   bodyType?: string[];
   fuel?: string[];
   transmission?: string[];
+  drivetrain?: string[];
+  /** Computed vs peer pricing: "Great" | "Good" | "Fair" */
+  dealRating?: string[];
   regionalSpec?: string[];
   emirate?: string[];
   condition?: string[];
@@ -84,11 +90,14 @@ export interface ListingSearchResult {
   facets: {
     makes: { value: string; count: number }[];
     models: { value: string; count: number }[];
+    trims: { value: string; count: number }[];
     bodyTypes: { value: string; count: number }[];
     emirates: { value: string; count: number }[];
     fuels: { value: string; count: number }[];
+    drivetrains: { value: string; count: number }[];
     colors: { value: string; count: number }[];
     conditions: { value: string; count: number }[];
+    dealRatings: { value: string; count: number }[];
   };
 }
 
@@ -122,6 +131,7 @@ function rowToView(r: DbRow): MockListing {
     bodyType: l.bodyType ?? "—",
     fuel: l.fuel ?? "—",
     transmission: l.transmission ?? "—",
+    drivetrain: l.drivetrain ?? undefined,
     regionalSpec: l.regionalSpec ?? "—",
     exteriorColor: l.colorExterior ?? "—",
     emirate: l.emirate,
@@ -204,6 +214,16 @@ function matchSellerType(l: MockListing, sellerType?: string) {
   return sellerType === "private" ? isPrivate : !isPrivate;
 }
 
+/** Deal rating is computed vs the whole public universe; memoize per listing. */
+const _dealRatingCache = new WeakMap<MockListing, DealRating | null>();
+function dealRatingOf(l: MockListing): DealRating | null {
+  const hit = _dealRatingCache.get(l);
+  if (hit !== undefined) return hit;
+  const r = computeDealRating(l, demoUniverse());
+  _dealRatingCache.set(l, r);
+  return r;
+}
+
 function filterMock(p: ListingSearchParams): MockListing[] {
   let items = demoUniverse().filter((l) => {
     if (p.q) {
@@ -213,9 +233,15 @@ function filterMock(p: ListingSearchParams): MockListing[] {
     }
     if (!matchMulti(l.make, p.make)) return false;
     if (!matchMulti(l.model, p.model)) return false;
+    if (p.trim?.length && !matchMulti(l.trim ?? "", p.trim)) return false;
     if (!matchMulti(l.bodyType, p.bodyType)) return false;
     if (!matchMulti(l.fuel, p.fuel)) return false;
     if (!matchMulti(l.transmission, p.transmission)) return false;
+    if (!matchMulti(deriveDrivetrain(l), p.drivetrain)) return false;
+    if (p.dealRating?.length) {
+      const r = dealRatingOf(l);
+      if (!r || !p.dealRating.includes(r)) return false;
+    }
     if (!matchMulti(l.regionalSpec, p.regionalSpec)) return false;
     if (!matchMulti(l.emirate, p.emirate)) return false;
     if (!matchCondition(l, p.condition)) return false;
@@ -312,6 +338,10 @@ async function runSearchListings(
           filterMock({ ...p, model: undefined }),
           (l) => l.model,
         ),
+        trims: facetCounts(
+          filterMock({ ...p, trim: undefined }).filter((l) => l.trim),
+          (l) => l.trim!,
+        ),
         bodyTypes: facetCounts(
           filterMock({ ...p, bodyType: undefined }),
           (l) => l.bodyType,
@@ -321,6 +351,10 @@ async function runSearchListings(
           (l) => l.emirate,
         ),
         fuels: facetCounts(filterMock({ ...p, fuel: undefined }), (l) => l.fuel),
+        drivetrains: facetCounts(
+          filterMock({ ...p, drivetrain: undefined }),
+          (l) => deriveDrivetrain(l),
+        ),
         colors: facetCounts(
           filterMock({ ...p, color: undefined }).filter((l) =>
             colorFamily(l.exteriorColor, EXTERIOR_COLOR_FAMILIES),
@@ -330,6 +364,10 @@ async function runSearchListings(
         conditions: facetCounts(
           filterMock({ ...p, condition: undefined }),
           (l) => (l.isNew ? "New" : "Used"),
+        ),
+        dealRatings: facetCounts(
+          filterMock({ ...p, dealRating: undefined }).filter((l) => dealRatingOf(l)),
+          (l) => dealRatingOf(l)!,
         ),
       },
     };
@@ -422,16 +460,29 @@ async function runSearchListings(
       .sort((a, b) => b.count - a.count);
   };
 
-  const [makes, models, bodyTypesF, emiratesF, fuels, colorRows, conditionsF] =
-    await Promise.all([
-      facetFor("make", listings.make),
-      facetFor("model", listings.model),
-      facetFor("bodyType", listings.bodyType),
-      facetFor("emirate", listings.emirate),
-      facetFor("fuel", listings.fuel),
-      facetFor("color", listings.colorExterior),
-      facetFor("condition", listings.condition),
-    ]);
+  const [
+    makes,
+    models,
+    trims,
+    bodyTypesF,
+    emiratesF,
+    fuels,
+    drivetrainsF,
+    colorRows,
+    conditionsF,
+    dealRatingsF,
+  ] = await Promise.all([
+    facetFor("make", listings.make),
+    facetFor("model", listings.model),
+    facetFor("trim", listings.trim),
+    facetFor("bodyType", listings.bodyType),
+    facetFor("emirate", listings.emirate),
+    facetFor("fuel", listings.fuel),
+    facetFor("drivetrain", listings.drivetrain),
+    facetFor("color", listings.colorExterior),
+    facetFor("condition", listings.condition),
+    facetFor("dealRating", listings.dealRating),
+  ]);
 
   // Free-text colors ("Nardo Grey") roll up into the swatch families.
   const colorMap = new Map<string, number>();
@@ -452,11 +503,16 @@ async function runSearchListings(
     facets: {
       makes,
       models,
+      trims,
       bodyTypes: bodyTypesF,
       emirates: emiratesF,
       fuels,
+      drivetrains: drivetrainsF,
       colors,
       conditions: conditionsF,
+      // Deal rating is denormalised onto listings.deal_rating (set on write +
+      // backfill), so it faceted like any other column.
+      dealRatings: dealRatingsF,
     },
   };
 }
@@ -480,10 +536,15 @@ function buildConditions(p: ListingSearchParams) {
   }
   if (p.make?.length) conds.push(inArray(listings.make, p.make));
   if (p.model?.length) conds.push(inArray(listings.model, p.model));
+  if (p.trim?.length) conds.push(inArray(listings.trim, p.trim));
   if (p.bodyType?.length) conds.push(inArray(listings.bodyType, p.bodyType));
   if (p.fuel?.length) conds.push(inArray(listings.fuel, p.fuel));
   if (p.transmission?.length)
     conds.push(inArray(listings.transmission, p.transmission));
+  if (p.drivetrain?.length)
+    conds.push(inArray(listings.drivetrain, p.drivetrain));
+  if (p.dealRating?.length)
+    conds.push(inArray(listings.dealRating, p.dealRating));
   if (p.regionalSpec?.length)
     conds.push(inArray(listings.regionalSpec, p.regionalSpec));
   if (p.emirate?.length) conds.push(inArray(listings.emirate, p.emirate));

@@ -203,7 +203,10 @@
       "yearDesc": "Year: Newest",
       "kmAsc": "Km: Lowest",
       "relevance": "Relevance"
-    }
+    },
+    "drivetrain": "Drivetrain",
+    "dealRating": "Deal rating",
+    "trim": "Trim"
   },
   "export": {
     "eyebrow": "B2B EXPORT",

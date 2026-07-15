@@ -8,17 +8,27 @@ import { useQueryState } from "@/lib/use-query-state";
 const MULTI_KEYS = [
   "make",
   "model",
+  "trim",
   "emirate",
   "bodyType",
   "fuel",
   "transmission",
+  "drivetrain",
   "regionalSpec",
   "condition",
+  "dealRating",
   "color",
   "interiorColor",
   "cylinders",
   "doors",
 ] as const;
+
+/** Deal-rating stores an id ("Great"); show the friendly label on the chip. */
+const DEAL_RATING_LABEL: Record<string, string> = {
+  Great: "Great Deal",
+  Good: "Good Deal",
+  Fair: "Fair Price",
+};
 
 /** Single-value params rendered as one chip with a formatted label. */
 const SINGLE_LABELS: Record<string, (v: string) => string> = {
@@ -66,7 +76,7 @@ export function ActiveFilters() {
     for (const v of values) {
       chips.push({
         key: `${key}:${v}`,
-        label: v,
+        label: key === "dealRating" ? (DEAL_RATING_LABEL[v] ?? v) : v,
         onRemove: () =>
           push({ [key]: getAll(key).filter((x) => x !== v) }),
       });

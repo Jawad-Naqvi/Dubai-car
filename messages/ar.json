@@ -203,7 +203,10 @@
       "yearDesc": "السنة: الأحدث",
       "kmAsc": "الأقل كم",
       "relevance": "الأنسب"
-    }
+    },
+    "drivetrain": "نظام الدفع",
+    "dealRating": "تقييم الصفقة",
+    "trim": "الفئة"
   },
   "export": {
     "eyebrow": "تصدير B2B",

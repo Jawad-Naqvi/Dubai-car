@@ -8,6 +8,7 @@
  *  - Wikimedia Commons — free, keyless photo search for model imagery.
  *
  * Optional enrichment (set env keys to activate):
+ *  - AUTO_DEV_API_KEY → real retail photos + specs via auto.dev (1k free/mo)
  *  - API_NINJAS_KEY   → full spec sheets (engine, drive, fuel economy…)
  *  - CARAPI_TOKEN/SECRET → trim-level data via carapi.app
  *  - NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY → studio renders via cdn.imagin.studio
@@ -145,6 +146,66 @@ export async function wikimediaImage(
     if (url && /\.(jpe?g|png|webp)/i.test(url) && !NOT_EXTERIOR.test(url)) return url;
   }
   return null;
+}
+
+/* ---------- Auto.dev photos + specs (optional, 1k free calls/mo) ---------- */
+
+const AUTODEV_BASE = "https://api.auto.dev";
+
+export function autodevKey(): string | undefined {
+  return process.env.AUTO_DEV_API_KEY || undefined;
+}
+
+async function autodevJson<T>(path: string): Promise<T | null> {
+  const key = autodevKey();
+  if (!key) return null;
+  const sep = path.includes("?") ? "&" : "?";
+  try {
+    const res = await fetch(`${AUTODEV_BASE}${path}${sep}apikey=${key}`, {
+      headers: { Authorization: `Bearer ${key}` },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+/** First real retail/studio photo for a make/model/year via auto.dev. */
+export async function autodevPhoto(
+  make: string,
+  model: string,
+  year?: number,
+): Promise<string | null> {
+  const q = new URLSearchParams({ make, model });
+  if (year) q.set("year", String(year));
+  const data = await autodevJson<{
+    photos?: (string | { url?: string })[];
+    photoUrls?: string[];
+    data?: { photos?: (string | { url?: string })[] };
+  }>(`/vehicle-photos?${q.toString()}`);
+  const list = data?.photos ?? data?.data?.photos ?? data?.photoUrls ?? [];
+  for (const p of list) {
+    const url = typeof p === "string" ? p : p?.url;
+    if (url && /^https?:\/\//.test(url)) return url;
+  }
+  return null;
+}
+
+/** Structured specifications for a make/model/year via auto.dev. */
+export async function autodevSpecs(
+  make: string,
+  model: string,
+  year?: number,
+): Promise<Record<string, unknown> | null> {
+  const q = new URLSearchParams({ make, model });
+  if (year) q.set("year", String(year));
+  const data = await autodevJson<Record<string, unknown>>(
+    `/specifications?${q.toString()}`,
+  );
+  if (!data || typeof data !== "object") return null;
+  return (data.data as Record<string, unknown>) ?? data;
 }
 
 /* ---------- API Ninjas spec enrichment (optional) ---------- */

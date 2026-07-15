@@ -158,6 +158,9 @@ export const listings = pgTable(
     bodyType: varchar("body_type", { length: 32 }),
     fuel: varchar("fuel", { length: 24 }),
     transmission: varchar("transmission", { length: 24 }),
+    drivetrain: varchar("drivetrain", { length: 32 }),
+    /** Denormalised deal score ("Great"|"Good"|"Fair") vs make/model median. */
+    dealRating: varchar("deal_rating", { length: 16 }),
     kms: integer("kms").notNull().default(0),
     colorExterior: varchar("color_exterior", { length: 32 }),
     colorInterior: varchar("color_interior", { length: 32 }),

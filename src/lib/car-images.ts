@@ -1,12 +1,16 @@
 /**
  * Car imagery provider chain.
  *
- * Priority:
+ * Priority (synchronous render-time chain):
  *  1. IMAGIN.studio CDN render (studio-quality, by make/model/year/angle) when
  *     NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY is configured — https://www.imagin.studio/car-image-api
- *  2. The image URL stored on the record (dealer upload / catalog-synced URL,
- *     e.g. a Wikimedia Commons image resolved at sync time)
+ *  2. The image URL stored on the record (dealer upload / catalog-synced URL —
+ *     resolved at sync time from auto.dev retail photos or Wikimedia Commons;
+ *     see src/lib/catalog/{providers,sync}.ts)
  *  3. Branded SVG placeholder (never a broken image)
+ *
+ * auto.dev and Wikimedia require an async lookup, so they run during catalog
+ * sync and persist a URL that this chain then serves as `fallbackUrl`.
  *
  * Used by the landing page, catalog pages, and anywhere a car must be shown
  * without a dealer-uploaded photo.

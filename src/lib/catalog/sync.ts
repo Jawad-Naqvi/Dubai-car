@@ -11,6 +11,9 @@ import { popularMakes } from "@/lib/brand";
 import {
   vpicModelsForMakeYear,
   wikimediaImage,
+  autodevPhoto,
+  autodevSpecs,
+  autodevKey,
   apiNinjasSpecs,
   carapiTrims,
   slugify,
@@ -155,18 +158,26 @@ export async function runCatalogSync(
       .limit(IMAGE_BUDGET_PER_RUN);
 
     for (const m of needImages) {
-      const url = await wikimediaImage(m.makeName, m.name, m.latestYear ?? undefined);
+      const year = m.latestYear ?? undefined;
+      // Prefer auto.dev's real retail photos when a key is set, else Wikimedia.
+      let url: string | null = null;
+      let source = "wikimedia";
+      if (autodevKey()) {
+        url = await autodevPhoto(m.makeName, m.name, year);
+        if (url) source = "autodev";
+      }
+      if (!url) url = await wikimediaImage(m.makeName, m.name, year);
       if (url) {
         await db
           .update(catalogModels)
-          .set({ imageUrl: url, imageSource: "wikimedia", updatedAt: new Date() })
+          .set({ imageUrl: url, imageSource: source, updatedAt: new Date() })
           .where(eq(catalogModels.id, m.id));
         stats.imagesResolved++;
       }
     }
 
     /* 3 — spec enrichment for trim-years missing specs */
-    if (process.env.API_NINJAS_KEY || process.env.CARAPI_TOKEN) {
+    if (autodevKey() || process.env.API_NINJAS_KEY || process.env.CARAPI_TOKEN) {
       const needSpecs = await db
         .select({
           id: catalogTrims.id,
@@ -182,6 +193,18 @@ export async function runCatalogSync(
         .limit(SPEC_BUDGET_PER_RUN);
 
       for (const trim of needSpecs) {
+        /* auto.dev specs first when configured */
+        if (autodevKey()) {
+          const adSpecs = await autodevSpecs(trim.makeName, trim.modelName, trim.year);
+          if (adSpecs && Object.keys(adSpecs).length) {
+            await db
+              .update(catalogTrims)
+              .set({ specs: adSpecs, specSource: "autodev", updatedAt: new Date() })
+              .where(eq(catalogTrims.id, trim.id));
+            stats.specsResolved++;
+            continue;
+          }
+        }
         const specs = await apiNinjasSpecs(trim.makeName, trim.modelName, trim.year);
         if (specs) {
           await db

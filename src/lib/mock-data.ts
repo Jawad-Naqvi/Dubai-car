@@ -14,6 +14,8 @@ export interface MockListing {
   bodyType: string;
   fuel: string;
   transmission: string;
+  /** Optional — derived from body/model when absent (see vehicle-derive.ts). */
+  drivetrain?: string;
   regionalSpec: string;
   exteriorColor: string;
   emirate: string;

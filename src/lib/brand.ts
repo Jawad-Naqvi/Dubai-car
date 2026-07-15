@@ -115,6 +115,25 @@ export const transmissions = ["Automatic", "Manual"] as const;
 export const regionalSpecs = ["GCC", "American", "European", "Japanese", "Canadian", "Other"] as const;
 export const conditions = ["New", "Used", "Certified Pre-Owned"] as const;
 
+/** Drivetrain options — mirrors the cars.com facet (AWD / 4WD / FWD / RWD). */
+export const drivetrains = [
+  "All-wheel Drive",
+  "Four-wheel Drive",
+  "Front-wheel Drive",
+  "Rear-wheel Drive",
+] as const;
+
+/**
+ * Deal rating buckets, cars.com-style. Computed from a listing's price versus
+ * the median asking price of comparable cars (same make/model, similar year).
+ */
+export const dealRatings = [
+  { id: "Great", label: "Great Deal" },
+  { id: "Good", label: "Good Deal" },
+  { id: "Fair", label: "Fair Price" },
+] as const;
+export type DealRating = (typeof dealRatings)[number]["id"];
+
 /**
  * Colour families used by the exterior/interior colour filters. Listing colours
  * are free-text (e.g. "Nardo Grey", "Pearl White"), so filtering matches the
