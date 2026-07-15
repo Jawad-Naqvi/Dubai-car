@@ -2,13 +2,19 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BuyerStats } from "@/components/dashboard/buyer-stats";
 import { formatAED } from "@/lib/utils";
 import {
   getDashboardStats,
   getDealerContext,
   getDealerInventory,
 } from "@/lib/data/dashboard";
-import { getLeadsForDealer } from "@/lib/data/leads";
+import { getLeadsForDealer, getMessagesForUser } from "@/lib/data/leads";
+import {
+  getB2BBuyerForUser,
+  getExportInquiriesForUser,
+} from "@/lib/data/b2b";
+import { getDashboardRole, getOrSyncUser } from "@/lib/data/users";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -18,7 +24,15 @@ import {
   Car,
   Plus,
   ArrowRight,
+  Search,
+  Ship,
+  FileText,
+  Heart,
+  ShieldCheck,
+  Clock,
 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -37,7 +51,31 @@ const LEAD_LABELS: Record<string, string> = {
   export_inquiry: "Export",
 };
 
-export default async function DealerOverview() {
+const STATUS_CHIP: Record<string, string> = {
+  new: "bg-[#1B4FA0]/10 text-[#1B4FA0]",
+  contacted: "bg-[#F0941F]/10 text-[#C97612]",
+  quoted: "bg-[#F0941F]/10 text-[#C97612]",
+  closed: "bg-[#F3F1E9] text-secondary",
+};
+
+function statusChip(status: string) {
+  return STATUS_CHIP[status] ?? "bg-[#F3F1E9] text-secondary";
+}
+
+/* =========================================================================
+   Role router — every login opens its own overview.
+   ========================================================================= */
+export default async function DashboardPage() {
+  const role = await getDashboardRole().catch(() => "dealer" as const);
+  if (role === "buyer") return <BuyerOverview />;
+  if (role === "b2b") return <B2BOverview />;
+  return <DealerOverview />;
+}
+
+/* =========================================================================
+   DEALER (also the admin fallback) — unchanged from the original overview.
+   ========================================================================= */
+async function DealerOverview() {
   const [ctx, stats, inventory, leads] = await Promise.all([
     getDealerContext(),
     getDashboardStats(),
@@ -223,6 +261,259 @@ export default async function DealerOverview() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+
+/* =========================================================================
+   BUYER overview.
+   ========================================================================= */
+async function BuyerOverview() {
+  const user = await getOrSyncUser().catch(() => null);
+  const firstName = user?.name?.split(" ")[0] ?? "there";
+  const messages = user
+    ? await getMessagesForUser(user.id).catch(() => [])
+    : [];
+
+  return (
+    <>
+      <DashboardHeader title="Your hub" subtitle="Saved cars, alerts & messages" />
+
+      <main className="p-5 space-y-4">
+        {/* Greeting / continue browsing */}
+        <div className="rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-6 relative overflow-hidden grain">
+          <Eyebrow tone="gold">WELCOME BACK</Eyebrow>
+          <h2 className="mt-3 text-lg font-bold tracking-tight">Hi {firstName}</h2>
+          <p className="mt-1 text-xs text-secondary max-w-md">
+            Pick up where you left off — browse the latest arrivals, revisit your
+            saved cars, or check for replies from sellers.
+          </p>
+          <Button asChild variant="gold" size="md" className="mt-5">
+            <Link href="/buy">
+              <Search className="h-4 w-4" />
+              Continue browsing
+            </Link>
+          </Button>
+        </div>
+
+        {/* Stat tiles (saved & alerts read client-side, messages from server) */}
+        <BuyerStats messagesCount={messages.length} />
+
+        {/* Recent messages + quick links */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
+          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+              <div>
+                <Eyebrow tone="gold">RECENT MESSAGES</Eyebrow>
+                <h2 className="mt-2 text-xs font-semibold">{messages.length} total</h2>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/messages">
+                  All messages
+                  <ArrowRight className="h-3 w-3 rtl-flip" />
+                </Link>
+              </Button>
+            </div>
+            {messages.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted">
+                No messages yet. Inquire on a listing and replies show up here.
+              </div>
+            ) : (
+              <div className="divide-y divide-[#E7E4DA]">
+                {messages.slice(0, 4).map((m) => (
+                  <div key={m.id} className="flex items-start gap-3 p-4 hover:bg-[#F1EFE9]">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-xs truncate">
+                        {m.listingTitle ?? "Listing"}
+                      </div>
+                      <div className="text-xs text-muted truncate mt-0.5">
+                        {m.dealerName ? `${m.dealerName} · ` : ""}
+                        {m.message}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusChip(
+                          m.status,
+                        )}`}
+                      >
+                        {m.status}
+                      </span>
+                      <span className="text-[10px] text-muted">{timeAgo(m.createdAt)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+            <h3 className="font-semibold">Quick links</h3>
+            <div className="mt-4 space-y-2">
+              <Button asChild variant="ghost" size="md" className="w-full justify-start">
+                <Link href="/dashboard/saved">
+                  <Heart className="h-4 w-4" />
+                  Saved cars
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="md" className="w-full justify-start">
+                <Link href="/dashboard/alerts">Manage alerts</Link>
+              </Button>
+              <Button asChild variant="ghost" size="md" className="w-full justify-start">
+                <Link href="/buy">Browse inventory</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+
+/* =========================================================================
+   B2B IMPORTER overview.
+   ========================================================================= */
+async function B2BOverview() {
+  const user = await getOrSyncUser().catch(() => null);
+  const [buyer, inquiries] = await Promise.all([
+    user ? getB2BBuyerForUser(user.id).catch(() => null) : Promise.resolve(null),
+    user ? getExportInquiriesForUser(user.id).catch(() => []) : Promise.resolve([]),
+  ]);
+
+  const verified = buyer?.isVerified ?? false;
+  const docCount = inquiries.reduce((acc, i) => acc + i.docRequests.length, 0);
+
+  const tiles = [
+    { label: "Export inquiries", value: inquiries.length, icon: Ship },
+    { label: "Watchlist", value: "—", icon: Heart },
+    { label: "Documents", value: docCount, icon: FileText },
+  ];
+
+  return (
+    <>
+      <DashboardHeader
+        title="Export desk"
+        subtitle={buyer?.companyName ?? "B2B importer"}
+      />
+
+      <main className="p-5 space-y-4">
+        {/* Verification banner */}
+        <div
+          className={`rounded-2xl border shadow-card p-5 flex items-start gap-3 ${
+            verified
+              ? "bg-[#1A7A4A]/5 border-[#1A7A4A]/20"
+              : "bg-[#F0941F]/5 border-[#F0941F]/25"
+          }`}
+        >
+          <ShieldCheck
+            className={`h-5 w-5 flex-shrink-0 ${
+              verified ? "text-[#1A7A4A]" : "text-[#C97612]"
+            }`}
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xs font-semibold">
+                {verified ? "Verified importer" : "Verification pending"}
+              </h2>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  verified
+                    ? "bg-[#1A7A4A]/10 text-[#1A7A4A]"
+                    : "bg-[#F0941F]/10 text-[#C97612]"
+                }`}
+              >
+                {verified ? "VERIFIED" : "PENDING"}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-secondary">
+              {verified
+                ? "Your trade license is verified. You can request export docs and submit inquiries."
+                : "Our team is reviewing your trade license. You can still browse and build a watchlist while you wait."}
+            </p>
+          </div>
+        </div>
+
+        {/* Stat tiles */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {tiles.map((t) => (
+            <div
+              key={t.label}
+              className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
+            >
+              <t.icon className="h-5 w-5 text-[#F0941F]" />
+              <div className="mt-4 text-base font-bold tracking-tight">{t.value}</div>
+              <div className="text-xs text-muted mt-1">{t.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Recent inquiries + quick actions */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
+          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+              <div>
+                <Eyebrow tone="gold">RECENT INQUIRIES</Eyebrow>
+                <h2 className="mt-2 text-xs font-semibold">{inquiries.length} total</h2>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/inquiries">
+                  All inquiries
+                  <ArrowRight className="h-3 w-3 rtl-flip" />
+                </Link>
+              </Button>
+            </div>
+            {inquiries.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted">
+                No export inquiries yet. Build a shipment on the export desk.
+              </div>
+            ) : (
+              <div className="divide-y divide-[#E7E4DA]">
+                {inquiries.slice(0, 4).map((i) => (
+                  <div key={i.id} className="flex items-center gap-3 p-4 hover:bg-[#F1EFE9]">
+                    <Ship className="h-4 w-4 text-muted flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-xs truncate">
+                        {i.destinationCountry} · {i.vehicleCount}{" "}
+                        {i.vehicleCount === 1 ? "vehicle" : "vehicles"}
+                      </div>
+                      <div className="text-xs text-muted flex items-center gap-1 mt-0.5">
+                        <Clock className="h-3 w-3" />
+                        {timeAgo(i.createdAt)}
+                        {i.shippingPreference ? ` · ${i.shippingPreference}` : ""}
+                      </div>
+                    </div>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold flex-shrink-0 ${statusChip(
+                        i.status,
+                      )}`}
+                    >
+                      {i.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+            <h3 className="font-semibold">Quick actions</h3>
+            <div className="mt-4 space-y-2">
+              <Button asChild variant="gold" size="md" className="w-full justify-start">
+                <Link href="/export">
+                  <Ship className="h-4 w-4" />
+                  Start an export inquiry
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="md" className="w-full justify-start">
+                <Link href="/buy?exportReady=true">Browse export-ready cars</Link>
+              </Button>
+              <Button asChild variant="ghost" size="md" className="w-full justify-start">
+                <Link href="/dashboard/documents">Document center</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </main>

@@ -1,7 +1,7 @@
 import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { leads, listings, type Lead } from "@/lib/db/schema";
+import { leads, listings, dealers, type Lead } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId, type DemoLead } from "./demo-store";
 import { sendLeadNotification } from "@/lib/notify";
@@ -169,4 +169,87 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
     createdAt: l.createdAt.toISOString(),
     listingId: l.listingId ?? undefined,
   }));
+}
+
+/** A buyer-facing message thread (one row per lead the buyer opened). */
+export interface MessageThread {
+  id: string;
+  type: string;
+  status: string;
+  message: string;
+  createdAt: string;
+  listingTitle?: string;
+  dealerName?: string;
+}
+
+/**
+ * Message threads for a signed-in buyer: their own leads, newest first, with
+ * listing (make/model/year) and dealer name joined for context. Read-only —
+ * new messages are created via the lead form on listing pages. Falls back to a
+ * few sample threads in demo mode so the page always renders.
+ */
+export async function getMessagesForUser(userId: string): Promise<MessageThread[]> {
+  if (!isDbEnabled()) {
+    const now = Date.now();
+    return [
+      {
+        id: "MSG-1",
+        type: "inquiry",
+        status: "new",
+        message: "Hi, is this still available? Can I come see it this weekend?",
+        createdAt: new Date(now - 2 * 3600_000).toISOString(),
+        listingTitle: "2022 BMW X5 xDrive40i",
+        dealerName: "Al Habtoor Motors",
+      },
+      {
+        id: "MSG-2",
+        type: "test_drive",
+        status: "contacted",
+        message: "Requested a test drive for Saturday afternoon.",
+        createdAt: new Date(now - 26 * 3600_000).toISOString(),
+        listingTitle: "2021 Mercedes-Benz C 300",
+        dealerName: "Deals on Wheels",
+      },
+      {
+        id: "MSG-3",
+        type: "contact_unlock",
+        status: "closed",
+        message: "Unlocked seller contact details.",
+        createdAt: new Date(now - 5 * 24 * 3600_000).toISOString(),
+        listingTitle: "2020 Toyota Land Cruiser GXR",
+        dealerName: "Gargash Motors",
+      },
+    ];
+  }
+  try {
+    const rows = await db
+      .select({
+        id: leads.id,
+        type: leads.type,
+        status: leads.status,
+        message: leads.message,
+        createdAt: leads.createdAt,
+        make: listings.make,
+        model: listings.model,
+        year: listings.year,
+        dealerName: dealers.businessName,
+      })
+      .from(leads)
+      .leftJoin(listings, eq(leads.listingId, listings.id))
+      .leftJoin(dealers, eq(leads.dealerId, dealers.id))
+      .where(eq(leads.buyerId, userId))
+      .orderBy(desc(leads.createdAt))
+      .limit(100);
+    return rows.map((r) => ({
+      id: r.id,
+      type: r.type,
+      status: r.status,
+      message: r.message ?? "",
+      createdAt: r.createdAt.toISOString(),
+      listingTitle: r.make ? `${r.year} ${r.make} ${r.model}` : undefined,
+      dealerName: r.dealerName ?? undefined,
+    }));
+  } catch {
+    return [];
+  }
 }

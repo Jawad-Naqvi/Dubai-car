@@ -105,6 +105,24 @@ export async function getOrSyncUser(): Promise<CurrentUser | null> {
   };
 }
 
+export type SidebarRole = "dealer" | "buyer" | "b2b" | "admin";
+
+/**
+ * Which dashboard a signed-in user sees. Resolves from the real Clerk/DB role
+ * so every login opens its own area:
+ *   dealer → seller dashboard, b2b_importer → export desk, buyer → buyer hub.
+ * In open-demo mode with no signed-in user, defaults to the dealer view so the
+ * showcase still renders real data.
+ */
+export async function getDashboardRole(): Promise<SidebarRole> {
+  const user = await getOrSyncUser();
+  if (!user) return "dealer";
+  if (user.role === "admin") return "admin";
+  if (user.role === "b2b_importer") return "b2b";
+  if (user.role === "dealer") return "dealer";
+  return "buyer";
+}
+
 /** The dealer record owned by the current user, if any. */
 export async function getCurrentDealer() {
   if (!isDbEnabled()) return null;

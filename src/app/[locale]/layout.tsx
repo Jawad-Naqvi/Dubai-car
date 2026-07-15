@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { brand } from "@/lib/brand";
 import { Toaster } from "sonner";
+import { NativeBridge } from "@/components/native/native-bridge";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -72,6 +73,7 @@ export default async function LocaleLayout({
           }}
         >
           <NextIntlClientProvider messages={messages}>
+            <NativeBridge />
             {children}
             <Toaster
               theme="light"

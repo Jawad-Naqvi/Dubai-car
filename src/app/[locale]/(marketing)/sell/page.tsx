@@ -63,6 +63,17 @@ export default async function SellPage({
                   </Button>
                 </div>
 
+                <p className="mt-4 text-xs text-secondary">
+                  Run a yard or dealership?{" "}
+                  <Link
+                    href="/sell/become-seller"
+                    className="font-semibold text-[#141414] underline underline-offset-2 hover:text-[#C97612]"
+                  >
+                    Open a seller account
+                  </Link>{" "}
+                  for inventory tools, lead inbox, and analytics.
+                </p>
+
                 <div className="mt-10 flex flex-wrap gap-6">
                   {[
                     { label: "19 days", desc: "Average time to sell" },
