@@ -47,6 +47,7 @@ export function parseListingParams(raw: RawParams): ListingSearchParams {
   return {
     q: str(raw.q),
     make: multi(raw.make),
+    model: multi(raw.model),
     bodyType: multi(raw.bodyType),
     fuel: multi(raw.fuel),
     transmission: multi(raw.transmission),

@@ -7,6 +7,7 @@ import { useQueryState } from "@/lib/use-query-state";
 /** Multi-value params rendered as one chip per selected value. */
 const MULTI_KEYS = [
   "make",
+  "model",
   "emirate",
   "bodyType",
   "fuel",
@@ -32,6 +33,15 @@ const SINGLE_LABELS: Record<string, (v: string) => string> = {
   exportReady: () => "Export ready",
   withPhotos: () => "With photos",
 };
+
+/** How many filters are currently applied — drives the mobile "Filters (N)" badge. */
+export function useActiveFilterCount() {
+  const { params, getAll } = useQueryState();
+  let n = 0;
+  for (const key of MULTI_KEYS) n += getAll(key).length;
+  for (const key of Object.keys(SINGLE_LABELS)) if (params.get(key)) n += 1;
+  return n;
+}
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (

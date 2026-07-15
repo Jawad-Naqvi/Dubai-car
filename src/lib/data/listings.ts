@@ -15,6 +15,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import type { PgColumn } from "drizzle-orm/pg-core";
 import { db } from "@/lib/db";
 import { listings, dealers, listingMedia, type Listing } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
@@ -42,6 +43,7 @@ export type SortKey =
 export interface ListingSearchParams {
   q?: string;
   make?: string[];
+  model?: string[];
   bodyType?: string[];
   fuel?: string[];
   transmission?: string[];
@@ -81,6 +83,7 @@ export interface ListingSearchResult {
   totalPages: number;
   facets: {
     makes: { value: string; count: number }[];
+    models: { value: string; count: number }[];
     bodyTypes: { value: string; count: number }[];
     emirates: { value: string; count: number }[];
     fuels: { value: string; count: number }[];
@@ -209,6 +212,7 @@ function filterMock(p: ListingSearchParams): MockListing[] {
       if (!hay.includes(p.q.toLowerCase())) return false;
     }
     if (!matchMulti(l.make, p.make)) return false;
+    if (!matchMulti(l.model, p.model)) return false;
     if (!matchMulti(l.bodyType, p.bodyType)) return false;
     if (!matchMulti(l.fuel, p.fuel)) return false;
     if (!matchMulti(l.transmission, p.transmission)) return false;
@@ -304,6 +308,10 @@ async function runSearchListings(
       totalPages: Math.max(1, Math.ceil(total / perPage)),
       facets: {
         makes: facetCounts(filterMock({ ...p, make: undefined }), (l) => l.make),
+        models: facetCounts(
+          filterMock({ ...p, model: undefined }),
+          (l) => l.model,
+        ),
         bodyTypes: facetCounts(
           filterMock({ ...p, bodyType: undefined }),
           (l) => l.bodyType,
@@ -393,28 +401,47 @@ async function runSearchListings(
     .where(and(...conds));
   const total = countRows[0]?.c ?? 0;
 
-  const facetRows = (await db
-    .select({
-      make: listings.make,
-      bodyType: listings.bodyType,
-      emirate: listings.emirate,
-      fuel: listings.fuel,
-      colorExterior: listings.colorExterior,
-      condition: listings.condition,
-    })
-    .from(listings)
-    .where(and(...conds))) as Pick<
-    Listing,
-    "make" | "bodyType" | "emirate" | "fuel" | "colorExterior" | "condition"
-  >[];
-
-  const tally = (vals: (string | null)[]) => {
-    const m = new Map<string, number>();
-    for (const v of vals) if (v) m.set(v, (m.get(v) ?? 0) + 1);
-    return Array.from(m.entries())
-      .map(([value, count]) => ({ value, count }))
+  /**
+   * Each facet is counted with its OWN filter excluded, so picking "Toyota"
+   * still shows how many BMWs you'd get if you switched — the way cars.com and
+   * every mature faceted search behaves. Counting with the full condition set
+   * would collapse each list to just the selected value.
+   */
+  const facetFor = async (
+    key: keyof ListingSearchParams,
+    column: PgColumn,
+  ): Promise<{ value: string; count: number }[]> => {
+    const rows = (await db
+      .select({ value: column, count: sql<number>`count(*)::int` })
+      .from(listings)
+      .where(and(...buildConditions({ ...resolved, [key]: undefined })))
+      .groupBy(column)) as { value: string | null; count: number }[];
+    return rows
+      .filter((r) => Boolean(r.value))
+      .map((r) => ({ value: r.value as string, count: r.count }))
       .sort((a, b) => b.count - a.count);
   };
+
+  const [makes, models, bodyTypesF, emiratesF, fuels, colorRows, conditionsF] =
+    await Promise.all([
+      facetFor("make", listings.make),
+      facetFor("model", listings.model),
+      facetFor("bodyType", listings.bodyType),
+      facetFor("emirate", listings.emirate),
+      facetFor("fuel", listings.fuel),
+      facetFor("color", listings.colorExterior),
+      facetFor("condition", listings.condition),
+    ]);
+
+  // Free-text colors ("Nardo Grey") roll up into the swatch families.
+  const colorMap = new Map<string, number>();
+  for (const r of colorRows) {
+    const fam = colorFamily(r.value, EXTERIOR_COLOR_FAMILIES);
+    if (fam) colorMap.set(fam, (colorMap.get(fam) ?? 0) + r.count);
+  }
+  const colors = Array.from(colorMap, ([value, count]) => ({ value, count })).sort(
+    (a, b) => b.count - a.count,
+  );
 
   return {
     items: rows.map(rowToView),
@@ -423,17 +450,13 @@ async function runSearchListings(
     perPage,
     totalPages: Math.max(1, Math.ceil(total / perPage)),
     facets: {
-      makes: tally(facetRows.map((r) => r.make)),
-      bodyTypes: tally(facetRows.map((r) => r.bodyType)),
-      emirates: tally(facetRows.map((r) => r.emirate)),
-      fuels: tally(facetRows.map((r) => r.fuel)),
-      colors: tally(
-        facetRows.map((r) =>
-          colorFamily(r.colorExterior ?? undefined, EXTERIOR_COLOR_FAMILIES) ??
-          null,
-        ),
-      ),
-      conditions: tally(facetRows.map((r) => r.condition)),
+      makes,
+      models,
+      bodyTypes: bodyTypesF,
+      emirates: emiratesF,
+      fuels,
+      colors,
+      conditions: conditionsF,
     },
   };
 }
@@ -456,6 +479,7 @@ function buildConditions(p: ListingSearchParams) {
     );
   }
   if (p.make?.length) conds.push(inArray(listings.make, p.make));
+  if (p.model?.length) conds.push(inArray(listings.model, p.model));
   if (p.bodyType?.length) conds.push(inArray(listings.bodyType, p.bodyType));
   if (p.fuel?.length) conds.push(inArray(listings.fuel, p.fuel));
   if (p.transmission?.length)

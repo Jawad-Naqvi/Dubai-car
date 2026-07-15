@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { ListingCard } from "@/components/listings/listing-card";
 import { FilterSidebar } from "@/components/listings/filter-sidebar";
 import { ActiveFilters } from "@/components/listings/active-filters";
+import { MobileFilterBar } from "@/components/listings/mobile-filter-bar";
 import {
   ListingSearchBar,
   ListingSortBar,
@@ -58,16 +59,19 @@ export default async function BuyPage({
           <div>
             {/* Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <div className="text-xs text-secondary">
-                <span className="text-[#141414] font-semibold">{result.total}</span>{" "}
-                results
-                {query.q ? (
-                  <>
-                    {" "}
-                    for{" "}
-                    <span className="text-[#141414] font-semibold">&ldquo;{query.q}&rdquo;</span>
-                  </>
-                ) : null}
+              <div className="flex items-center gap-3">
+                <MobileFilterBar facets={result.facets} total={result.total} />
+                <div className="text-xs text-secondary">
+                  <span className="text-[#141414] font-semibold">{result.total}</span>{" "}
+                  results
+                  {query.q ? (
+                    <>
+                      {" "}
+                      for{" "}
+                      <span className="text-[#141414] font-semibold">&ldquo;{query.q}&rdquo;</span>
+                    </>
+                  ) : null}
+                </div>
               </div>
               <ListingSortBar />
             </div>

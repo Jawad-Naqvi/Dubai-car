@@ -259,7 +259,8 @@
           "cta": "Explore",
           "href": "/export"
         }
-      ]
+      ],
+      "orSearchBy": "or search by"
     },
     "featuredWork": "Featured Inventory",
     "topSelling": {

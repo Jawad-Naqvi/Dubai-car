@@ -259,7 +259,8 @@
           "cta": "استكشف",
           "href": "/export"
         }
-      ]
+      ],
+      "orSearchBy": "أو ابحث حسب"
     },
     "featuredWork": "مخزون مميز",
     "topSelling": {

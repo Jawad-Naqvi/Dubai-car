@@ -26,8 +26,9 @@ interface Facet {
   value: string;
   count: number;
 }
-interface Facets {
+export interface Facets {
   makes: Facet[];
+  models?: Facet[];
   bodyTypes: Facet[];
   emirates: Facet[];
   fuels: Facet[];
@@ -176,10 +177,13 @@ export function FilterSidebar({
   className,
   facets,
   total,
+  onApplied,
 }: {
   className?: string;
   facets?: Facets;
   total?: number;
+  /** Called after Apply/Reset commits — lets the mobile drawer close itself. */
+  onApplied?: () => void;
 }) {
   const t = useTranslations("filters");
   const { params, push } = useQueryState();
@@ -263,6 +267,7 @@ export function FilterSidebar({
       exportReady: exportOnly ? "true" : null,
       withPhotos: withPhotos ? "true" : null,
     });
+    onApplied?.();
   };
 
   const reset = () => {
@@ -289,6 +294,7 @@ export function FilterSidebar({
       withPhotos: null,
       q: null,
     });
+    onApplied?.();
   };
 
   const countFor = (arr: Facet[] | undefined, value: string) =>
@@ -323,7 +329,13 @@ export function FilterSidebar({
           </button>
         </div>
 
-        <div className="px-4 max-h-[calc(100vh-180px)] overflow-y-auto">
+        {/* In the drawer the parent already scrolls, so don't nest a scroller. */}
+        <div
+          className={cn(
+            "px-4",
+            !onApplied && "max-h-[calc(100vh-180px)] overflow-y-auto",
+          )}
+        >
           <FilterGroup title={t("emirate")}>
             {emirates.map((e) => (
               <CheckRow
