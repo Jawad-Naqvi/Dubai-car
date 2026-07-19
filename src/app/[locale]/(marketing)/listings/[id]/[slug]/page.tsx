@@ -254,6 +254,8 @@ export default async function ListingDetailPage({
                   <ContactPaywall
                     listingId={listing.id}
                     listingTitle={listingTitle}
+                    dealerPhone={listing.dealer.phone}
+                    dealerWhatsapp={listing.dealer.whatsapp}
                   />
                 </div>
 

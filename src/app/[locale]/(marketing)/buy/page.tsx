@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { ListingCard } from "@/components/listings/listing-card";
 import { FilterSidebar } from "@/components/listings/filter-sidebar";
 import { ActiveFilters } from "@/components/listings/active-filters";
+import { SaveSearchButton } from "@/components/listings/save-search-button";
 import { MobileFilterBar } from "@/components/listings/mobile-filter-bar";
 import {
   ListingSearchBar,
@@ -73,7 +74,10 @@ export default async function BuyPage({
                   ) : null}
                 </div>
               </div>
-              <ListingSortBar />
+              <div className="flex items-center gap-2">
+                <SaveSearchButton className="hidden sm:inline-flex" />
+                <ListingSortBar />
+              </div>
             </div>
 
             <ActiveFilters />

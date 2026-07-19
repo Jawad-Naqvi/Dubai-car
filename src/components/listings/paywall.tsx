@@ -23,8 +23,8 @@ interface ContactPaywallProps {
 export function ContactPaywall({
   listingId,
   listingTitle,
-  dealerPhone = "971500000000",
-  dealerWhatsapp = "971500000000",
+  dealerPhone,
+  dealerWhatsapp,
   className,
 }: ContactPaywallProps) {
   const whatsappMsg = `Hi, I'm interested in the ${listingTitle} (DXB-${listingId}).`;
@@ -65,22 +65,27 @@ export function ContactPaywall({
       </SignedOut>
 
       <SignedIn>
-        <a
-          href={`tel:+${dealerPhone}`}
-          className="flex items-center justify-center gap-1.5 h-9 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#141414]/90 transition-colors w-full"
-        >
-          <Phone className="h-3 w-3" />
-          Call seller
-        </a>
-        <a
-          href={whatsappLink(dealerWhatsapp, whatsappMsg)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 h-9 rounded-full bg-[#1A7A4A] text-white text-xs font-semibold hover:bg-[#15633C] transition-colors w-full"
-        >
-          <MessageCircle className="h-3 w-3" />
-          WhatsApp seller
-        </a>
+        {dealerPhone && (
+          <a
+            href={`tel:+${dealerPhone}`}
+            className="flex items-center justify-center gap-1.5 h-9 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#141414]/90 transition-colors w-full"
+          >
+            <Phone className="h-3 w-3" />
+            Call seller
+          </a>
+        )}
+        {dealerWhatsapp && (
+          <a
+            href={whatsappLink(dealerWhatsapp, whatsappMsg)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 h-9 rounded-full bg-[#1A7A4A] text-white text-xs font-semibold hover:bg-[#15633C] transition-colors w-full"
+          >
+            <MessageCircle className="h-3 w-3" />
+            WhatsApp seller
+          </a>
+        )}
+        {/* Always available — creates a lead that IS delivered to the seller. */}
         <SendMessageButton listingId={listingId} listingTitle={listingTitle} />
       </SignedIn>
     </div>

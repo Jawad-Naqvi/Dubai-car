@@ -1,10 +1,49 @@
 import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/lib/db";
-import { leads, listings, dealers, type Lead } from "@/lib/db/schema";
+import { leads, listings, dealers, users, type Lead } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId, type DemoLead } from "./demo-store";
 import { sendLeadNotification } from "@/lib/notify";
+
+const LEAD_TYPE_LABEL: Record<string, string> = {
+  inquiry: "enquiry",
+  test_drive: "test-drive request",
+  contact_unlock: "contact unlock",
+  export_inquiry: "export enquiry",
+};
+
+/** Build the seller/dealer notification for a new lead. */
+function buildLeadEmail(opts: {
+  to?: string;
+  type: string;
+  buyerName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
+  message?: string;
+  listingTitle?: string;
+}) {
+  const label = LEAD_TYPE_LABEL[opts.type] ?? "enquiry";
+  const car = opts.listingTitle ? ` on ${opts.listingTitle}` : "";
+  const lines = [
+    `You have a new ${label}${car}.`,
+    "",
+    `Buyer:  ${opts.buyerName ?? "—"}`,
+    `Phone:  ${opts.buyerPhone ?? "—"}`,
+    `Email:  ${opts.buyerEmail ?? "—"}`,
+    opts.message ? `\nMessage:\n${opts.message}` : "",
+    "",
+    "Reply to this email to reach the buyer directly, or open your dashboard:",
+    "https://dxbmotors.ae/dashboard/leads",
+  ];
+  return {
+    to: opts.to,
+    replyTo: opts.buyerEmail,
+    subject: `New ${label}${car} — ${opts.buyerName ?? "a buyer"}`,
+    body: lines.filter((l) => l !== undefined).join("\n"),
+  };
+}
 
 export interface CreateLeadInput {
   listingId?: string;
@@ -53,25 +92,49 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
       createdAt: new Date().toISOString(),
     };
     store.leads.unshift(lead);
-    void sendLeadNotification({
-      subject: `New ${type} lead from ${input.buyerName ?? "a buyer"}`,
-      body: `${input.message ?? ""}\nContact: ${input.buyerPhone ?? input.buyerEmail ?? "—"}`,
-    });
+    void sendLeadNotification(
+      buildLeadEmail({
+        type,
+        buyerName: input.buyerName,
+        buyerEmail: input.buyerEmail,
+        buyerPhone: input.buyerPhone,
+        message: input.message,
+      }),
+    );
     return { id: lead.id };
   }
 
-  // Look up the listing's dealer + price for routing and fee calc.
+  // Look up the listing's dealer/seller + price for routing, fee calc, and to
+  // notify the RIGHT recipient (dealer's account email, or the private
+  // seller's email — falling back to LEADS_NOTIFY_EMAIL so leads never vanish).
   let dealerId = input.dealerId;
   let price: number | undefined;
+  let recipientEmail: string | undefined;
+  let listingTitle: string | undefined;
   if (input.listingId) {
+    const dealerUser = alias(users, "dealer_user");
+    const sellerUser = alias(users, "seller_user");
     const l = await db
-      .select({ dealerId: listings.dealerId, price: listings.priceAED })
+      .select({
+        dealerId: listings.dealerId,
+        price: listings.priceAED,
+        make: listings.make,
+        model: listings.model,
+        year: listings.year,
+        dealerEmail: dealerUser.email,
+        sellerEmail: sellerUser.email,
+      })
       .from(listings)
+      .leftJoin(dealers, eq(listings.dealerId, dealers.id))
+      .leftJoin(dealerUser, eq(dealers.userId, dealerUser.id))
+      .leftJoin(sellerUser, eq(listings.sellerId, sellerUser.id))
       .where(eq(listings.id, input.listingId))
       .limit(1);
     if (l[0]) {
       dealerId = dealerId ?? l[0].dealerId ?? undefined;
       price = l[0].price;
+      recipientEmail = l[0].dealerEmail ?? l[0].sellerEmail ?? undefined;
+      listingTitle = `${l[0].year} ${l[0].make} ${l[0].model}`;
     }
     await db
       .update(listings)
@@ -98,10 +161,17 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
     })
     .returning({ id: leads.id });
 
-  void sendLeadNotification({
-    subject: `New ${type} lead from ${input.buyerName ?? "a buyer"}`,
-    body: `${input.message ?? ""}\nContact: ${input.buyerPhone ?? input.buyerEmail ?? "—"}`,
-  });
+  void sendLeadNotification(
+    buildLeadEmail({
+      to: recipientEmail,
+      type,
+      buyerName: input.buyerName,
+      buyerEmail: input.buyerEmail,
+      buyerPhone: input.buyerPhone,
+      message: input.message,
+      listingTitle,
+    }),
+  );
 
   return { id: row.id };
 }

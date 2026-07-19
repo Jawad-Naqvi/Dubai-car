@@ -26,6 +26,8 @@ export interface MockListing {
     isVerified: boolean;
     rating: number;
     reviewCount: number;
+    phone?: string;
+    whatsapp?: string;
   };
   isFeatured: boolean;
   isInspected: boolean;

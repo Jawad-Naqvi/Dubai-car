@@ -285,10 +285,13 @@ export const savedSearches = pgTable("saved_searches", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 120 }),
-  query: jsonb("query").notNull(),
+  query: jsonb("query").$type<Record<string, string>>().notNull(),
   alertFrequency: varchar("alert_frequency", { length: 16 }).default("daily"),
+  /** High-water mark: only listings newer than this are "new matches". */
+  lastNotifiedAt: timestamp("last_notified_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+export type SavedSearch = typeof savedSearches.$inferSelect;
 
 /* === B2B === */
 export const b2bBuyers = pgTable("b2b_buyers", {

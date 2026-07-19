@@ -76,6 +76,8 @@ export interface ListingSearchParams {
   dealerId?: string;
   sellerId?: string;
   status?: string;
+  /** Only listings created after this instant (used by saved-search alerts). */
+  createdAfter?: Date;
   sort?: SortKey;
   page?: number;
   perPage?: number;
@@ -114,6 +116,8 @@ type DbRow = {
   dealerVerified: boolean | null;
   dealerRating: number | null;
   dealerReviews: number | null;
+  dealerPhone: string | null;
+  dealerWhatsapp: string | null;
   heroUrl: string | null;
 };
 
@@ -142,6 +146,8 @@ function rowToView(r: DbRow): MockListing {
       isVerified: r.dealerVerified ?? false,
       rating: r.dealerRating ?? 0,
       reviewCount: r.dealerReviews ?? 0,
+      phone: r.dealerPhone ?? undefined,
+      whatsapp: r.dealerWhatsapp ?? undefined,
     },
     isFeatured: l.isFeatured,
     isInspected: l.isInspected,
@@ -421,6 +427,8 @@ async function runSearchListings(
       dealerVerified: dealers.isVerified,
       dealerRating: dealers.rating,
       dealerReviews: dealers.reviewCount,
+      dealerPhone: dealers.phone,
+      dealerWhatsapp: dealers.whatsapp,
       heroUrl: hero.url,
     })
     .from(listings)
@@ -586,6 +594,7 @@ function buildConditions(p: ListingSearchParams) {
   if (p.featured) conds.push(eq(listings.isFeatured, true));
   if (p.dealerId) conds.push(eq(listings.dealerId, p.dealerId));
   if (p.sellerId) conds.push(eq(listings.sellerId, p.sellerId));
+  if (p.createdAfter) conds.push(gte(listings.createdAt, p.createdAfter));
   return conds;
 }
 
@@ -636,6 +645,8 @@ async function runGetListingById(id: string): Promise<MockListing | null> {
       dealerVerified: dealers.isVerified,
       dealerRating: dealers.rating,
       dealerReviews: dealers.reviewCount,
+      dealerPhone: dealers.phone,
+      dealerWhatsapp: dealers.whatsapp,
       heroUrl: hero.url,
     })
     .from(listings)
