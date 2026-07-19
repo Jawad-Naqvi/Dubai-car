@@ -13,8 +13,16 @@ import {
   index,
   uniqueIndex,
   primaryKey,
+  customType,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+
+/** Postgres bytea <-> Node Buffer (node-postgres maps these natively). */
+export const bytea = customType<{ data: Buffer; default: false }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 /* === Enums === */
 export const roleEnum = pgEnum("role", [
@@ -214,6 +222,20 @@ export const listingMedia = pgTable("listing_media", {
   height: integer("height"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+/**
+ * Uploaded image bytes stored in Postgres (no external object store / no local
+ * disk needed — survives serverless deploys). Served by GET /api/media/[id].
+ * Used when Cloudflare R2 is not configured.
+ */
+export const mediaAssets = pgTable("media_assets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  mimeType: varchar("mime_type", { length: 64 }).notNull().default("image/jpeg"),
+  size: integer("size").notNull().default(0),
+  data: bytea("data").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type MediaAsset = typeof mediaAssets.$inferSelect;
 
 /* === Leads === */
 export const leads = pgTable("leads", {

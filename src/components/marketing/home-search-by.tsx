@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Loader2 } from "lucide-react";
-import { emirates } from "@/lib/brand";
+import { emirates, makeModels } from "@/lib/brand";
 
 interface Facet {
   value: string;
@@ -97,10 +97,27 @@ export function HomeSearchBy() {
     };
   }, [query]);
 
+  // Full lineup for the chosen make (catalogue), with in-stock counts merged.
+  const modelOptions = useMemo(() => {
+    if (!make) return [];
+    const counts = new Map(models.map((m) => [m.value.toLowerCase(), m.count]));
+    const catalog = makeModels[make] ?? [];
+    const inStock = models.map((m) => m.value);
+    const names = Array.from(new Set([...catalog, ...inStock]));
+    return names.map((value) => ({
+      value,
+      label: counts.get(value.toLowerCase())
+        ? `${value} (${counts.get(value.toLowerCase())})`
+        : value,
+    }));
+  }, [make, models]);
+
   // Switching make invalidates a model that no longer belongs to it.
   useEffect(() => {
-    if (model && !models.some((m) => m.value === model)) setModel("");
-  }, [models, model]);
+    if (model && make && !(makeModels[make] ?? []).includes(model) &&
+        !models.some((m) => m.value === model))
+      setModel("");
+  }, [make, models, model]);
 
   const go = () => router.push(`/buy?${query.toString()}`);
 
@@ -148,10 +165,7 @@ export function HomeSearchBy() {
             onChange={setModel}
             disabled={!make}
             placeholder={make ? "All models" : "Select a make"}
-            options={models.map((m) => ({
-              value: m.value,
-              label: `${m.value} (${m.count})`,
-            }))}
+            options={modelOptions}
           />
         </div>
 

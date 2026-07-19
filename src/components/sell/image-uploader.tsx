@@ -29,9 +29,11 @@ export function ImageUploader({
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       onChange([...value, ...(data.urls ?? [])]);
-      if (!data.stored) {
-        toast.message("Demo mode: stock photos used", {
-          description: "Connect Cloudflare R2 to store real uploads.",
+      if (data.stored) {
+        toast.success("Photos uploaded");
+      } else {
+        toast.message("Photos added (temporary storage)", {
+          description: "Connect the database or R2 to store photos permanently.",
         });
       }
     } catch {

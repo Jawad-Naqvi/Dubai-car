@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronDown, RotateCw, SlidersHorizontal } from "lucide-react";
 import {
   popularMakes,
+  makeModels,
   bodyTypes,
   fuelTypes,
   transmissions,
@@ -220,6 +221,7 @@ export function FilterSidebar({
   const [exportOnly, setExportOnly] = useState(false);
   const [withPhotos, setWithPhotos] = useState(false);
   const [showAllMakes, setShowAllMakes] = useState(false);
+  const [showAllModels, setShowAllModels] = useState(false);
 
   // Re-seed whenever the URL changes (back/forward, links).
   useEffect(() => {
@@ -328,6 +330,36 @@ export function FilterSidebar({
   }, [facets]);
   const visibleMakes = showAllMakes ? makeList : makeList.slice(0, 8);
 
+  /**
+   * Model options. When makes are selected, show each selected make's FULL
+   * lineup from the catalogue (so BMW lists every BMW model, not just the two
+   * in stock), merged with live inventory counts. With no make selected, fall
+   * back to whatever models are actually in inventory.
+   */
+  const modelList = useMemo(() => {
+    const counts = new Map(
+      (facets?.models ?? []).map((m) => [m.value.toLowerCase(), m.count]),
+    );
+    let names: string[];
+    if (makes.length > 0) {
+      const catalog = makes.flatMap((mk) => makeModels[mk] ?? []);
+      // Keep any in-stock model that isn't in the catalogue (e.g. odd trims).
+      const inStock = (facets?.models ?? []).map((m) => m.value);
+      names = Array.from(new Set([...catalog, ...inStock]));
+    } else {
+      names = (facets?.models ?? []).map((m) => m.value);
+    }
+    return names
+      .map((value) => ({ value, count: counts.get(value.toLowerCase()) }))
+      // In-stock models first (by count desc), then the rest alphabetically.
+      .sort((a, b) => {
+        if ((b.count ?? 0) !== (a.count ?? 0))
+          return (b.count ?? 0) - (a.count ?? 0);
+        return a.value.localeCompare(b.value);
+      });
+  }, [makes, facets]);
+  const visibleModels = showAllModels ? modelList : modelList.slice(0, 12);
+
   return (
     <aside className={cn("w-full", className)}>
       <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
@@ -389,10 +421,10 @@ export function FilterSidebar({
             )}
           </FilterGroup>
 
-          {/* Model — dependent on make (populated from facets). */}
-          {facets?.models && facets.models.length > 0 && (
+          {/* Model — full lineup for the selected make(s), counts from stock. */}
+          {modelList.length > 0 && (
             <FilterGroup title={t("model")}>
-              {facets.models.map((m) => (
+              {visibleModels.map((m) => (
                 <CheckRow
                   key={m.value}
                   label={m.value}
@@ -401,6 +433,16 @@ export function FilterSidebar({
                   onChange={() => toggle(modelSel, setModelSel)(m.value)}
                 />
               ))}
+              {modelList.length > 12 && (
+                <button
+                  onClick={() => setShowAllModels((v) => !v)}
+                  className="text-[10px] text-[#C97612] font-semibold hover:underline pt-0.5"
+                >
+                  {showAllModels
+                    ? t("showLess")
+                    : `${t("showMore")} (${modelList.length - 12})`}
+                </button>
+              )}
             </FilterGroup>
           )}
 

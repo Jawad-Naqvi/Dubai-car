@@ -595,14 +595,24 @@ const cachedGetById = unstable_cache(
   { revalidate: 120, tags: ["listings"] },
 );
 
+/**
+ * Postgres ids are UUIDs; seeded mock ids ("L-004") are not. Guarding on this
+ * lets mock-linked pages (homepage promos, carousels) resolve from mock data
+ * instead of throwing "invalid input syntax for type uuid" when the DB is on.
+ */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function mockById(id: string): MockListing | null {
+  return (
+    demoStore().newListings.find((l) => l.id === id) ??
+    mockListings.find((l) => l.id === id) ??
+    null
+  );
+}
+
 export async function getListingById(id: string): Promise<MockListing | null> {
-  if (!isDbEnabled()) {
-    return (
-      demoStore().newListings.find((l) => l.id === id) ??
-      mockListings.find((l) => l.id === id) ??
-      null
-    );
-  }
+  if (!isDbEnabled() || !UUID_RE.test(id)) return mockById(id);
   return cachedGetById(id);
 }
 
@@ -662,7 +672,7 @@ const cachedMedia = unstable_cache(
 );
 
 export async function getListingMedia(id: string): Promise<string[]> {
-  if (!isDbEnabled()) {
+  if (!isDbEnabled() || !UUID_RE.test(id)) {
     const found = await getListingById(id);
     return found?.imageUrls ?? [];
   }
@@ -706,7 +716,7 @@ export async function getFeaturedListings(limit = 6): Promise<MockListing[]> {
 }
 
 export async function incrementViewCount(id: string): Promise<void> {
-  if (!isDbEnabled()) return;
+  if (!isDbEnabled() || !UUID_RE.test(id)) return;
   await db
     .update(listings)
     .set({ viewCount: sql`${listings.viewCount} + 1` })
