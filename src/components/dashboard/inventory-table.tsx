@@ -22,6 +22,7 @@ import {
   Star,
   Trash2,
   Clock,
+  TrendingDown,
 } from "lucide-react";
 
 const TABS = ["All", "Active", "Pending", "Reserved", "Sold", "Archived"] as const;
@@ -90,6 +91,34 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
       router.refresh();
     } catch {
       toast.error("Action failed");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const changePrice = async (id: string, current: number) => {
+    const input = window.prompt("New price (AED):", String(current));
+    if (input == null) return;
+    const price = Number(input.replace(/[^0-9.]/g, ""));
+    if (!Number.isFinite(price) || price < 1000) {
+      toast.error("Enter a valid price (min AED 1,000)");
+      return;
+    }
+    if (price === current) return;
+    setBusy(id);
+    try {
+      const res = await fetch(`/api/listings/${id}/price`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(
+        price < current ? "Price dropped — buyers will be alerted" : "Price updated",
+      );
+      router.refresh();
+    } catch {
+      toast.error("Could not update price");
     } finally {
       setBusy(null);
     }
@@ -230,6 +259,9 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
                         </Item>
                         <Item onClick={() => act(l.id, { status: "sold" }, "Marked sold")}>
                           <Tag className="h-3.5 w-3.5" /> Mark sold
+                        </Item>
+                        <Item onClick={() => changePrice(l.id, l.priceAED)}>
+                          <TrendingDown className="h-3.5 w-3.5" /> Change price
                         </Item>
                         <Item
                           onClick={() =>

@@ -78,6 +78,8 @@ export interface ListingSearchParams {
   status?: string;
   /** Only listings created after this instant (used by saved-search alerts). */
   createdAfter?: Date;
+  /** Restrict to these listing ids (used by price-drop alert matching). */
+  ids?: string[];
   sort?: SortKey;
   page?: number;
   perPage?: number;
@@ -132,12 +134,18 @@ function rowToView(r: DbRow): MockListing {
     year: l.year,
     kms: l.kms,
     priceAED: l.priceAED,
+    previousPrice:
+      l.previousPrice && l.previousPrice > l.priceAED
+        ? l.previousPrice
+        : undefined,
     bodyType: l.bodyType ?? "—",
     fuel: l.fuel ?? "—",
     transmission: l.transmission ?? "—",
     drivetrain: l.drivetrain ?? undefined,
+    dealRating: (l.dealRating as MockListing["dealRating"]) ?? undefined,
     regionalSpec: l.regionalSpec ?? "—",
     exteriorColor: l.colorExterior ?? "—",
+    vin: l.vin ?? undefined,
     emirate: l.emirate,
     dealer: {
       id: l.dealerId ?? "private",
@@ -237,6 +245,7 @@ function filterMock(p: ListingSearchParams): MockListing[] {
         `${l.year} ${l.make} ${l.model} ${l.trim ?? ""} ${l.exteriorColor} ${l.bodyType} ${l.description} ${(l.features ?? []).join(" ")}`.toLowerCase();
       if (!hay.includes(p.q.toLowerCase())) return false;
     }
+    if (p.ids?.length && !p.ids.includes(l.id)) return false;
     if (!matchMulti(l.make, p.make)) return false;
     if (!matchMulti(l.model, p.model)) return false;
     if (p.trim?.length && !matchMulti(l.trim ?? "", p.trim)) return false;
@@ -331,7 +340,9 @@ async function runSearchListings(
     const all = filterMock(p);
     const total = all.length;
     const start = (page - 1) * perPage;
-    const items = all.slice(start, start + perPage);
+    const items = all
+      .slice(start, start + perPage)
+      .map((l) => ({ ...l, dealRating: dealRatingOf(l) ?? undefined }));
     return {
       items,
       total,
@@ -599,6 +610,7 @@ function buildConditions(p: ListingSearchParams) {
   if (p.dealerId) conds.push(eq(listings.dealerId, p.dealerId));
   if (p.sellerId) conds.push(eq(listings.sellerId, p.sellerId));
   if (p.createdAfter) conds.push(gte(listings.createdAt, p.createdAfter));
+  if (p.ids?.length) conds.push(inArray(listings.id, p.ids));
   return conds;
 }
 
@@ -617,11 +629,13 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function mockById(id: string): MockListing | null {
-  return (
+  const found =
     demoStore().newListings.find((l) => l.id === id) ??
     mockListings.find((l) => l.id === id) ??
-    null
-  );
+    null;
+  return found
+    ? { ...found, dealRating: dealRatingOf(found) ?? undefined }
+    : null;
 }
 
 export async function getListingById(id: string): Promise<MockListing | null> {

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -8,7 +9,7 @@ import {
   getListingMedia,
   incrementViewCount,
 } from "@/lib/data/listings";
-import { formatAED, formatKm, monthlyEMI } from "@/lib/utils";
+import { formatAED, formatKm, monthlyEMI, cn } from "@/lib/utils";
 import { ListingGallery } from "@/components/listings/listing-gallery";
 import { FinanceCalculator } from "@/components/listings/finance-calculator";
 import { SaveButton } from "@/components/listings/save-button";
@@ -18,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ListingCard } from "@/components/listings/listing-card";
 import { ContactPaywall } from "@/components/listings/paywall";
+import { DealBadge } from "@/components/listings/deal-badge";
+import { ReportListingButton } from "@/components/listings/report-listing-button";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import {
   Heart,
@@ -41,6 +44,46 @@ import {
   Sparkles,
 } from "lucide-react";
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://dxbmotors.ae";
+
+/** Per-car SEO: unique title, description and OG image so each listing ranks. */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, id, slug } = await params;
+  const listing = await getListingById(id);
+  if (!listing) return { title: "Car not found — DXB Motors" };
+
+  const title = `${listing.year} ${listing.make} ${listing.model}${listing.trim ? ` ${listing.trim}` : ""} for sale in ${listing.emirate} — ${formatAED(listing.priceAED)}`;
+  const description = `${listing.year} ${listing.make} ${listing.model} · ${formatKm(listing.kms, locale as "en" | "ar")} · ${listing.fuel} · ${listing.transmission} · ${listing.regionalSpec} spec. ${formatAED(listing.priceAED)} at ${listing.dealer.name}, ${listing.emirate}. View photos, specs and finance options on DXB Motors.`;
+  const image = listing.imageUrl?.startsWith("http")
+    ? listing.imageUrl
+    : `${SITE_URL}${listing.imageUrl ?? ""}`;
+  const canonical = `${SITE_URL}/${locale}/listings/${id}/${slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "website",
+      images: image ? [{ url: image, width: 1200, height: 630 }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
+}
+
 export default async function ListingDetailPage({
   params,
 }: {
@@ -62,6 +105,10 @@ export default async function ListingDetailPage({
   const gallery = media.length > 0 ? media : [listing.imageUrl];
   const emi = monthlyEMI(listing.priceAED);
   const listingTitle = `${listing.year} ${listing.make} ${listing.model}`;
+  // "Service history" is a real signal only when the seller listed it as a feature.
+  const hasServiceHistory = (listing.features ?? []).some((f) =>
+    /service history|full history|dealer history/i.test(f),
+  );
 
   const specs = [
     { icon: Calendar, label: t("year"), value: listing.year },
@@ -153,12 +200,26 @@ export default async function ListingDetailPage({
                   )}
                 </div>
                 <div className="text-right">
-                  <div className="text-xl lg:text-2xl font-bold text-[#141414] leading-none">
-                    {formatAED(listing.priceAED, locale as "en" | "ar")}
+                  <div className="flex items-center justify-end gap-2">
+                    <div className="text-xl lg:text-2xl font-bold text-[#141414] leading-none">
+                      {formatAED(listing.priceAED, locale as "en" | "ar")}
+                    </div>
+                    <DealBadge rating={listing.dealRating} />
                   </div>
-                  <div className="mt-1 text-[10px] text-muted">
-                    From {formatAED(emi, locale as "en" | "ar")} / month
-                  </div>
+                  {listing.previousPrice ? (
+                    <div className="mt-1 flex items-center justify-end gap-1.5">
+                      <span className="text-[11px] text-muted line-through">
+                        {formatAED(listing.previousPrice, locale as "en" | "ar")}
+                      </span>
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-[#137A43] text-white px-1.5 py-0.5 text-[10px] font-semibold">
+                        {formatAED(listing.previousPrice - listing.priceAED, locale as "en" | "ar")} price drop
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-[10px] text-muted">
+                      From {formatAED(emi, locale as "en" | "ar")} / month
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -265,6 +326,9 @@ export default async function ListingDetailPage({
                 >
                   View storefront →
                 </Link>
+                <div className="mt-2 flex justify-center">
+                  <ReportListingButton listingId={listing.id} />
+                </div>
               </div>
 
               {/* Export panel */}
@@ -286,21 +350,57 @@ export default async function ListingDetailPage({
                 </div>
               )}
 
-              {/* Trust strip */}
+              {/* Trust strip — reflects real listing/dealer data, not static text */}
               <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-3">
                 <div className="space-y-1.5 text-[11px]">
-                  <div className="flex items-center gap-1.5 text-secondary">
-                    <ShieldCheck className="h-3 w-3 text-[#F0941F]" />
-                    Verified dealer
+                  <div
+                    className={cn(
+                      "flex items-center gap-1.5",
+                      listing.dealer.isVerified
+                        ? "text-secondary"
+                        : "text-muted",
+                    )}
+                  >
+                    <ShieldCheck
+                      className={cn(
+                        "h-3 w-3",
+                        listing.dealer.isVerified
+                          ? "text-[#137A43]"
+                          : "text-[#B8B2A0]",
+                      )}
+                    />
+                    {listing.dealer.isVerified
+                      ? "Verified dealer"
+                      : "Dealer not yet verified"}
                   </div>
-                  <div className="flex items-center gap-1.5 text-secondary">
-                    <FileText className="h-3 w-3 text-[#F0941F]" />
-                    Full service history
+                  {hasServiceHistory && (
+                    <div className="flex items-center gap-1.5 text-secondary">
+                      <FileText className="h-3 w-3 text-[#F0941F]" />
+                      Full service history
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      "flex items-center gap-1.5",
+                      listing.isInspected ? "text-secondary" : "text-muted",
+                    )}
+                  >
+                    <Sparkles
+                      className={cn(
+                        "h-3 w-3",
+                        listing.isInspected ? "text-[#137A43]" : "text-[#B8B2A0]",
+                      )}
+                    />
+                    {listing.isInspected
+                      ? "Inspection report available"
+                      : "Inspection on request"}
                   </div>
-                  <div className="flex items-center gap-1.5 text-secondary">
-                    <Sparkles className="h-3 w-3 text-[#F0941F]" />
-                    Inspection on request
-                  </div>
+                  {listing.vin && (
+                    <div className="flex items-center gap-1.5 text-secondary">
+                      <FileText className="h-3 w-3 text-[#F0941F]" />
+                      VIN: <span className="font-mono">{listing.vin}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

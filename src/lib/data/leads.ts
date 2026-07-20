@@ -12,6 +12,7 @@ const LEAD_TYPE_LABEL: Record<string, string> = {
   test_drive: "test-drive request",
   contact_unlock: "contact unlock",
   export_inquiry: "export enquiry",
+  finance_preapproval: "finance pre-approval request",
 };
 
 /** Build the seller/dealer notification for a new lead. */

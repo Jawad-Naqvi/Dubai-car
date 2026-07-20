@@ -14,10 +14,12 @@ import {
   Building2,
   Heart,
   Bell,
+  Tag,
   Ship,
   FileText,
   Users,
   ShieldCheck,
+  Flag,
   TrendingUp,
   Image as ImageIcon,
   Database,
@@ -39,6 +41,8 @@ const buyerNav = [
   { href: "/dashboard/saved", label: "Saved cars", icon: Heart },
   { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
   { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+  { href: "/dashboard/inventory", label: "My listings", icon: Car },
+  { href: "/sell", label: "Sell a car", icon: Tag },
 ];
 
 const b2bNav = [
@@ -51,6 +55,7 @@ const b2bNav = [
 const adminNav = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/moderation", label: "Moderation", icon: ShieldCheck },
+  { href: "/admin/reports", label: "Reported listings", icon: Flag },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/dealers", label: "Dealers", icon: Building2 },
   { href: "/admin/revenue", label: "Revenue", icon: TrendingUp },

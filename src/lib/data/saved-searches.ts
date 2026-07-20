@@ -5,6 +5,7 @@ import { savedSearches, users } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { parseListingParams } from "./search-params";
 import { searchListings } from "./listings";
+import { droppedListingIdsSince } from "./price";
 import { sendEmail } from "@/lib/notify";
 import { brand } from "@/lib/brand";
 
@@ -145,22 +146,44 @@ export async function runSavedSearchAlerts(
     params.sort = "newest";
     const res = await searchListings(params);
 
-    if (res.total > 0) {
+    // Price drops on cars matching this search since the last check.
+    const droppedIds = await droppedListingIdsSince(since);
+    let dropped: typeof res.items = [];
+    if (droppedIds.length) {
+      const dropRes = await searchListings({
+        ...parseListingParams(s.query),
+        ids: droppedIds,
+        perPage: 5,
+        sort: "price_asc",
+      });
+      dropped = dropRes.items.filter((l) => l.previousPrice);
+    }
+
+    if (res.total > 0 || dropped.length > 0) {
       totalNew += res.total;
       const name = s.name ?? "your saved search";
+      const parts = [];
+      if (res.total > 0)
+        parts.push(`${res.total} new`);
+      if (dropped.length > 0)
+        parts.push(`${dropped.length} price drop${dropped.length === 1 ? "" : "s"}`);
       const lines = [
-        `${res.total} new car${res.total === 1 ? "" : "s"} match "${name}".`,
+        `${parts.join(" + ")} for "${name}".`,
         "",
         ...res.items.map(
           (l) =>
-            `• ${l.year} ${l.make} ${l.model} — AED ${l.priceAED.toLocaleString()} (${l.emirate})`,
+            `• NEW  ${l.year} ${l.make} ${l.model} — AED ${l.priceAED.toLocaleString()} (${l.emirate})`,
+        ),
+        ...dropped.map(
+          (l) =>
+            `• ↓    ${l.year} ${l.make} ${l.model} — AED ${l.priceAED.toLocaleString()} (was ${l.previousPrice!.toLocaleString()})`,
         ),
         "",
         `See them all: ${brand.url}/buy?${toQueryString(s.query)}`,
       ];
       const sent = await sendEmail({
         to: s.email,
-        subject: `${res.total} new match${res.total === 1 ? "" : "es"} — ${name}`,
+        subject: `${parts.join(" + ")} — ${name}`,
         body: lines.join("\n"),
         label: "saved-search alert",
       });

@@ -54,6 +54,7 @@ export const leadTypeEnum = pgEnum("lead_type", [
   "contact_unlock",
   "test_drive",
   "export_inquiry",
+  "finance_preapproval",
 ]);
 
 export const paymentTypeEnum = pgEnum("payment_type", [
@@ -179,6 +180,9 @@ export const listings = pgTable(
     seats: integer("seats"),
     horsepower: integer("horsepower"),
     priceAED: bigint("price_aed", { mode: "number" }).notNull(),
+    /** Denormalised: the price before the most recent change (for drop badges). */
+    previousPrice: bigint("previous_price", { mode: "number" }),
+    priceUpdatedAt: timestamp("price_updated_at"),
     monthlyEMI: integer("monthly_emi"),
     condition: varchar("condition", { length: 32 }),
     description: text("description"),
@@ -292,6 +296,53 @@ export const savedSearches = pgTable("saved_searches", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type SavedSearch = typeof savedSearches.$inferSelect;
+
+/* === Trust: dealer reviews === */
+export const dealerReviews = pgTable("dealer_reviews", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  dealerId: uuid("dealer_id")
+    .notNull()
+    .references(() => dealers.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  authorName: varchar("author_name", { length: 120 }),
+  rating: integer("rating").notNull(),
+  title: varchar("title", { length: 160 }),
+  body: text("body"),
+  /** published | pending | rejected */
+  status: varchar("status", { length: 16 }).notNull().default("published"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type DealerReview = typeof dealerReviews.$inferSelect;
+
+/* === Trust: listing reports (fraud / scam flags) === */
+export const listingReports = pgTable("listing_reports", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" }),
+  reporterId: uuid("reporter_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  reason: varchar("reason", { length: 64 }).notNull(),
+  details: text("details"),
+  reporterEmail: varchar("reporter_email", { length: 200 }),
+  /** open | reviewing | resolved | dismissed */
+  status: varchar("status", { length: 16 }).notNull().default("open"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ListingReport = typeof listingReports.$inferSelect;
+
+/* === Price history (price-drop tracking + alerts) === */
+export const priceHistory = pgTable("price_history", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" }),
+  oldPrice: bigint("old_price", { mode: "number" }).notNull(),
+  newPrice: bigint("new_price", { mode: "number" }).notNull(),
+  changedAt: timestamp("changed_at").defaultNow().notNull(),
+});
+export type PriceHistory = typeof priceHistory.$inferSelect;
 
 /* === B2B === */
 export const b2bBuyers = pgTable("b2b_buyers", {

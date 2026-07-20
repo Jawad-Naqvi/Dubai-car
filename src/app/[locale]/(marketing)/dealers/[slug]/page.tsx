@@ -9,6 +9,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ListingCard } from "@/components/listings/listing-card";
+import { ReviewsSection } from "@/components/dealers/reviews-section";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import {
   BadgeCheck,
@@ -133,6 +134,8 @@ export default async function DealerStorefront({
           )}
         </div>
       </section>
+
+      <ReviewsSection slug={slug} />
     </>
   );
 }
