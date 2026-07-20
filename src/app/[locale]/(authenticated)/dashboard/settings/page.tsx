@@ -3,8 +3,9 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getOrSyncUser, getCurrentRole } from "@/lib/data/users";
+import { NotificationPrefs } from "@/components/dashboard/notification-prefs";
 import Link from "next/link";
-import { User, Globe, Bell, ShieldCheck } from "lucide-react";
+import { User, Globe, ShieldCheck } from "lucide-react";
 
 export default async function SettingsPage() {
   const [user, role] = await Promise.all([
@@ -17,19 +18,19 @@ export default async function SettingsPage() {
       <DashboardHeader title="Settings" subtitle="Account & preferences" />
       <main className="p-5 space-y-4 max-w-3xl">
         {/* Account */}
-        <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5">
+        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <User className="h-4 w-4 text-[#C8A93E]" />
+            <User className="h-4 w-4 text-[#F0941F]" />
             <Eyebrow tone="gold">ACCOUNT</Eyebrow>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
               <div className="text-[11px] uppercase tracking-wider text-muted mb-1">Name</div>
-              <div className="text-[#1A1A1A]">{user?.name ?? "—"}</div>
+              <div className="text-[#141414]">{user?.name ?? "—"}</div>
             </div>
             <div>
               <div className="text-[11px] uppercase tracking-wider text-muted mb-1">Email</div>
-              <div className="text-[#1A1A1A]">{user?.email ?? "Not signed in"}</div>
+              <div className="text-[#141414]">{user?.email ?? "Not signed in"}</div>
             </div>
             <div>
               <div className="text-[11px] uppercase tracking-wider text-muted mb-1">Role</div>
@@ -42,31 +43,18 @@ export default async function SettingsPage() {
         </div>
 
         {/* Preferences */}
-        <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5">
+        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Globe className="h-4 w-4 text-[#C8A93E]" />
+            <Globe className="h-4 w-4 text-[#F0941F]" />
             <Eyebrow tone="gold">PREFERENCES</Eyebrow>
           </div>
-          <div className="space-y-3 text-sm">
-            <label className="flex items-center justify-between">
-              <span className="flex items-center gap-2 text-secondary">
-                <Bell className="h-3.5 w-3.5" /> Email me new leads
-              </span>
-              <input type="checkbox" defaultChecked className="h-4 w-4 accent-[#C8A93E]" />
-            </label>
-            <label className="flex items-center justify-between">
-              <span className="flex items-center gap-2 text-secondary">
-                <Bell className="h-3.5 w-3.5" /> WhatsApp lead alerts
-              </span>
-              <input type="checkbox" defaultChecked className="h-4 w-4 accent-[#C8A93E]" />
-            </label>
-          </div>
+          <NotificationPrefs />
         </div>
 
         {/* Plan shortcut */}
-        <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5 flex items-center justify-between">
+        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-[#C8A93E]" />
+            <ShieldCheck className="h-4 w-4 text-[#F0941F]" />
             <span className="text-sm">Subscription & billing</span>
           </div>
           <Button asChild variant="ghost" size="sm">

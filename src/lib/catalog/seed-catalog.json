@@ -1,0 +1,3008 @@
+{
+ "generatedAt": "2026-07-10T19:56:50.659Z",
+ "source": "vpic+wikimedia",
+ "makes": [
+  {
+   "name": "Toyota",
+   "slug": "toyota",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Corolla",
+     "slug": "corolla",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/2026_Toyota_Corolla_SE.jpg/1280px-2026_Toyota_Corolla_SE.jpg"
+    },
+    {
+     "name": "Prius",
+     "slug": "prius",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/2026_Toyota_Prius_PHEV_au_SIAM_2026.JPG/1280px-2026_Toyota_Prius_PHEV_au_SIAM_2026.JPG"
+    },
+    {
+     "name": "Yaris",
+     "slug": "yaris",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/DSC00769_Toyota_Yaris%2C_Carabinieri%2C_Front_Left.jpg/1280px-DSC00769_Toyota_Yaris%2C_Carabinieri%2C_Front_Left.jpg"
+    },
+    {
+     "name": "Camry",
+     "slug": "camry",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/TOYOTA_CAMRY_%28XV70%29_China_%28183%29.jpg/1280px-TOYOTA_CAMRY_%28XV70%29_China_%28183%29.jpg"
+    },
+    {
+     "name": "FCHV-adv",
+     "slug": "fchv-adv",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Toyota_FCHV-adv_rear.jpg/1280px-Toyota_FCHV-adv_rear.jpg"
+    },
+    {
+     "name": "Celica",
+     "slug": "celica",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/1998_Toyota_Celica_at_Faversham%2C_Kent.jpg/1280px-1998_Toyota_Celica_at_Faversham%2C_Kent.jpg"
+    },
+    {
+     "name": "Supra",
+     "slug": "supra",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Toyota_Supra_Las_Vegas_2026.jpg/1280px-Toyota_Supra_Las_Vegas_2026.jpg"
+    },
+    {
+     "name": "Paseo",
+     "slug": "paseo",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/OJ_C_425_of_2018_-_DA_Danish.pdf/page1-960px-OJ_C_425_of_2018_-_DA_Danish.pdf.jpg"
+    },
+    {
+     "name": "Mirai",
+     "slug": "mirai",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "C-HR",
+     "slug": "c-hr",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Prius Prime (PHEV)",
+     "slug": "prius-prime-phev",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GR86",
+     "slug": "gr86",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Crown",
+     "slug": "crown",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GR Corolla",
+     "slug": "gr-corolla",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Crown Signia",
+     "slug": "crown-signia",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Land Cruiser",
+     "slug": "land-cruiser",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Highlander",
+     "slug": "highlander",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "4Runner",
+     "slug": "4runner",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RAV4",
+     "slug": "rav4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Sienna",
+     "slug": "sienna",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Sequoia",
+     "slug": "sequoia",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Venza",
+     "slug": "venza",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RAV4 Prime (PHEV)",
+     "slug": "rav4-prime-phev",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Corolla Cross",
+     "slug": "corolla-cross",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Grand Highlander",
+     "slug": "grand-highlander",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "bZ",
+     "slug": "bz",
+     "latestYear": 2026,
+     "years": [
+      2026
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "bZ Woodland",
+     "slug": "bz-woodland",
+     "latestYear": 2026,
+     "years": [
+      2026
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Tacoma",
+     "slug": "tacoma",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Tundra",
+     "slug": "tundra",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "bZ4X",
+     "slug": "bz4x",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Nissan",
+   "slug": "nissan",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "GT-R",
+     "slug": "gt-r",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Nissan_GT-R_50_by_Italdesign_at_Osaka_Auto_Messe_2026.jpg/1280px-Nissan_GT-R_50_by_Italdesign_at_Osaka_Auto_Messe_2026.jpg"
+    },
+    {
+     "name": "Versa",
+     "slug": "versa",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Mitsubishi_Versa_Van_E26_2.5_GLX_White_Solid_01.jpg/1280px-Mitsubishi_Versa_Van_E26_2.5_GLX_White_Solid_01.jpg"
+    },
+    {
+     "name": "Altima",
+     "slug": "altima",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/1999_Nissan_Altima_GXE%2C_Front_left%2C_01-26-2026.jpg/1280px-1999_Nissan_Altima_GXE%2C_Front_left%2C_01-26-2026.jpg"
+    },
+    {
+     "name": "Leaf",
+     "slug": "leaf",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/2026_Nissan_Leaf_au_salon_auto_Lanaudi%C3%A8re_2025.jpg/1280px-2026_Nissan_Leaf_au_salon_auto_Lanaudi%C3%A8re_2025.jpg"
+    },
+    {
+     "name": "Sentra",
+     "slug": "sentra",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/2026_Nissan_Sentra_front_view.jpg/1280px-2026_Nissan_Sentra_front_view.jpg"
+    },
+    {
+     "name": "Nissan Z",
+     "slug": "nissan-z",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/1978-1981_Nissan_Fairlady_280_Z-T.jpg/1280px-1978-1981_Nissan_Fairlady_280_Z-T.jpg"
+    },
+    {
+     "name": "Kicks Play",
+     "slug": "kicks-play",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/2018_Nissan_Kicks_SV_front_3.30.19.jpg/1280px-2018_Nissan_Kicks_SV_front_3.30.19.jpg"
+    },
+    {
+     "name": "Pathfinder",
+     "slug": "pathfinder",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/2026_Nissan_Pathfinder_au_SIAM_2026.jpg/1280px-2026_Nissan_Pathfinder_au_SIAM_2026.jpg"
+    },
+    {
+     "name": "Rogue",
+     "slug": "rogue",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Murano",
+     "slug": "murano",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Armada",
+     "slug": "armada",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "NV200",
+     "slug": "nv200",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Kicks MPV",
+     "slug": "kicks-mpv",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Ariya MPV",
+     "slug": "ariya-mpv",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Frontier",
+     "slug": "frontier",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Titan",
+     "slug": "titan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "NV",
+     "slug": "nv",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Mercedes-Benz",
+   "slug": "mercedes-benz",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "SL-Class",
+     "slug": "sl-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/OJ_C_80_of_2013_-_EN_English.pdf/page1-960px-OJ_C_80_of_2013_-_EN_English.pdf.jpg"
+    },
+    {
+     "name": "E-Class",
+     "slug": "e-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/MERCEDES-BENZ_E_CLASS_%28W214%29_China_%285%29.jpg/1280px-MERCEDES-BENZ_E_CLASS_%28W214%29_China_%285%29.jpg"
+    },
+    {
+     "name": "CLA-Class",
+     "slug": "cla-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Mercedes-Benz_Concept_CLA_Class%2C_IAA_Open_Space_2023%2C_Munich_%28P1120159%29.jpg/1280px-Mercedes-Benz_Concept_CLA_Class%2C_IAA_Open_Space_2023%2C_Munich_%28P1120159%29.jpg"
+    },
+    {
+     "name": "C-Class",
+     "slug": "c-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/MERCEDES_BENZ_C-CLASS_%28W203%29_China_%283%29.jpg/1280px-MERCEDES_BENZ_C-CLASS_%28W203%29_China_%283%29.jpg"
+    },
+    {
+     "name": "S-Class",
+     "slug": "s-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/MERCEDES-BENZ_S-CLASS_%28W220%29_China_%2820%29.jpg/1280px-MERCEDES-BENZ_S-CLASS_%28W220%29_China_%2820%29.jpg"
+    },
+    {
+     "name": "AMG GT",
+     "slug": "amg-gt",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Moscow%2C_Mercedes-Benz_AMG_red_in_snow%2C_Feb_2026_01.jpg/1280px-Moscow%2C_Mercedes-Benz_AMG_red_in_snow%2C_Feb_2026_01.jpg"
+    },
+    {
+     "name": "EQS-Class Sedan",
+     "slug": "eqs-class-sedan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Mercedes-Benz_Vision_EQS_Concept_%2848819809281%29.jpg/1280px-Mercedes-Benz_Vision_EQS_Concept_%2848819809281%29.jpg"
+    },
+    {
+     "name": "EQE-Class Sedan",
+     "slug": "eqe-class-sedan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "CLE",
+     "slug": "cle",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Sprinter",
+     "slug": "sprinter",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GLA-Class",
+     "slug": "gla-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "G-Class",
+     "slug": "g-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GLC-Class",
+     "slug": "glc-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GLE-Class",
+     "slug": "gle-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Metris",
+     "slug": "metris",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GLS-Class",
+     "slug": "gls-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GLB-Class",
+     "slug": "glb-class",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "EQS-Class SUV",
+     "slug": "eqs-class-suv",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "EQE-Class SUV",
+     "slug": "eqe-class-suv",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "eSprinter",
+     "slug": "esprinter",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1013",
+     "slug": "l1013",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1113",
+     "slug": "l1113",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1116",
+     "slug": "l1116",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1316",
+     "slug": "l1316",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1418",
+     "slug": "l1418",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1117",
+     "slug": "l1117",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1317",
+     "slug": "l1317",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1419",
+     "slug": "l1419",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "LP1419",
+     "slug": "lp1419",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "LPS1525",
+     "slug": "lps1525",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "LP1219",
+     "slug": "lp1219",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "L1319",
+     "slug": "l1319",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "EQB-Class",
+     "slug": "eqb-class",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "BMW",
+   "slug": "bmw",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "M3",
+     "slug": "m3",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/2010_BMW_M3_GT2_Art_Car_R26.jpg/1280px-2010_BMW_M3_GT2_Art_Car_R26.jpg"
+    },
+    {
+     "name": "740i",
+     "slug": "740i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/BMW_740i_%28G70%2C_2026%29_%2855206388807%29.jpg/1280px-BMW_740i_%28G70%2C_2026%29_%2855206388807%29.jpg"
+    },
+    {
+     "name": "Z4",
+     "slug": "z4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/BMW_Z4_M40i_%28G29%29_China.jpg/1280px-BMW_Z4_M40i_%28G29%29_China.jpg"
+    },
+    {
+     "name": "M5",
+     "slug": "m5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/BMW_M5_G90_%2855057507115%29.jpg/1280px-BMW_M5_G90_%2855057507115%29.jpg"
+    },
+    {
+     "name": "530i",
+     "slug": "530i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/BMW_530i_%28G60%29_China.jpg/1280px-BMW_530i_%28G60%29_China.jpg"
+    },
+    {
+     "name": "330i",
+     "slug": "330i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/BMW_330i_xDrive_%28G20%2C_2026%29_%2855206388887%29.jpg/1280px-BMW_330i_xDrive_%28G20%2C_2026%29_%2855206388887%29.jpg"
+    },
+    {
+     "name": "760i",
+     "slug": "760i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/BMW_760i_xDrive_%28G70%2C_2024%29_%2855217196305%29.jpg/1280px-BMW_760i_xDrive_%28G70%2C_2024%29_%2855217196305%29.jpg"
+    },
+    {
+     "name": "540i",
+     "slug": "540i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/20_BMW_540i_Base.jpg/1280px-20_BMW_540i_Base.jpg"
+    },
+    {
+     "name": "M2",
+     "slug": "m2",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "M4",
+     "slug": "m4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "230i",
+     "slug": "230i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "M240i",
+     "slug": "m240i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "430i",
+     "slug": "430i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "M340i",
+     "slug": "m340i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "840i",
+     "slug": "840i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "M850i",
+     "slug": "m850i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "M440i",
+     "slug": "m440i",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "i4",
+     "slug": "i4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "i7",
+     "slug": "i7",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "750e",
+     "slug": "750e",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "i5",
+     "slug": "i5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "550e",
+     "slug": "550e",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "M235",
+     "slug": "m235",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "X6",
+     "slug": "x6",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "X5",
+     "slug": "x5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "X3",
+     "slug": "x3",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "X1",
+     "slug": "x1",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "X2",
+     "slug": "x2",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "X7",
+     "slug": "x7",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "iX",
+     "slug": "ix",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "XM",
+     "slug": "xm",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "228i",
+     "slug": "228i",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "M8",
+     "slug": "m8",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Alpina B8",
+     "slug": "alpina-b8",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "X4",
+     "slug": "x4",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Lexus",
+   "slug": "lexus",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "GS",
+     "slug": "gs",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/15_Lexus_GS_350_F_Sport.jpg/1280px-15_Lexus_GS_350_F_Sport.jpg"
+    },
+    {
+     "name": "LS",
+     "slug": "ls",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Lexus_LS_500h_black.jpg/1280px-Lexus_LS_500h_black.jpg"
+    },
+    {
+     "name": "SC",
+     "slug": "sc",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/OJ_C_146_of_2016_-_SK_Slovak.pdf/page1-960px-OJ_C_146_of_2016_-_SK_Slovak.pdf.jpg"
+    },
+    {
+     "name": "IS",
+     "slug": "is",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Lexus_RZ_550e_%28XEBM25%29_IMG_5155.jpg/1280px-Lexus_RZ_550e_%28XEBM25%29_IMG_5155.jpg"
+    },
+    {
+     "name": "ES",
+     "slug": "es",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/LEXUS_ES_300h_%28XV60%29_China_%28107%29.jpg/1280px-LEXUS_ES_300h_%28XV60%29_China_%28107%29.jpg"
+    },
+    {
+     "name": "RC",
+     "slug": "rc",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Lexus_RC_F_GT3_at_the_2022_Greater_Los_Angeles_Auto_Show_%282%29.jpg/1280px-Lexus_RC_F_GT3_at_the_2022_Greater_Los_Angeles_Auto_Show_%282%29.jpg"
+    },
+    {
+     "name": "LC",
+     "slug": "lc",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/LEXUS_LC_500h_China_%286%29.jpg/1280px-LEXUS_LC_500h_China_%286%29.jpg"
+    },
+    {
+     "name": "UX",
+     "slug": "ux",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/2022_Lexus_UX_200_rear.jpg/1280px-2022_Lexus_UX_200_rear.jpg"
+    },
+    {
+     "name": "LX",
+     "slug": "lx",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RX",
+     "slug": "rx",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "GX",
+     "slug": "gx",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "NX",
+     "slug": "nx",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RZ",
+     "slug": "rz",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "TX",
+     "slug": "tx",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Land Rover",
+   "slug": "land-rover",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Discovery Sport",
+     "slug": "discovery-sport",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Land_Rover_Discovery_Sport_094806.jpg/1280px-Land_Rover_Discovery_Sport_094806.jpg"
+    },
+    {
+     "name": "Range Rover Evoque",
+     "slug": "range-rover-evoque",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/LAND_ROVER_RANGE_ROVER_EVOQUE_%28L538%29_China_%288%29.jpg/1280px-LAND_ROVER_RANGE_ROVER_EVOQUE_%28L538%29_China_%288%29.jpg"
+    },
+    {
+     "name": "Range Rover Sport",
+     "slug": "range-rover-sport",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/LAND_ROVER_RANGE_ROVER_SPORT_%28L494%29_China_%2817%29.jpg/1280px-LAND_ROVER_RANGE_ROVER_SPORT_%28L494%29_China_%2817%29.jpg"
+    },
+    {
+     "name": "Range Rover",
+     "slug": "range-rover",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/25_Land_Rover_Range_Rover_P530_SE.jpg/1280px-25_Land_Rover_Range_Rover_P530_SE.jpg"
+    },
+    {
+     "name": "Discovery",
+     "slug": "discovery",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Moscow%2C_Land_Rover_Discovery_5%2C_Apr_2026_01.jpg/1280px-Moscow%2C_Land_Rover_Discovery_5%2C_Apr_2026_01.jpg"
+    },
+    {
+     "name": "Defender",
+     "slug": "defender",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/DSC00733_Land_Rover_Defender%2C_Soccorso_Alpino_Guardia_di_Finanza%2C_Front_Right.jpg/1280px-DSC00733_Land_Rover_Defender%2C_Soccorso_Alpino_Guardia_di_Finanza%2C_Front_Right.jpg"
+    },
+    {
+     "name": "Range Rover Velar",
+     "slug": "range-rover-velar",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/2020_Range_Rover_Velar_P250_S_R-Dynamic_rear.jpg/1280px-2020_Range_Rover_Velar_P250_S_R-Dynamic_rear.jpg"
+    }
+   ]
+  },
+  {
+   "name": "Porsche",
+   "slug": "porsche",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Panamera",
+     "slug": "panamera",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/PORSCHE_PANAMERA_SECOND_GENEGRATION_China_%2844%29.jpg/1280px-PORSCHE_PANAMERA_SECOND_GENEGRATION_China_%2844%29.jpg"
+    },
+    {
+     "name": "Taycan",
+     "slug": "taycan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Moscow%2C_Porsche_Taycan_4S_black%2C_Feb_2026_02.jpg/1280px-Moscow%2C_Porsche_Taycan_4S_black%2C_Feb_2026_02.jpg"
+    },
+    {
+     "name": "718 Boxster",
+     "slug": "718-boxster",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Porsche_718_Boxster%2C_Coffee_%26_Cars_%E2%80%93_Littleton_2016-07-04.jpg/1280px-Porsche_718_Boxster%2C_Coffee_%26_Cars_%E2%80%93_Littleton_2016-07-04.jpg"
+    },
+    {
+     "name": "718 Spyder",
+     "slug": "718-spyder",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/2021_Porsche_718.jpg/1280px-2021_Porsche_718.jpg"
+    },
+    {
+     "name": "718 Cayman",
+     "slug": "718-cayman",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/PORSCHE_718_CAYMAN_China_%287%29.jpg/1280px-PORSCHE_718_CAYMAN_China_%287%29.jpg"
+    },
+    {
+     "name": "Cayenne",
+     "slug": "cayenne",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Porsche_Cayenne_S_at_the_2026_Australian_Grand_Prix_%28028A8464%29.jpg/1280px-Porsche_Cayenne_S_at_the_2026_Australian_Grand_Prix_%28028A8464%29.jpg"
+    },
+    {
+     "name": "Macan",
+     "slug": "macan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/PORSCHE_MACAN_%28XAB%29_China_%282%29.jpg/1280px-PORSCHE_MACAN_%28XAB%29_China_%282%29.jpg"
+    }
+   ]
+  },
+  {
+   "name": "Audi",
+   "slug": "audi",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "A4",
+     "slug": "a4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/DSC00875_Unmarked_Audi_A4%2C_Polizia_di_Stato%2C_Front_Right.jpg/1280px-DSC00875_Unmarked_Audi_A4%2C_Polizia_di_Stato%2C_Front_Right.jpg"
+    },
+    {
+     "name": "S4",
+     "slug": "s4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/AUDI_S4_%28B9%29_China_%287%29.jpg/1280px-AUDI_S4_%28B9%29_China_%287%29.jpg"
+    },
+    {
+     "name": "A6",
+     "slug": "a6",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/DSC05640_Audi_A6%2C_Bundespolizei_%C3%96sterreich%2C_Right_View%2C_2023-10.jpg/1280px-DSC05640_Audi_A6%2C_Bundespolizei_%C3%96sterreich%2C_Right_View%2C_2023-10.jpg"
+    },
+    {
+     "name": "A3",
+     "slug": "a3",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Moscow%2C_Audi_A3_convertible%2C_Mar_2026_02.jpg/1280px-Moscow%2C_Audi_A3_convertible%2C_Mar_2026_02.jpg"
+    },
+    {
+     "name": "S8",
+     "slug": "s8",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Audi_S8_%282024%29_%2855011678052%29.jpg/1280px-Audi_S8_%282024%29_%2855011678052%29.jpg"
+    },
+    {
+     "name": "A5",
+     "slug": "a5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/AUDI_A5_CONVERTIBLE_F5_China_%285%29.jpg/1280px-AUDI_A5_CONVERTIBLE_F5_China_%285%29.jpg"
+    },
+    {
+     "name": "S5",
+     "slug": "s5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Audi_S5_B10_3.0_TFSI_quattro_MHEV_Horizon_Blue_Metallic.jpg/1280px-Audi_S5_B10_3.0_TFSI_quattro_MHEV_Horizon_Blue_Metallic.jpg"
+    },
+    {
+     "name": "S3",
+     "slug": "s3",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Audi_S3_%2855055899525%29.jpg/1280px-Audi_S3_%2855055899525%29.jpg"
+    },
+    {
+     "name": "RS 7",
+     "slug": "rs-7",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RS 3",
+     "slug": "rs-3",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "A6 allroad",
+     "slug": "a6-allroad",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RS e-tron GT",
+     "slug": "rs-e-tron-gt",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "A8 L",
+     "slug": "a8-l",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "e-tron GT",
+     "slug": "e-tron-gt",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RS 6 Avant",
+     "slug": "rs-6-avant",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "S e-tron GT",
+     "slug": "s-e-tron-gt",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Q7",
+     "slug": "q7",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Q5",
+     "slug": "q5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Q3",
+     "slug": "q3",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "SQ5",
+     "slug": "sq5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "A4 allroad",
+     "slug": "a4-allroad",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Q8",
+     "slug": "q8",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "SQ7",
+     "slug": "sq7",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "SQ8",
+     "slug": "sq8",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RS Q8",
+     "slug": "rs-q8",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Q4",
+     "slug": "q4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Q6",
+     "slug": "q6",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "SQ6",
+     "slug": "sq6",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "S6",
+     "slug": "s6",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "RS 5",
+     "slug": "rs-5",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "A7",
+     "slug": "a7",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "S7",
+     "slug": "s7",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Q5 e",
+     "slug": "q5-e",
+     "latestYear": 2025,
+     "years": [
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Ford",
+   "slug": "ford",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Focus",
+     "slug": "focus",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/2007_Ford_Focus_SES_wagon%2C_rear_left%2C_06-13-2026.jpg/1280px-2007_Ford_Focus_SES_wagon%2C_rear_left%2C_06-13-2026.jpg"
+    },
+    {
+     "name": "Mustang",
+     "slug": "mustang",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/2026_Ford_Mustang_SC.jpg/1280px-2026_Ford_Mustang_SC.jpg"
+    },
+    {
+     "name": "Fiesta",
+     "slug": "fiesta",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/FORD_IKON_%28FORD_FIESTA_MK4_SEDAN%29_China_%282%29.jpg/1280px-FORD_IKON_%28FORD_FIESTA_MK4_SEDAN%29_China_%282%29.jpg"
+    },
+    {
+     "name": "GT MKII",
+     "slug": "gt-mkii",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Ford_GT_Red.jpg/1280px-Ford_GT_Red.jpg"
+    },
+    {
+     "name": "Mustang GTD",
+     "slug": "mustang-gtd",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/2026_Ford_Mustang_GTD_%2855107992816%29.jpg/1280px-2026_Ford_Mustang_GTD_%2855107992816%29.jpg"
+    },
+    {
+     "name": "Malibu Sedan",
+     "slug": "malibu-sedan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/2013_Chevrolet_Malibu_%28US_preproduction%29_-_Flickr_-_skinnylawyer.jpg/1280px-2013_Chevrolet_Malibu_%28US_preproduction%29_-_Flickr_-_skinnylawyer.jpg"
+    },
+    {
+     "name": "Cordova Sedan",
+     "slug": "cordova-sedan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Post-_och_Inrikes_Tidningar_1836-06-15.djvu/page1-1280px-Post-_och_Inrikes_Tidningar_1836-06-15.djvu.jpg"
+    },
+    {
+     "name": "Classic Sedan",
+     "slug": "classic-sedan",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Edge",
+     "slug": "edge",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Escape",
+     "slug": "escape",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Expedition",
+     "slug": "expedition",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Explorer",
+     "slug": "explorer",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Flex",
+     "slug": "flex",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Expedition MAX",
+     "slug": "expedition-max",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Transit",
+     "slug": "transit",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Bronco",
+     "slug": "bronco",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Ecosport",
+     "slug": "ecosport",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Bronco Sport",
+     "slug": "bronco-sport",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Mustang Mach-E",
+     "slug": "mustang-mach-e",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "F-150",
+     "slug": "f-150",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Ranger",
+     "slug": "ranger",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "F-250",
+     "slug": "f-250",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "F-350",
+     "slug": "f-350",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "F-450",
+     "slug": "f-450",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "F-550",
+     "slug": "f-550",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Transit Connect",
+     "slug": "transit-connect",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "F-600",
+     "slug": "f-600",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Maverick",
+     "slug": "maverick",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Chevrolet",
+   "slug": "chevrolet",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Aveo",
+     "slug": "aveo",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Chevrolet_Aveo_III_001.jpg/1280px-Chevrolet_Aveo_III_001.jpg"
+    },
+    {
+     "name": "Camaro",
+     "slug": "camaro",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Chevrolet_Camaro_at_the_2026_Adelaide_Motorsport_Festival_%28028A6829%29.jpg/1280px-Chevrolet_Camaro_at_the_2026_Adelaide_Motorsport_Festival_%28028A6829%29.jpg"
+    },
+    {
+     "name": "Caprice Police Vehicle",
+     "slug": "caprice-police-vehicle",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7f/1987_Chevrolet_Caprice_FDNY.png"
+    },
+    {
+     "name": "Corvette",
+     "slug": "corvette",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Chevrolet_Corvette_C3_at_Hindley_Street%2C_Adelaide.jpg/1280px-Chevrolet_Corvette_C3_at_Hindley_Street%2C_Adelaide.jpg"
+    },
+    {
+     "name": "Cruze",
+     "slug": "cruze",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/CHEVROLET_CRUZE_%28J300%29_China_%2830%29.jpg/1280px-CHEVROLET_CRUZE_%28J300%29_China_%2830%29.jpg"
+    },
+    {
+     "name": "Impala",
+     "slug": "impala",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/1958_Chevrolet_Impala_Coupe_-_%22Lucille%22.jpg/1280px-1958_Chevrolet_Impala_Coupe_-_%22Lucille%22.jpg"
+    },
+    {
+     "name": "Malibu",
+     "slug": "malibu",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/1965_Chevrolet_Chevelle_Malibu_350%2C_black%2C_Golden_Super_Cruise_2026-05-02.jpg/1280px-1965_Chevrolet_Chevelle_Malibu_350%2C_black%2C_Golden_Super_Cruise_2026-05-02.jpg"
+    },
+    {
+     "name": "Sonic",
+     "slug": "sonic",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Chevrolet_Sonic_%28Brazil%29_2026.jpg/1280px-Chevrolet_Sonic_%28Brazil%29_2026.jpg"
+    },
+    {
+     "name": "Spark",
+     "slug": "spark",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "SS",
+     "slug": "ss",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Volt",
+     "slug": "volt",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Geo Prizm",
+     "slug": "geo-prizm",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Onix",
+     "slug": "onix",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Captiva Sport",
+     "slug": "captiva-sport",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Equinox",
+     "slug": "equinox",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Orlando",
+     "slug": "orlando",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Suburban",
+     "slug": "suburban",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Tahoe",
+     "slug": "tahoe",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Traverse",
+     "slug": "traverse",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Trailblazer",
+     "slug": "trailblazer",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Trax",
+     "slug": "trax",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Blazer",
+     "slug": "blazer",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Traverse Limited",
+     "slug": "traverse-limited",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Suburban HD",
+     "slug": "suburban-hd",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Express",
+     "slug": "express",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Silverado",
+     "slug": "silverado",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Colorado",
+     "slug": "colorado",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Silverado HD",
+     "slug": "silverado-hd",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Silverado LD",
+     "slug": "silverado-ld",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Silverado LTD",
+     "slug": "silverado-ltd",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "BrightDrop",
+     "slug": "brightdrop",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Honda",
+   "slug": "honda",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Accord",
+     "slug": "accord",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/2024_Honda_Accord_EX%2C_rear_left%2C_03-21-2026.jpg/1280px-2024_Honda_Accord_EX%2C_rear_left%2C_03-21-2026.jpg"
+    },
+    {
+     "name": "Civic",
+     "slug": "civic",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Honda_Civic_Type_R_HRC_Concept_%281%29_at_Osaka_Auto_Messe_2026.jpg/1280px-Honda_Civic_Type_R_HRC_Concept_%281%29_at_Osaka_Auto_Messe_2026.jpg"
+    },
+    {
+     "name": "Prelude",
+     "slug": "prelude",
+     "latestYear": 2026,
+     "years": [
+      2026
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Honda_Prelude_%286th_generation%29_IMG_5842.jpg/1280px-Honda_Prelude_%286th_generation%29_IMG_5842.jpg"
+    },
+    {
+     "name": "Civic Si",
+     "slug": "civic-si",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/HondaCivicSi1990.Ignition.jpg/1280px-HondaCivicSi1990.Ignition.jpg"
+    },
+    {
+     "name": "Civic Type R",
+     "slug": "civic-type-r",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Honda_Civic_Type_R_HRC_Concept_%282%29_at_Osaka_Auto_Messe_2026.jpg/1280px-Honda_Civic_Type_R_HRC_Concept_%282%29_at_Osaka_Auto_Messe_2026.jpg"
+    },
+    {
+     "name": "Pilot",
+     "slug": "pilot",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Moscow%2C_Honda_Pilot_black%2C_Apr_2026_01.jpg/1280px-Moscow%2C_Honda_Pilot_black%2C_Apr_2026_01.jpg"
+    },
+    {
+     "name": "CR-V",
+     "slug": "cr-v",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/21_Honda_CR-V_LX.jpg/1280px-21_Honda_CR-V_LX.jpg"
+    },
+    {
+     "name": "Odyssey",
+     "slug": "odyssey",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Moscow%2C_Honda_Odyssey_RA6RA9_Apr_2026_05.jpg/1280px-Moscow%2C_Honda_Odyssey_RA6RA9_Apr_2026_05.jpg"
+    },
+    {
+     "name": "Passport",
+     "slug": "passport",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "HR-V",
+     "slug": "hr-v",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Prologue",
+     "slug": "prologue",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Ridgeline",
+     "slug": "ridgeline",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Hyundai",
+   "slug": "hyundai",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Sonata",
+     "slug": "sonata",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/HYUNDAI_SONATA_%28NF%29_China_%284%29.jpg/1280px-HYUNDAI_SONATA_%28NF%29_China_%284%29.jpg"
+    },
+    {
+     "name": "Elantra",
+     "slug": "elantra",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/HYUNDAI_ELANTRA_%28HD%29_China_%2858%29.jpg/1280px-HYUNDAI_ELANTRA_%28HD%29_China_%2858%29.jpg"
+    },
+    {
+     "name": "Accent",
+     "slug": "accent",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/20_Hyundai_Accent_SE.jpg/1280px-20_Hyundai_Accent_SE.jpg"
+    },
+    {
+     "name": "Venue",
+     "slug": "venue",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/2023_Hyundai_Venue_base_front.jpg/1280px-2023_Hyundai_Venue_base_front.jpg"
+    },
+    {
+     "name": "Elantra N",
+     "slug": "elantra-n",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Hyundai_Elantra_N_TCR_2.0T_%284%29.jpg/1280px-Hyundai_Elantra_N_TCR_2.0T_%284%29.jpg"
+    },
+    {
+     "name": "Ioniq 6",
+     "slug": "ioniq-6",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Hyundai_Ioniq_6_charging_at_Newton_Free_Library_January_2026.jpg/1280px-Hyundai_Ioniq_6_charging_at_Newton_Free_Library_January_2026.jpg"
+    },
+    {
+     "name": "Ioniq 6 N",
+     "slug": "ioniq-6-n",
+     "latestYear": 2026,
+     "years": [
+      2026
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Hyundai_Ioniq_6_N_Drift_%2855060541014%29.jpg/1280px-Hyundai_Ioniq_6_N_Drift_%2855060541014%29.jpg"
+    },
+    {
+     "name": "Santa Fe",
+     "slug": "santa-fe",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/2024_Hyundai_Santa_Fe_%28MX5%29_IMG_5295.jpg/1280px-2024_Hyundai_Santa_Fe_%28MX5%29_IMG_5295.jpg"
+    },
+    {
+     "name": "Tucson",
+     "slug": "tucson",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Kona",
+     "slug": "kona",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Santa Fe XL",
+     "slug": "santa-fe-xl",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Nexo",
+     "slug": "nexo",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Palisade",
+     "slug": "palisade",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Ioniq 5",
+     "slug": "ioniq-5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Kona N",
+     "slug": "kona-n",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Ioniq 5 N",
+     "slug": "ioniq-5-n",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Ioniq 9",
+     "slug": "ioniq-9",
+     "latestYear": 2026,
+     "years": [
+      2026
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Santa Cruz",
+     "slug": "santa-cruz",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "Xcient",
+     "slug": "xcient",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Mitsubishi",
+   "slug": "mitsubishi",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "Mirage",
+     "slug": "mirage",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/2001-2002_Mitsubishi_Mirage_Dingo_1.png/1280px-2001-2002_Mitsubishi_Mirage_Dingo_1.png"
+    },
+    {
+     "name": "Diamante",
+     "slug": "diamante",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Mitsubishi_Diamante_25E-SE.jpg/1280px-Mitsubishi_Diamante_25E-SE.jpg"
+    },
+    {
+     "name": "Mirage G4",
+     "slug": "mirage-g4",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2024_Mitsubishi_Mirage_G4_ES_in_Wine_Red_Metallic%2C_front_left%2C_05-16-2026.jpg/1280px-2024_Mitsubishi_Mirage_G4_ES_in_Wine_Red_Metallic%2C_front_left%2C_05-16-2026.jpg"
+    },
+    {
+     "name": "Outlander",
+     "slug": "outlander",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Mitsubishi_OUTLANDER_2026Winter.jpg/1280px-Mitsubishi_OUTLANDER_2026Winter.jpg"
+    },
+    {
+     "name": "Outlander Sport",
+     "slug": "outlander-sport",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/19_Mitsubishi_Outlander_Sport_LE.jpg/1280px-19_Mitsubishi_Outlander_Sport_LE.jpg"
+    },
+    {
+     "name": "Eclipse Cross",
+     "slug": "eclipse-cross",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/2024_Mitsubishi_Eclipse_Cross_ES_front.jpg/1280px-2024_Mitsubishi_Eclipse_Cross_ES_front.jpg"
+    },
+    {
+     "name": "FE639",
+     "slug": "fe639",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FE649",
+     "slug": "fe649",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FH211",
+     "slug": "fh211",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FK617",
+     "slug": "fk617",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FM617",
+     "slug": "fm617",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FM657",
+     "slug": "fm657",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FG639",
+     "slug": "fg639",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FE640",
+     "slug": "fe640",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FG649",
+     "slug": "fg649",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FE640DW",
+     "slug": "fe640dw",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    },
+    {
+     "name": "FEC7US / eCanter",
+     "slug": "fec7us-ecanter",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  },
+  {
+   "name": "Mazda",
+   "slug": "mazda",
+   "isPopular": true,
+   "models": [
+    {
+     "name": "MX-5",
+     "slug": "mx-5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Mazda_MX-5_Miata_with_front-end_bra%2C_Strathroy%2C_Ontario%2C_2026-05-17.jpg/1280px-Mazda_MX-5_Miata_with_front-end_bra%2C_Strathroy%2C_Ontario%2C_2026-05-17.jpg"
+    },
+    {
+     "name": "Mazda3",
+     "slug": "mazda3",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/MAZDA3_HATCHBACK_%28BK%29_China_%284%29.jpg/1280px-MAZDA3_HATCHBACK_%28BK%29_China_%284%29.jpg"
+    },
+    {
+     "name": "MX-30",
+     "slug": "mx-30",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Mazda_MX-5_RF_Grand_Touring_%282026%29_%2855259429213%29.jpg/1280px-Mazda_MX-5_RF_Grand_Touring_%282026%29_%2855259429213%29.jpg"
+    },
+    {
+     "name": "CX-9",
+     "slug": "cx-9",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/MAZDA_CX-9_%28TC%29_HONG_KONG.jpg/1280px-MAZDA_CX-9_%28TC%29_HONG_KONG.jpg"
+    },
+    {
+     "name": "CX-5",
+     "slug": "cx-5",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Mazda_CX-5_%28KI%29_IMG_5264.jpg/1280px-Mazda_CX-5_%28KI%29_IMG_5264.jpg"
+    },
+    {
+     "name": "CX-30",
+     "slug": "cx-30",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Mazda_CX-30_GTX_2021.jpg/1280px-Mazda_CX-30_GTX_2021.jpg"
+    },
+    {
+     "name": "CX-50",
+     "slug": "cx-50",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Mazda_CX-90_KK_3.3T_e-Skyactiv-G_AWD_Mild_Hybrid_Exclusive_Platinum_Quartz_01.jpg/1280px-Mazda_CX-90_KK_3.3T_e-Skyactiv-G_AWD_Mild_Hybrid_Exclusive_Platinum_Quartz_01.jpg"
+    },
+    {
+     "name": "CX-90",
+     "slug": "cx-90",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Mazda_CX-90_KK_3.3_eSkyactiv-G_AWD_HEV_Turbo_Exclusive_Deep_Crystal_Blue.jpg/1280px-Mazda_CX-90_KK_3.3_eSkyactiv-G_AWD_HEV_Turbo_Exclusive_Deep_Crystal_Blue.jpg"
+    },
+    {
+     "name": "CX-70",
+     "slug": "cx-70",
+     "latestYear": 2026,
+     "years": [
+      2026,
+      2025
+     ],
+     "imageUrl": null
+    }
+   ]
+  }
+ ]
+}

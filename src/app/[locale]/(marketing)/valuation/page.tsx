@@ -55,8 +55,8 @@ export default function ValuationPage() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
         <div className="text-center max-w-3xl mx-auto">
           <Eyebrow tone="gold">FREE VALUATION</Eyebrow>
-          <h1 className="mt-6 text-xl lg:text-2xl font-bold tracking-tight leading-[1.05]">
-            What&apos;s your car worth today in Dubai?
+          <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05]">
+            What&apos;s your car <span className="font-extrabold">worth today</span> in Dubai?
           </h1>
           <p className="mt-4 text-sm text-secondary">
             Instant estimate, blended with live market data from active listings.
@@ -65,14 +65,14 @@ export default function ValuationPage() {
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-5xl mx-auto">
           {/* Form */}
-          <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5">
+          <div className="rounded-3xl bg-white border border-[#E7E4DA] shadow-card p-5">
             <div className="space-y-5">
               <div>
                 <label className="text-xs text-muted mb-2 block">Make</label>
                 <select
                   value={make}
                   onChange={(e) => setMake(e.target.value)}
-                  className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
+                  className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                 >
                   {popularMakes.map((m) => (
                     <option key={m}>{m}</option>
@@ -84,7 +84,7 @@ export default function ValuationPage() {
                 <input
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
+                  className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -96,7 +96,7 @@ export default function ValuationPage() {
                     onChange={(e) => setYear(Number(e.target.value))}
                     min={1990}
                     max={2026}
-                    className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
+                    className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                   />
                 </div>
                 <div>
@@ -105,7 +105,7 @@ export default function ValuationPage() {
                     type="number"
                     value={kms}
                     onChange={(e) => setKms(Number(e.target.value))}
-                    className="w-full h-11 rounded-sm bg-white border border-[#E5E5E5] text-[#1A1A1A] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
+                    className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                   />
                 </div>
               </div>
@@ -118,8 +118,8 @@ export default function ValuationPage() {
                       onClick={() => setCondition(c)}
                       className={
                         condition === c
-                          ? "h-11 rounded-sm text-xs font-semibold bg-[#C8A93E] text-white"
-                          : "h-11 rounded-sm text-xs bg-white border border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/30"
+                          ? "h-11 rounded-full text-xs font-semibold bg-[#141414] text-white"
+                          : "h-11 rounded-full text-xs font-semibold bg-white border border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white transition-colors"
                       }
                     >
                       {c}
@@ -131,17 +131,17 @@ export default function ValuationPage() {
           </div>
 
           {/* Estimate */}
-          <div className="rounded-xl bg-white border border-[#C8A93E]/25 shadow-card p-5 relative overflow-hidden grain">
+          <div className="rounded-3xl bg-[#FBE7D4] border border-[#E7E4DA] shadow-card p-5 relative overflow-hidden">
             <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-40" />
             <div className="relative">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-5 w-5 text-[#C8A93E]" />
+                <Sparkles className="h-5 w-5 text-[#F0941F]" />
                 <Eyebrow tone="gold">ESTIMATE</Eyebrow>
               </div>
               <div className="mt-4 text-sm text-secondary">
                 {year} {make} {model}
               </div>
-              <div className="mt-2 text-2xl lg:text-3xl font-bold text-gradient-gold leading-none">
+              <div className="mt-2 text-2xl lg:text-3xl font-extrabold tracking-tight text-[#141414] leading-none">
                 {formatAED(v.estimate)}
               </div>
               <div className="mt-3 text-sm text-muted">
@@ -149,7 +149,7 @@ export default function ValuationPage() {
               </div>
 
               {comps !== null && (
-                <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-[#A98F2E] bg-[#C8A93E]/12 border border-[#C8A93E]/25 rounded-sm px-2 py-1">
+                <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#C97612] bg-white/70 border border-[#F0941F]/25 rounded-full px-2.5 py-1">
                   <BadgeCheck className="h-3 w-3" />
                   {comps > 0
                     ? `Blended with ${comps} live comparables`

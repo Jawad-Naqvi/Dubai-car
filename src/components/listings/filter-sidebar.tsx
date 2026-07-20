@@ -8,6 +8,8 @@ import {
   bodyTypes,
   fuelTypes,
   transmissions,
+  drivetrains,
+  dealRatings,
   regionalSpecs,
   emirates,
   conditions,
@@ -27,13 +29,17 @@ interface Facet {
   value: string;
   count: number;
 }
-interface Facets {
+export interface Facets {
   makes: Facet[];
+  models?: Facet[];
+  trims?: Facet[];
   bodyTypes: Facet[];
   emirates: Facet[];
   fuels: Facet[];
+  drivetrains?: Facet[];
   colors: Facet[];
   conditions: Facet[];
+  dealRatings?: Facet[];
 }
 
 function FilterGroup({
@@ -47,12 +53,12 @@ function FilterGroup({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-[#E5E5E5] py-3">
+    <div className="border-b border-[#E7E4DA] py-3">
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center justify-between w-full text-left"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#1A1A1A]">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#141414]">
           {title}
         </span>
         <ChevronDown
@@ -80,13 +86,13 @@ function CheckRow({
 }) {
   return (
     <label className="flex items-center justify-between cursor-pointer group">
-      <span className="flex items-center gap-1.5 text-xs text-secondary group-hover:text-[#1A1A1A]">
+      <span className="flex items-center gap-1.5 text-xs text-secondary group-hover:text-[#141414]">
         <input
           type="checkbox"
           checked={!!checked}
           onChange={(e) => onChange?.(e.target.checked)}
           suppressHydrationWarning
-          className="h-3 w-3 rounded-sm border-[#D4D4D4] bg-transparent text-[#C8A93E] focus:ring-[#C8A93E]/40"
+          className="h-3 w-3 rounded-sm border-[#D8D4C6] bg-transparent text-[#141414] focus:ring-[#141414]/20"
         />
         {label}
       </span>
@@ -111,11 +117,11 @@ function ColorRow({
 }) {
   return (
     <label className="flex items-center justify-between cursor-pointer group">
-      <span className="flex items-center gap-2 text-xs text-secondary group-hover:text-[#1A1A1A]">
+      <span className="flex items-center gap-2 text-xs text-secondary group-hover:text-[#141414]">
         <span
           className={cn(
             "relative h-4 w-4 rounded-full border flex items-center justify-center",
-            color.light ? "border-[#D4D4D4]" : "border-transparent",
+            color.light ? "border-[#D8D4C6]" : "border-transparent",
           )}
           style={{ backgroundColor: color.hex }}
         >
@@ -123,7 +129,7 @@ function ColorRow({
             <Check
               className={cn(
                 "h-2.5 w-2.5",
-                color.light ? "text-[#1A1A1A]" : "text-white",
+                color.light ? "text-[#141414]" : "text-white",
               )}
               strokeWidth={3}
             />
@@ -159,10 +165,10 @@ function Pill({
     <button
       onClick={onClick}
       className={cn(
-        "text-[11px] px-2.5 py-1 rounded-sm border transition-colors",
+        "text-[11px] px-3 py-1 rounded-full border transition-colors",
         active
-          ? "bg-[#C8A93E] border-[#C8A93E] text-white"
-          : "bg-[#F4F4F4] border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40",
+          ? "bg-[#141414] border-[#141414] text-white"
+          : "bg-white border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white",
       )}
     >
       {label}
@@ -171,16 +177,19 @@ function Pill({
 }
 
 const inputCls =
-  "h-7 rounded-sm bg-white border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder:text-muted px-2 focus:outline-none focus:border-[#C8A93E]";
+  "h-7 rounded-lg bg-white border border-[#E7E4DA] text-xs text-[#141414] placeholder:text-muted px-2 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
 
 export function FilterSidebar({
   className,
   facets,
   total,
+  onApplied,
 }: {
   className?: string;
   facets?: Facets;
   total?: number;
+  /** Called after Apply/Reset commits — lets the mobile drawer close itself. */
+  onApplied?: () => void;
 }) {
   const t = useTranslations("filters");
   const { params, push } = useQueryState();
@@ -188,10 +197,13 @@ export function FilterSidebar({
   // Draft state seeded from the URL; committed on Apply.
   const [makes, setMakes] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
+  const [trimSel, setTrimSel] = useState<string[]>([]);
   const [emirateSel, setEmirateSel] = useState<string[]>([]);
   const [body, setBody] = useState<string[]>([]);
   const [fuel, setFuel] = useState<string[]>([]);
   const [trans, setTrans] = useState<string[]>([]);
+  const [drivetrainSel, setDrivetrainSel] = useState<string[]>([]);
+  const [dealRatingSel, setDealRatingSel] = useState<string[]>([]);
   const [spec, setSpec] = useState<string[]>([]);
   const [condition, setCondition] = useState<string[]>([]);
   const [color, setColor] = useState<string[]>([]);
@@ -216,10 +228,13 @@ export function FilterSidebar({
   useEffect(() => {
     setMakes(params.getAll("make"));
     setModels(params.getAll("model"));
+    setTrimSel(params.getAll("trim"));
     setEmirateSel(params.getAll("emirate"));
     setBody(params.getAll("bodyType"));
     setFuel(params.getAll("fuel"));
     setTrans(params.getAll("transmission"));
+    setDrivetrainSel(params.getAll("drivetrain"));
+    setDealRatingSel(params.getAll("dealRating"));
     setSpec(params.getAll("regionalSpec"));
     setCondition(params.getAll("condition"));
     setColor(params.getAll("color"));
@@ -249,10 +264,13 @@ export function FilterSidebar({
       make: makes,
       // Drop any model no longer valid for the selected makes.
       model: models.filter((m) => validModels.has(m)),
+      trim: trimSel,
       emirate: emirateSel,
       bodyType: body,
       fuel,
       transmission: trans,
+      drivetrain: drivetrainSel,
+      dealRating: dealRatingSel,
       regionalSpec: spec,
       condition,
       color,
@@ -270,16 +288,20 @@ export function FilterSidebar({
       exportReady: exportOnly ? "true" : null,
       withPhotos: withPhotos ? "true" : null,
     });
+    onApplied?.();
   };
 
   const reset = () => {
     push({
       make: null,
       model: null,
+      trim: null,
       emirate: null,
       bodyType: null,
       fuel: null,
       transmission: null,
+      drivetrain: null,
+      dealRating: null,
       regionalSpec: null,
       condition: null,
       color: null,
@@ -297,6 +319,7 @@ export function FilterSidebar({
       withPhotos: null,
       q: null,
     });
+    onApplied?.();
   };
 
   const countFor = (arr: Facet[] | undefined, value: string) =>
@@ -337,10 +360,10 @@ export function FilterSidebar({
 
   return (
     <aside className={cn("w-full", className)}>
-      <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5]">
+      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E7E4DA]">
           <div className="flex items-center gap-1.5">
-            <SlidersHorizontal className="h-3 w-3 text-[#C8A93E]" />
+            <SlidersHorizontal className="h-3 w-3 text-[#F0941F]" />
             <span className="text-xs font-semibold">{t("title")}</span>
             {total !== undefined && (
               <span className="text-[10px] text-muted">
@@ -350,14 +373,20 @@ export function FilterSidebar({
           </div>
           <button
             onClick={reset}
-            className="flex items-center gap-1 text-[10px] text-muted hover:text-[#1A1A1A]"
+            className="flex items-center gap-1 text-[10px] text-muted hover:text-[#141414]"
           >
             <RotateCw className="h-2.5 w-2.5" />
             {t("reset")}
           </button>
         </div>
 
-        <div className="px-4 max-h-[calc(100vh-180px)] overflow-y-auto">
+        {/* In the drawer the parent already scrolls, so don't nest a scroller. */}
+        <div
+          className={cn(
+            "px-4",
+            !onApplied && "max-h-[calc(100vh-180px)] overflow-y-auto",
+          )}
+        >
           <FilterGroup title={t("emirate")}>
             {emirates.map((e) => (
               <CheckRow
@@ -383,7 +412,7 @@ export function FilterSidebar({
             {makeList.length > 8 && (
               <button
                 onClick={() => setShowAllMakes((v) => !v)}
-                className="text-[10px] text-[#A98F2E] font-semibold hover:underline pt-0.5"
+                className="text-[10px] text-[#C97612] font-semibold hover:underline pt-0.5"
               >
                 {showAllMakes ? t("showLess") : t("showMore")}
               </button>
@@ -447,6 +476,21 @@ export function FilterSidebar({
             </FilterGroup>
           )}
 
+          {/* Trim — dependent on model. */}
+          {facets?.trims && facets.trims.length > 0 && models.length > 0 && (
+            <FilterGroup title={t("trim")}>
+              {facets.trims.map((tr) => (
+                <CheckRow
+                  key={tr.value}
+                  label={tr.value}
+                  count={tr.count}
+                  checked={trimSel.includes(tr.value)}
+                  onChange={() => toggle(trimSel, setTrimSel)(tr.value)}
+                />
+              ))}
+            </FilterGroup>
+          )}
+
           <FilterGroup title={t("condition")}>
             {conditions.map((c) => (
               <CheckRow
@@ -455,6 +499,18 @@ export function FilterSidebar({
                 count={countFor(facets?.conditions, c)}
                 checked={condition.includes(c)}
                 onChange={() => toggle(condition, setCondition)(c)}
+              />
+            ))}
+          </FilterGroup>
+
+          <FilterGroup title={t("dealRating")}>
+            {dealRatings.map((d) => (
+              <CheckRow
+                key={d.id}
+                label={d.label}
+                count={countFor(facets?.dealRatings, d.id)}
+                checked={dealRatingSel.includes(d.id)}
+                onChange={() => toggle(dealRatingSel, setDealRatingSel)(d.id)}
               />
             ))}
           </FilterGroup>
@@ -485,7 +541,7 @@ export function FilterSidebar({
                 <button
                   key={p}
                   onClick={() => setPriceMax(String(p))}
-                  className="text-[10px] px-1.5 py-0.5 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40"
+                  className="text-[10px] px-2 py-0.5 rounded-full border border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white transition-colors"
                 >
                   &lt; {p / 1000}k
                 </button>
@@ -508,7 +564,7 @@ export function FilterSidebar({
                 <button
                   key={p}
                   onClick={() => setKmsMax(String(p))}
-                  className="text-[10px] px-1.5 py-0.5 rounded-sm bg-[#F4F4F4] border border-[#E5E5E5] text-secondary hover:border-[#C8A93E]/40"
+                  className="text-[10px] px-2 py-0.5 rounded-full border border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white transition-colors"
                 >
                   &lt; {p / 1000}k
                 </button>
@@ -597,6 +653,18 @@ export function FilterSidebar({
             ))}
           </FilterGroup>
 
+          <FilterGroup title={t("drivetrain")}>
+            {drivetrains.map((d) => (
+              <CheckRow
+                key={d}
+                label={d}
+                count={countFor(facets?.drivetrains, d)}
+                checked={drivetrainSel.includes(d)}
+                onChange={() => toggle(drivetrainSel, setDrivetrainSel)(d)}
+              />
+            ))}
+          </FilterGroup>
+
           <FilterGroup title={t("cylinders")} defaultOpen={false}>
             <div className="flex flex-wrap gap-1.5">
               {cylinderOptions.map((c) => (
@@ -635,21 +703,21 @@ export function FilterSidebar({
           </FilterGroup>
 
           <FilterGroup title={t("sellerType")} defaultOpen={false}>
-            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#1A1A1A]">
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#141414]">
               <input
                 type="radio"
                 name="sellerType"
                 checked={sellerType === ""}
                 onChange={() => setSellerType("")}
                 suppressHydrationWarning
-                className="h-3 w-3 border-[#D4D4D4] text-[#C8A93E] focus:ring-[#C8A93E]/40"
+                className="h-3 w-3 border-[#D8D4C6] text-[#141414] focus:ring-[#141414]/20"
               />
               All
             </label>
             {sellerTypes.map((s) => (
               <label
                 key={s.id}
-                className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#1A1A1A]"
+                className="flex items-center gap-1.5 cursor-pointer text-xs text-secondary hover:text-[#141414]"
               >
                 <input
                   type="radio"
@@ -657,7 +725,7 @@ export function FilterSidebar({
                   checked={sellerType === s.id}
                   onChange={() => setSellerType(s.id)}
                   suppressHydrationWarning
-                  className="h-3 w-3 border-[#D4D4D4] text-[#C8A93E] focus:ring-[#C8A93E]/40"
+                  className="h-3 w-3 border-[#D8D4C6] text-[#141414] focus:ring-[#141414]/20"
                 />
                 {s.label}
               </label>
@@ -694,10 +762,10 @@ export function FilterSidebar({
           </div>
         </div>
 
-        <div className="p-3 border-t border-[#E5E5E5]">
+        <div className="p-3 border-t border-[#E7E4DA]">
           <button
             onClick={apply}
-            className="w-full h-9 rounded-lg bg-[#C8A93E] text-white text-xs font-semibold hover:bg-[#B4972F] transition-colors"
+            className="w-full h-9 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#141414]/90 transition-colors"
           >
             {t("apply")}
           </button>

@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { b2bBuyers, users } from "@/lib/db/schema";
+import { b2bBuyers, exportInquiries, users } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId, type DemoB2BBuyer } from "./demo-store";
 import type { CurrentUser } from "./users";
@@ -113,6 +113,111 @@ export async function getB2BBuyers(): Promise<B2BBuyerView[]> {
     isVerified: b.isVerified,
     createdAt: b.createdAt.toISOString(),
   }));
+}
+
+/** The importer (b2b_buyers) record for a signed-in user, if they have one. */
+export async function getB2BBuyerForUser(
+  userId: string,
+): Promise<B2BBuyerView | null> {
+  if (!isDbEnabled()) {
+    const b = demoStore().b2bBuyers[0];
+    return b ? { ...b } : null;
+  }
+  try {
+    const rows = await db
+      .select()
+      .from(b2bBuyers)
+      .where(eq(b2bBuyers.userId, userId))
+      .limit(1);
+    const b = rows[0];
+    if (!b) return null;
+    return {
+      id: b.id,
+      companyName: b.companyName,
+      country: b.country,
+      contactPhone: b.contactPhone ?? undefined,
+      isVerified: b.isVerified,
+      createdAt: b.createdAt.toISOString(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface ExportInquiryView {
+  id: string;
+  destinationCountry: string;
+  vehicleCount: number;
+  shippingPreference?: string;
+  docRequests: string[];
+  notes?: string;
+  status: string;
+  createdAt: string;
+}
+
+/**
+ * Export inquiries submitted by a signed-in importer. Joins export_inquiries →
+ * b2b_buyers on the buyer's userId. Read-only. Falls back to sample inquiries in
+ * demo mode so the page always renders.
+ */
+export async function getExportInquiriesForUser(
+  userId: string,
+): Promise<ExportInquiryView[]> {
+  if (!isDbEnabled()) {
+    const now = Date.now();
+    return [
+      {
+        id: "EXP-1",
+        destinationCountry: "Kenya",
+        vehicleCount: 3,
+        shippingPreference: "RoRo",
+        docRequests: ["Export Certificate", "RTA Deregistration Letter"],
+        notes: "Right-hand-drive SUVs preferred.",
+        status: "new",
+        createdAt: new Date(now - 3 * 24 * 3600_000).toISOString(),
+      },
+      {
+        id: "EXP-2",
+        destinationCountry: "Nigeria",
+        vehicleCount: 8,
+        shippingPreference: "Container",
+        docRequests: ["Vehicle Title / Ownership"],
+        notes: undefined,
+        status: "quoted",
+        createdAt: new Date(now - 9 * 24 * 3600_000).toISOString(),
+      },
+    ];
+  }
+  try {
+    const rows = await db
+      .select({
+        id: exportInquiries.id,
+        destinationCountry: exportInquiries.destinationCountry,
+        listingIds: exportInquiries.listingIds,
+        shippingPreference: exportInquiries.shippingPreference,
+        docRequests: exportInquiries.docRequests,
+        notes: exportInquiries.notes,
+        status: exportInquiries.status,
+        createdAt: exportInquiries.createdAt,
+      })
+      .from(exportInquiries)
+      .innerJoin(b2bBuyers, eq(exportInquiries.b2bBuyerId, b2bBuyers.id))
+      .where(eq(b2bBuyers.userId, userId))
+      .orderBy(desc(exportInquiries.createdAt))
+      .limit(100);
+    return rows.map((r) => ({
+      id: r.id,
+      destinationCountry: r.destinationCountry,
+      vehicleCount: (r.listingIds ?? []).length,
+      shippingPreference: r.shippingPreference ?? undefined,
+      docRequests: r.docRequests ?? [],
+      notes: r.notes ?? undefined,
+      status: r.status,
+      createdAt: r.createdAt.toISOString(),
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function verifyB2BBuyer(

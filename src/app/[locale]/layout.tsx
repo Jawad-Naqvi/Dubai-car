@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css";
+import { DM_Sans, Tajawal } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -7,6 +8,24 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { brand } from "@/lib/brand";
 import { Toaster } from "sonner";
+import { NativeBridge } from "@/components/native/native-bridge";
+
+/**
+ * Self-hosted fonts via next/font — no render-blocking request to Google's CDN,
+ * fonts are inlined/preloaded and served same-origin, and there's no layout
+ * shift (display: swap + size-adjust handled automatically).
+ */
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+const tajawal = Tajawal({
+  subsets: ["arabic"],
+  weight: ["400", "500", "700", "800"],
+  variable: "--font-tajawal",
+  display: "swap",
+});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -36,42 +55,34 @@ export default async function LocaleLayout({
   const isRTL = locale === "ar";
 
   return (
-    <html lang={locale} dir={isRTL ? "rtl" : "ltr"} suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        />
-        {isRTL && (
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
-          />
-        )}
-      </head>
+    <html
+      lang={locale}
+      dir={isRTL ? "rtl" : "ltr"}
+      className={`${dmSans.variable} ${tajawal.variable}`}
+      suppressHydrationWarning
+    >
       <body
         className="bg-page text-[#1A1A1A] antialiased"
         style={{
           fontFamily: isRTL
-            ? '"Tajawal", "Inter", ui-sans-serif, system-ui, sans-serif'
-            : '"Inter", "Tajawal", ui-sans-serif, system-ui, sans-serif',
+            ? "var(--font-tajawal), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif"
+            : "var(--font-dm-sans), var(--font-tajawal), ui-sans-serif, system-ui, sans-serif",
         }}
       >
         <ClerkProvider
           appearance={{
             variables: {
-              colorPrimary: "#C8A93E",
+              colorPrimary: "#141414",
               colorBackground: "#FFFFFF",
               colorInputBackground: "#FFFFFF",
-              colorInputText: "#1A1A1A",
-              colorText: "#1A1A1A",
-              borderRadius: "0.75rem",
+              colorInputText: "#141414",
+              colorText: "#141414",
+              borderRadius: "1rem",
             },
           }}
         >
           <NextIntlClientProvider messages={messages}>
+            <NativeBridge />
             {children}
             <Toaster
               theme="light"
@@ -79,7 +90,7 @@ export default async function LocaleLayout({
               toastOptions={{
                 style: {
                   background: "#FFFFFF",
-                  border: "1px solid #E5E5E5",
+                  border: "1px solid #E7E4DA",
                   color: "#1A1A1A",
                 },
               }}

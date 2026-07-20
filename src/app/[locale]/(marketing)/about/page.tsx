@@ -37,8 +37,9 @@ export default async function AboutPage({
         <RadialGlow color="gold" size="xl" className="-top-40 -right-40 opacity-25" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
           <Eyebrow tone="gold">ABOUT DXB MOTORS</Eyebrow>
-          <h1 className="mt-6 text-sm lg:text-2xl font-bold tracking-tight leading-[1.05] max-w-4xl">
-            We're building Dubai's car operating system.
+          <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05] max-w-4xl">
+            We're building Dubai's{" "}
+            <span className="font-extrabold">car operating system</span>.
           </h1>
           <p className="mt-8 text-sm text-secondary max-w-2xl leading-relaxed">
             The UAE used-car market is heading from USD 20 billion in 2024 to
@@ -54,10 +55,10 @@ export default async function AboutPage({
             {principles.map((p) => (
               <div
                 key={p.title}
-                className="rounded-xl bg-white border border-[#E5E5E5] shadow-card p-4 hover:border-[#C8A93E]/30 hover:shadow-card-hover transition-colors"
+                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
               >
-                <div className="h-12 w-12 rounded-lg bg-[#C8A93E]/10 ring-1 ring-[#C8A93E]/30 flex items-center justify-center mb-5">
-                  <p.icon className="h-5 w-5 text-[#C8A93E]" />
+                <div className="h-12 w-12 rounded-full bg-[#FBE7D4] flex items-center justify-center mb-5">
+                  <p.icon className="h-5 w-5 text-[#F0941F]" />
                 </div>
                 <h3 className="font-semibold text-sm">{p.title}</h3>
                 <p className="mt-2 text-sm text-secondary leading-relaxed">
@@ -88,7 +89,7 @@ export default async function AboutPage({
             </BentoCard>
 
             <BentoCard variant="dark" className="col-span-12 md:col-span-5">
-              <div className="text-sm font-bold text-gradient-gold">USD 35B</div>
+              <div className="text-3xl font-extrabold tracking-tight text-[#141414]">USD 35B</div>
               <p className="mt-3 text-sm text-secondary">
                 UAE used-car market projection by 2030.
                 <br />
@@ -99,7 +100,7 @@ export default async function AboutPage({
             </BentoCard>
 
             <BentoCard variant="emerald" className="col-span-12 md:col-span-5">
-              <div className="text-sm font-bold text-[#C8A93E]">+42%</div>
+              <div className="text-3xl font-extrabold tracking-tight text-[#141414]">+42%</div>
               <p className="mt-3 text-sm text-secondary">
                 Increase in online car demand in the UAE in H1 2025 vs H1 2024.
                 <br />
@@ -116,7 +117,7 @@ export default async function AboutPage({
                   </BentoTitle>
                 </div>
                 <Button asChild variant="gold" size="lg">
-                  <Link href="/careers">See open roles</Link>
+                  <Link href="/contact">See open roles</Link>
                 </Button>
               </div>
             </BentoCard>

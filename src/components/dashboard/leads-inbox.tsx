@@ -91,15 +91,15 @@ export function LeadsInbox({ leads }: { leads: LeadView[] }) {
 
   return (
     <main className="p-5 space-y-4">
-      <div className="flex items-center gap-1 border-b border-[#E5E5E5] overflow-x-auto">
+      <div className="flex items-center gap-1 border-b border-[#E7E4DA] overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={
               t === tab
-                ? "px-4 py-3 text-xs font-semibold border-b-2 border-[#C8A93E] text-[#A98F2E] whitespace-nowrap"
-                : "px-4 py-3 text-xs text-secondary hover:text-[#1A1A1A] border-b-2 border-transparent whitespace-nowrap"
+                ? "px-4 py-3 text-xs font-semibold border-b-2 border-[#F0941F] text-[#C97612] whitespace-nowrap"
+                : "px-4 py-3 text-xs text-secondary hover:text-[#141414] border-b-2 border-transparent whitespace-nowrap"
             }
           >
             {t}
@@ -108,25 +108,25 @@ export function LeadsInbox({ leads }: { leads: LeadView[] }) {
         ))}
       </div>
 
-      <div className="rounded-xl bg-white border border-[#E5E5E5] shadow-card overflow-hidden">
+      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-10 text-center text-xs text-muted">
             No leads in this view yet.
           </div>
         ) : (
-          <div className="divide-y divide-[#E5E5E5]">
+          <div className="divide-y divide-[#E7E4DA]">
             {filtered.map((l) => {
               const meta = TYPE_META[l.type] ?? TYPE_META.inquiry;
               const Icon = meta.icon;
               return (
                 <div
                   key={l.id}
-                  className={`grid grid-cols-1 md:grid-cols-[1.4fr_1.4fr_130px_110px_130px] items-center gap-4 p-5 hover:bg-[#F8F8F8] ${
+                  className={`grid grid-cols-1 md:grid-cols-[1.4fr_1.4fr_130px_110px_130px] items-center gap-4 p-5 hover:bg-[#F1EFE9] ${
                     busy === l.id ? "opacity-50" : ""
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-8 w-10 rounded-full bg-[#C8A93E]/10 text-[#A98F2E] flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <div className="h-8 w-10 rounded-full bg-[#F0941F]/10 text-[#C97612] flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {l.buyerName.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -148,7 +148,7 @@ export function LeadsInbox({ leads }: { leads: LeadView[] }) {
                     <Icon className="h-3.5 w-3.5" />
                     {meta.label}
                   </div>
-                  <div className="text-xs font-semibold text-[#C8A93E]">
+                  <div className="text-xs font-semibold text-[#F0941F]">
                     {l.feeAED ? formatAED(l.feeAED) : "—"}
                   </div>
                   <Dropdown.Root>
@@ -161,16 +161,16 @@ export function LeadsInbox({ leads }: { leads: LeadView[] }) {
                     <Dropdown.Portal>
                       <Dropdown.Content
                         align="end"
-                        className="z-50 min-w-[140px] rounded-md bg-white border border-[#E5E5E5] p-1 shadow-card text-xs"
+                        className="z-50 min-w-[140px] rounded-xl bg-white border border-[#E7E4DA] p-1 shadow-card text-xs"
                       >
                         {STATUS_OPTIONS.map((s) => (
                           <Dropdown.Item
                             key={s}
                             onClick={() => setStatus(l.id, s)}
-                            className="flex items-center justify-between px-2.5 py-2 rounded-sm cursor-pointer outline-none text-secondary data-[highlighted]:bg-[#F8F8F8] capitalize"
+                            className="flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer outline-none text-secondary data-[highlighted]:bg-[#F1EFE9] capitalize"
                           >
                             {s}
-                            {l.status === s && <Check className="h-3 w-3 text-[#C8A93E]" />}
+                            {l.status === s && <Check className="h-3 w-3 text-[#F0941F]" />}
                           </Dropdown.Item>
                         ))}
                       </Dropdown.Content>

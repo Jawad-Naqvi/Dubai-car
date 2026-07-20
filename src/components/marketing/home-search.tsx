@@ -42,8 +42,8 @@ export function HomeSearch() {
   return (
     <div className="mt-8 max-w-2xl mx-auto">
       <div className="relative">
-        <div className="relative flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-full shadow-card hover:shadow-card-hover transition-shadow p-1.5 pl-5">
-          <Search className="h-5 w-5 text-[#C8A93E] flex-shrink-0" />
+        <div className="relative flex items-center gap-2 bg-white border border-[#E7E4DA] rounded-full shadow-card hover:shadow-card-hover transition-shadow p-1.5 pl-5">
+          <Search className="h-5 w-5 text-[#F0941F] flex-shrink-0" />
           <input
             type="text"
             value={value}
@@ -51,7 +51,7 @@ export function HomeSearch() {
             onKeyDown={(e) => e.key === "Enter" && go()}
             placeholder={t("hero.searchPlaceholder")}
             suppressHydrationWarning
-            className="flex-1 bg-transparent text-[#1A1A1A] placeholder:text-muted text-sm outline-none py-2.5"
+            className="flex-1 bg-transparent text-[#141414] placeholder:text-muted text-sm outline-none py-2.5"
           />
           <Button variant="gold" size="lg" className="rounded-full px-6" onClick={go}>
             <Search className="h-4 w-4" />

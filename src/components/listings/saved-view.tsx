@@ -41,13 +41,13 @@ export function SavedView({ locale = "en" }: { locale?: "en" | "ar" }) {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-24 rounded-xl bg-white border border-[#E5E5E5] shadow-card">
+      <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
         <Heart className="h-8 w-8 text-muted mb-3" />
         <h3 className="text-sm font-semibold">No saved cars yet</h3>
         <p className="mt-1 text-xs text-muted max-w-xs">
           Tap the heart on any listing to save it here for later.
         </p>
-        <Link href="/buy" className="mt-4 text-xs text-[#A98F2E] hover:underline">
+        <Link href="/buy" className="mt-4 text-xs font-semibold text-[#141414] underline underline-offset-2 hover:opacity-70">
           Browse inventory →
         </Link>
       </div>

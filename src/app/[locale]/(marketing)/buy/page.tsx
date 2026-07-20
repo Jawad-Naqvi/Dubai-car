@@ -2,6 +2,8 @@ import { setRequestLocale } from "next-intl/server";
 import { ListingCard } from "@/components/listings/listing-card";
 import { FilterSidebar } from "@/components/listings/filter-sidebar";
 import { ActiveFilters } from "@/components/listings/active-filters";
+import { SaveSearchButton } from "@/components/listings/save-search-button";
+import { MobileFilterBar } from "@/components/listings/mobile-filter-bar";
 import {
   ListingSearchBar,
   ListingSortBar,
@@ -32,12 +34,12 @@ export default async function BuyPage({
   return (
     <div className="relative">
       {/* Hero strip */}
-      <div className="relative bg-hero-panel py-6 lg:py-8 border-b border-[#E5E5E5]">
-        <div className="absolute inset-0 opacity-60 bg-gradient-to-r from-transparent via-transparent to-[#C8A93E]/10" />
+      <div className="relative bg-[#F3F1E9] py-8 lg:py-10 border-b border-[#E7E4DA]">
         <div className="relative mx-auto max-w-7xl px-4 lg:px-6">
           <Eyebrow tone="gold">BROWSE INVENTORY</Eyebrow>
-          <h1 className="mt-2 text-xl lg:text-2xl font-bold tracking-tight">
-            {result.total.toLocaleString()} verified cars across the UAE
+          <h1 className="mt-2 text-2xl lg:text-3xl font-light tracking-tight">
+            {result.total.toLocaleString()} verified cars{" "}
+            <span className="font-extrabold">across the UAE</span>
           </h1>
           <p className="mt-1.5 text-xs text-secondary max-w-xl">
             Hand-picked listings from {dealerCount}+ verified yards.
@@ -58,18 +60,24 @@ export default async function BuyPage({
           <div>
             {/* Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <div className="text-xs text-secondary">
-                <span className="text-[#1A1A1A] font-semibold">{result.total}</span>{" "}
-                results
-                {query.q ? (
-                  <>
-                    {" "}
-                    for{" "}
-                    <span className="text-[#A98F2E] font-medium">&ldquo;{query.q}&rdquo;</span>
-                  </>
-                ) : null}
+              <div className="flex items-center gap-3">
+                <MobileFilterBar facets={result.facets} total={result.total} />
+                <div className="text-xs text-secondary">
+                  <span className="text-[#141414] font-semibold">{result.total}</span>{" "}
+                  results
+                  {query.q ? (
+                    <>
+                      {" "}
+                      for{" "}
+                      <span className="text-[#141414] font-semibold">&ldquo;{query.q}&rdquo;</span>
+                    </>
+                  ) : null}
+                </div>
               </div>
-              <ListingSortBar />
+              <div className="flex items-center gap-2">
+                <SaveSearchButton className="hidden sm:inline-flex" />
+                <ListingSortBar />
+              </div>
             </div>
 
             <ActiveFilters />
@@ -86,15 +94,15 @@ export default async function BuyPage({
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center text-center py-24 rounded-xl bg-white border border-[#E5E5E5] shadow-card">
+              <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
                 <SearchX className="h-8 w-8 text-muted mb-3" />
-                <h3 className="text-sm font-semibold text-[#1A1A1A]">No cars match your filters</h3>
+                <h3 className="text-sm font-semibold text-[#141414]">No cars match your filters</h3>
                 <p className="mt-1 text-xs text-muted max-w-xs">
                   Try widening your price range or clearing a filter.
                 </p>
                 <Link
                   href="/buy"
-                  className="mt-4 text-xs text-[#A98F2E] font-semibold hover:underline"
+                  className="mt-4 text-xs text-[#141414] font-semibold underline underline-offset-2 hover:opacity-70"
                 >
                   Reset all filters
                 </Link>

@@ -40,17 +40,17 @@ export function FinanceCalculator({
   return (
     <div
       className={cn(
-        "rounded-xl bg-white border border-[#E5E5E5] shadow-card p-5 relative overflow-hidden grain",
+        "rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 relative overflow-hidden",
         className,
       )}
     >
       <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-30" />
       <div className="relative">
         <div className="flex items-center gap-1.5 mb-1">
-          <Calculator className="h-3.5 w-3.5 text-[#C8A93E]" />
+          <Calculator className="h-3.5 w-3.5 text-[#F0941F]" />
           <Eyebrow tone="gold">FINANCE</Eyebrow>
         </div>
-        <h3 className="text-base font-bold mt-2">Estimate monthly payment</h3>
+        <h3 className="text-base font-bold tracking-tight mt-2">Estimate monthly payment</h3>
 
         <div className="mt-4 space-y-4">
           <Slider
@@ -82,18 +82,18 @@ export function FinanceCalculator({
           />
         </div>
 
-        <div className="mt-4 pt-4 border-t border-[#E5E5E5] flex items-center justify-between">
+        <div className="mt-4 pt-4 border-t border-[#E7E4DA] flex items-center justify-between">
           <div className="text-xs text-secondary">Estimated monthly</div>
-          <div className="text-lg font-bold text-gradient-gold">
+          <div className="text-lg font-bold text-[#141414]">
             {formatAED(emi, locale)}/mo
           </div>
         </div>
         <div className="mt-2 grid grid-cols-2 gap-2 text-[10px] text-muted">
-          <div className="flex justify-between rounded-sm bg-[#F4F4F4] px-2 py-1.5">
+          <div className="flex justify-between rounded-lg bg-[#F3F1E9] px-2 py-1.5">
             <span>Total interest</span>
             <span className="text-secondary">{formatAED(totalInterest, locale)}</span>
           </div>
-          <div className="flex justify-between rounded-sm bg-[#F4F4F4] px-2 py-1.5">
+          <div className="flex justify-between rounded-lg bg-[#F3F1E9] px-2 py-1.5">
             <span>Total payable</span>
             <span className="text-secondary">{formatAED(totalPayable, locale)}</span>
           </div>
@@ -128,7 +128,7 @@ function Slider({
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[11px] text-muted">{label}</span>
-        <span className="text-xs font-semibold text-[#1A1A1A]">{value}</span>
+        <span className="text-xs font-semibold text-[#141414]">{value}</span>
       </div>
       <input
         type="range"
@@ -137,7 +137,7 @@ function Slider({
         step={step}
         value={current}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1 accent-[#C8A93E] cursor-pointer"
+        className="w-full h-1 accent-[#141414] cursor-pointer"
       />
     </div>
   );

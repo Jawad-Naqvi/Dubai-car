@@ -39,9 +39,9 @@ export function ModerationQueue({ items }: { items: ModerationItem[] }) {
 
   if (pending.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-24 rounded-lg bg-white shadow-card border border-[#E5E5E5]">
+      <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white shadow-card border border-[#E7E4DA]">
         <Inbox className="h-8 w-8 text-muted mb-3" />
-        <h3 className="text-sm font-semibold text-[#1A1A1A]">Queue is clear</h3>
+        <h3 className="text-sm font-semibold text-[#141414]">Queue is clear</h3>
         <p className="mt-1 text-xs text-muted">No listings awaiting review.</p>
       </div>
     );
@@ -52,18 +52,18 @@ export function ModerationQueue({ items }: { items: ModerationItem[] }) {
       {pending.map((l) => (
         <div
           key={l.id}
-          className={`rounded-lg bg-white shadow-card border border-[#E5E5E5] overflow-hidden hover:border-[#C8A93E]/30 transition-colors ${
+          className={`rounded-2xl bg-white shadow-card border border-[#E7E4DA] overflow-hidden hover:shadow-card-hover transition-shadow ${
             busy === l.id ? "opacity-50" : ""
           }`}
         >
           <div className="grid grid-cols-[160px_1fr]">
-            <div className="relative aspect-square bg-[#F4F4F4]">
+            <div className="relative aspect-square bg-[#F3F1E9]">
               <Image src={l.imageUrl} alt="" fill sizes="160px" className="object-cover" />
             </div>
             <div className="p-5">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <h3 className="font-semibold text-xs truncate text-[#1A1A1A]">{l.title}</h3>
+                  <h3 className="font-semibold text-xs truncate text-[#141414]">{l.title}</h3>
                   <div className="text-xs text-muted">
                     DXB-{l.id} · {l.dealerName}
                   </div>

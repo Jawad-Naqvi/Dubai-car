@@ -13,10 +13,10 @@ const toneStyles: Record<BadgeTone, string> = {
   verified: "bg-[#1A7A4A] text-white shadow-sm",
   reserved: "bg-[#B7791F]/12 text-[#8A5A12] ring-1 ring-[#B7791F]/30",
   new: "bg-[#1B4FA0] text-white shadow-sm",
-  export: "bg-[#C8A93E] text-white shadow-sm",
+  export: "bg-[#F0941F] text-white shadow-sm",
   inspected: "bg-[#1A7A4A]/12 text-[#1A7A4A] ring-1 ring-[#1A7A4A]/25",
-  featured: "bg-[#C8A93E] text-white shadow-sm",
-  neutral: "bg-[#F4F4F4] text-[#6B6B6B] ring-1 ring-[#E5E5E5]",
+  featured: "bg-[#F0941F] text-white shadow-sm",
+  neutral: "bg-[#F3F1E9] text-[#6B6B6B] ring-1 ring-[#E7E4DA]",
 };
 
 export function Badge({
@@ -31,7 +31,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-sm px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider",
+        "inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider",
         toneStyles[tone],
         className,
       )}

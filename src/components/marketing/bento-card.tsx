@@ -12,22 +12,22 @@ export function BentoCard({
   children,
 }: BentoCardProps) {
   const variants = {
-    dark: "bg-white border border-[#E5E5E5] text-[#1A1A1A] shadow-card",
-    gold: "bg-bento-gold text-white border border-[#C8A93E]/40 shadow-card",
-    emerald: "bg-white border border-[#E5E5E5] text-[#1A1A1A] shadow-card",
+    dark: "bg-white border border-[#E7E4DA] text-[#141414] shadow-card",
+    gold: "bg-bento-gold text-white border border-[#F0941F]/40 shadow-card",
+    emerald: "bg-white border border-[#E7E4DA] text-[#141414] shadow-card",
   };
 
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl p-5 lg:p-6 transition-all duration-300 hover:shadow-card-hover hover:border-[#D4D4D4]",
+        "group relative overflow-hidden rounded-2xl p-5 lg:p-6 transition-all duration-300 hover:shadow-card-hover hover:border-[#D8D4C6]",
         variants[variant],
         className,
       )}
     >
       <div className="relative z-10 h-full">{children}</div>
       {variant === "dark" && (
-        <div className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#C8A93E]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#F0941F]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       )}
     </div>
   );
