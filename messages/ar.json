@@ -134,6 +134,8 @@
     "title": "الفلاتر",
     "make": "الصانع",
     "model": "الموديل",
+    "modelSearchPlaceholder": "ابحث عن الموديلات…",
+    "modelNoCatalog": "لا تتوفر قائمة موديلات لهذا الصانع بعد.",
     "yearFrom": "السنة من",
     "yearTo": "السنة إلى",
     "priceFrom": "السعر من",

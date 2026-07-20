@@ -42,6 +42,7 @@ export type SortKey =
 export interface ListingSearchParams {
   q?: string;
   make?: string[];
+  model?: string[];
   bodyType?: string[];
   fuel?: string[];
   transmission?: string[];
@@ -209,6 +210,7 @@ function filterMock(p: ListingSearchParams): MockListing[] {
       if (!hay.includes(p.q.toLowerCase())) return false;
     }
     if (!matchMulti(l.make, p.make)) return false;
+    if (!matchMulti(l.model, p.model)) return false;
     if (!matchMulti(l.bodyType, p.bodyType)) return false;
     if (!matchMulti(l.fuel, p.fuel)) return false;
     if (!matchMulti(l.transmission, p.transmission)) return false;
@@ -456,6 +458,11 @@ function buildConditions(p: ListingSearchParams) {
     );
   }
   if (p.make?.length) conds.push(inArray(listings.make, p.make));
+  // Model values are entered by dealers with inconsistent casing (e.g. "m5" vs
+  // "M5"), so match case-insensitively rather than with an exact inArray.
+  if (p.model?.length) {
+    conds.push(or(...p.model.map((m) => ilike(listings.model, m)))!);
+  }
   if (p.bodyType?.length) conds.push(inArray(listings.bodyType, p.bodyType));
   if (p.fuel?.length) conds.push(inArray(listings.fuel, p.fuel));
   if (p.transmission?.length)

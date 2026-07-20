@@ -19,6 +19,7 @@ import {
   mileagePresets,
   type ColorOption,
 } from "@/lib/brand";
+import { modelGroupsForMakes } from "@/lib/car-models";
 import { cn } from "@/lib/utils";
 import { useQueryState } from "@/lib/use-query-state";
 
@@ -186,6 +187,7 @@ export function FilterSidebar({
 
   // Draft state seeded from the URL; committed on Apply.
   const [makes, setMakes] = useState<string[]>([]);
+  const [models, setModels] = useState<string[]>([]);
   const [emirateSel, setEmirateSel] = useState<string[]>([]);
   const [body, setBody] = useState<string[]>([]);
   const [fuel, setFuel] = useState<string[]>([]);
@@ -207,10 +209,13 @@ export function FilterSidebar({
   const [exportOnly, setExportOnly] = useState(false);
   const [withPhotos, setWithPhotos] = useState(false);
   const [showAllMakes, setShowAllMakes] = useState(false);
+  const [showAllModels, setShowAllModels] = useState(false);
+  const [modelQuery, setModelQuery] = useState("");
 
   // Re-seed whenever the URL changes (back/forward, links).
   useEffect(() => {
     setMakes(params.getAll("make"));
+    setModels(params.getAll("model"));
     setEmirateSel(params.getAll("emirate"));
     setBody(params.getAll("bodyType"));
     setFuel(params.getAll("fuel"));
@@ -242,6 +247,8 @@ export function FilterSidebar({
   const apply = () => {
     push({
       make: makes,
+      // Drop any model no longer valid for the selected makes.
+      model: models.filter((m) => validModels.has(m)),
       emirate: emirateSel,
       bodyType: body,
       fuel,
@@ -268,6 +275,7 @@ export function FilterSidebar({
   const reset = () => {
     push({
       make: null,
+      model: null,
       emirate: null,
       bodyType: null,
       fuel: null,
@@ -300,6 +308,32 @@ export function FilterSidebar({
     return Array.from(new Set([...fromFacets, ...popularMakes]));
   }, [facets]);
   const visibleMakes = showAllMakes ? makeList : makeList.slice(0, 8);
+
+  // Model catalog for the currently-selected (draft) makes. Grouped by make so
+  // multi-make selections stay readable; each value is the bare model name.
+  const modelGroups = useMemo(() => modelGroupsForMakes(makes), [makes]);
+  const validModels = useMemo(
+    () => new Set(modelGroups.flatMap((g) => g.models)),
+    [modelGroups],
+  );
+
+  // Apply the model-search filter within each group, and collapse long lists.
+  const MODEL_COLLAPSE = 10;
+  const filteredGroups = useMemo(() => {
+    const q = modelQuery.trim().toLowerCase();
+    return modelGroups
+      .map((g) => ({
+        make: g.make,
+        models: q
+          ? g.models.filter((m) => m.toLowerCase().includes(q))
+          : g.models,
+      }))
+      .filter((g) => g.models.length > 0);
+  }, [modelGroups, modelQuery]);
+  const totalFilteredModels = filteredGroups.reduce(
+    (n, g) => n + g.models.length,
+    0,
+  );
 
   return (
     <aside className={cn("w-full", className)}>
@@ -355,6 +389,63 @@ export function FilterSidebar({
               </button>
             )}
           </FilterGroup>
+
+          {makes.length > 0 && (
+            <FilterGroup title={t("model")}>
+              {modelGroups.length === 0 ? (
+                <p className="text-[10px] text-muted">{t("modelNoCatalog")}</p>
+              ) : (
+                <>
+                  {totalFilteredModels > MODEL_COLLAPSE && (
+                    <input
+                      value={modelQuery}
+                      onChange={(e) => setModelQuery(e.target.value)}
+                      placeholder={t("modelSearchPlaceholder")}
+                      suppressHydrationWarning
+                      className={cn(inputCls, "w-full mb-1")}
+                    />
+                  )}
+                  {(() => {
+                    // Cap the number of rendered rows across all groups until
+                    // the user expands, so the list doesn't dominate the sidebar.
+                    let budget = showAllModels ? Infinity : MODEL_COLLAPSE;
+                    return filteredGroups.map((g) => {
+                      if (budget <= 0) return null;
+                      const shown = g.models.slice(0, budget);
+                      budget -= shown.length;
+                      return (
+                        <div key={g.make} className="space-y-1.5">
+                          {modelGroups.length > 1 && (
+                            <p className="text-[10px] font-semibold text-muted uppercase tracking-wider pt-1">
+                              {g.make}
+                            </p>
+                          )}
+                          {shown.map((m) => (
+                            <CheckRow
+                              key={`${g.make}:${m}`}
+                              label={m}
+                              checked={models.includes(m)}
+                              onChange={() => toggle(models, setModels)(m)}
+                            />
+                          ))}
+                        </div>
+                      );
+                    });
+                  })()}
+                  {totalFilteredModels > MODEL_COLLAPSE && (
+                    <button
+                      onClick={() => setShowAllModels((v) => !v)}
+                      className="text-[10px] text-[#A98F2E] font-semibold hover:underline pt-0.5"
+                    >
+                      {showAllModels
+                        ? t("showLess")
+                        : `${t("showMore")} (${totalFilteredModels})`}
+                    </button>
+                  )}
+                </>
+              )}
+            </FilterGroup>
+          )}
 
           <FilterGroup title={t("condition")}>
             {conditions.map((c) => (

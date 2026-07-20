@@ -7,6 +7,7 @@ import { useQueryState } from "@/lib/use-query-state";
 /** Multi-value params rendered as one chip per selected value. */
 const MULTI_KEYS = [
   "make",
+  "model",
   "emirate",
   "bodyType",
   "fuel",

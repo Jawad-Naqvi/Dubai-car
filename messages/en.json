@@ -134,6 +134,8 @@
     "title": "Filters",
     "make": "Make",
     "model": "Model",
+    "modelSearchPlaceholder": "Search models…",
+    "modelNoCatalog": "No model list available for this make yet.",
     "yearFrom": "Year from",
     "yearTo": "Year to",
     "priceFrom": "Price from",
