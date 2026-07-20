@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatAED, monthlyEMI } from "@/lib/utils";
@@ -6,7 +6,8 @@ import { MapPin, Gauge, Calendar, Fuel, Lock, BadgeCheck, TrendingDown } from "l
 import type { MockListing } from "@/lib/mock-data";
 import { SaveButton } from "./save-button";
 import { CompareButton } from "./compare-button";
-import { DealBadge } from "./deal-badge";
+import { DealBadge, HighDemandBadge } from "./deal-badge";
+import { isHighDemand } from "@/lib/vehicle-derive";
 
 export function ListingCard({
   listing,
@@ -39,6 +40,7 @@ export function ListingCard({
             </Badge>
           )}
           {listing.status === "reserved" && <Badge tone="reserved">Reserved</Badge>}
+          <HighDemandBadge show={isHighDemand(listing)} />
         </div>
 
         <div className="absolute top-2 right-2 flex flex-col gap-1.5">

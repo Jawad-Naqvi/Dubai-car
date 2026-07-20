@@ -1,5 +1,5 @@
 import { SignUp } from "@clerk/nextjs";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { AuthShell, clerkAuthAppearance } from "@/components/auth/auth-shell";
 
 export default async function SignUpPage({

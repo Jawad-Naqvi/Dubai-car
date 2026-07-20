@@ -208,6 +208,45 @@ export async function autodevSpecs(
   return (data.data as Record<string, unknown>) ?? data;
 }
 
+export interface VinDecodeResult {
+  vin: string;
+  valid: boolean;
+  make?: string;
+  model?: string;
+  /** Best-effort single year picked from the decoded range — an auto-fill
+   *  convenience, not authoritative; the seller can always correct it. */
+  year?: number;
+  type?: string;
+}
+
+/**
+ * Decode a VIN via auto.dev — identity/spec data only (make, model, year
+ * range, vehicle type). Does NOT return accident/title/ownership history;
+ * that's a different product category (see lib/data/vehicle-history.ts's
+ * `fetchProviderHistory` seam for a real history provider).
+ */
+export async function decodeVin(vin: string): Promise<VinDecodeResult | null> {
+  const clean = vin.trim().toUpperCase();
+  if (clean.length < 11 || clean.length > 17) return null;
+  const data = await autodevJson<{
+    vin: string;
+    vinValid?: boolean;
+    make?: string;
+    model?: string;
+    years?: number[];
+    type?: string;
+  }>(`/vin/${encodeURIComponent(clean)}`);
+  if (!data) return null;
+  return {
+    vin: data.vin ?? clean,
+    valid: data.vinValid ?? true,
+    make: data.make,
+    model: data.model,
+    year: data.years?.[0],
+    type: data.type,
+  };
+}
+
 /* ---------- API Ninjas spec enrichment (optional) ---------- */
 
 export interface CarSpecs {

@@ -4,6 +4,7 @@ type RawParams = Record<string, string | string[] | undefined>;
 
 const SORTS: SortKey[] = [
   "newest",
+  "deal_desc",
   "price_asc",
   "price_desc",
   "year_desc",

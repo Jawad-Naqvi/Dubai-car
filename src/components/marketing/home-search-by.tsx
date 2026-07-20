@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { emirates, makeModels } from "@/lib/brand";
 

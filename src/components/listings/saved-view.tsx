@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Heart } from "lucide-react";
 import { ListingCard } from "./listing-card";
 import { ListingCardSkeleton } from "./listing-card";

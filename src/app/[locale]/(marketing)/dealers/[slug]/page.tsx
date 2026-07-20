@@ -1,6 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { getDealerBySlug } from "@/lib/data/dealers";
 import { brand } from "@/lib/brand";
 import { whatsappLink } from "@/lib/utils";

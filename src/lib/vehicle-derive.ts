@@ -60,3 +60,36 @@ export function computeDealRating(
   if (ratio <= 1.04) return "Good";
   return "Fair";
 }
+
+/** FNV-1a hash → unsigned 32-bit int (deterministic, no Math.random). */
+function seedHash(str: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+const VIEW_THRESHOLD = 40;
+const INQUIRY_THRESHOLD = 3;
+
+/**
+ * "High Demand" — a scarcity signal distinct from DealBadge's price-fairness
+ * rating (cars.com shows both side by side on a card).
+ *
+ * Real listings (DB mode) use the actual `viewCount`/`inquiryCount` counters
+ * already tracked on every listing. Listings with no counters (demo/seed data)
+ * get a deterministic pseudo-random flag from the listing id — same
+ * derive-when-unknown approach already used for inspection reports — so the
+ * demo still shows the badge on ~1 in 5 cars without inventing a specific
+ * fabricated view count.
+ */
+export function isHighDemand(
+  l: Pick<MockListing, "id" | "viewCount" | "inquiryCount">,
+): boolean {
+  if (l.viewCount != null || l.inquiryCount != null) {
+    return (l.viewCount ?? 0) >= VIEW_THRESHOLD || (l.inquiryCount ?? 0) >= INQUIRY_THRESHOLD;
+  }
+  return seedHash(`${l.id}|high-demand`) % 5 === 0;
+}

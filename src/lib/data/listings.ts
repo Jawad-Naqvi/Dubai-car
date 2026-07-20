@@ -40,7 +40,9 @@ export type SortKey =
   | "price_asc"
   | "price_desc"
   | "year_desc"
-  | "kms_asc";
+  | "kms_asc"
+  /** cars.com "Best deal" — Great Deal first, then Good, then Fair/unrated. */
+  | "deal_desc";
 
 export interface ListingSearchParams {
   q?: string;
@@ -170,6 +172,8 @@ function rowToView(r: DbRow): MockListing {
     imageUrls: r.heroUrl ? [r.heroUrl] : [],
     description: l.description ?? "",
     features: (l.features as string[] | null) ?? [],
+    viewCount: l.viewCount,
+    inquiryCount: l.inquiryCount,
   };
 }
 
@@ -290,6 +294,15 @@ function filterMock(p: ListingSearchParams): MockListing[] {
     case "kms_asc":
       items = items.sort((a, b) => a.kms - b.kms);
       break;
+    case "deal_desc": {
+      const rank: Record<DealRating, number> = { Great: 0, Good: 1, Fair: 2 };
+      items = items.sort((a, b) => {
+        const ra = dealRatingOf(a);
+        const rb = dealRatingOf(b);
+        return (ra ? rank[ra] : 3) - (rb ? rank[rb] : 3);
+      });
+      break;
+    }
     default:
       // "newest" — featured first, then keep declared order
       items = items.sort(
@@ -413,6 +426,8 @@ async function runSearchListings(
         return desc(listings.year);
       case "kms_asc":
         return asc(listings.kms);
+      case "deal_desc":
+        return sql`case ${listings.dealRating} when 'Great' then 0 when 'Good' then 1 when 'Fair' then 2 else 3 end`;
       default:
         return [desc(listings.isFeatured), desc(listings.publishedAt)];
     }

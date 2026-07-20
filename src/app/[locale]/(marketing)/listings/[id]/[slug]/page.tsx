@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import {
   getListingById,
@@ -19,12 +19,15 @@ import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ListingCard } from "@/components/listings/listing-card";
 import { ContactPaywall } from "@/components/listings/paywall";
-import { DealBadge } from "@/components/listings/deal-badge";
+import { DealBadge, HighDemandBadge } from "@/components/listings/deal-badge";
+import { isHighDemand } from "@/lib/vehicle-derive";
 import { ReportListingButton } from "@/components/listings/report-listing-button";
 import { InspectionReport } from "@/components/listings/inspection-report";
 import { getInspection } from "@/lib/data/inspection";
 import { VehicleHistory } from "@/components/listings/vehicle-history";
 import { getVehicleHistory } from "@/lib/data/vehicle-history";
+import { PriceHistoryTable } from "@/components/listings/price-history-table";
+import { getPriceHistory } from "@/lib/data/price";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import {
   Heart,
@@ -99,11 +102,12 @@ export default async function ListingDetailPage({
   if (!listing) notFound();
 
   const t = await getTranslations("listing");
-  const [similar, media, inspection, history] = await Promise.all([
+  const [similar, media, inspection, history, priceHistory] = await Promise.all([
     getSimilarListings(listing, 4),
     getListingMedia(id),
     getInspection(listing),
     getVehicleHistory(listing),
+    getPriceHistory(id),
   ]);
   // fire-and-forget view counter (no-op when DB is off)
   void incrementViewCount(id);
@@ -211,6 +215,7 @@ export default async function ListingDetailPage({
                       {formatAED(listing.priceAED, locale as "en" | "ar")}
                     </div>
                     <DealBadge rating={listing.dealRating} />
+                    <HighDemandBadge show={isHighDemand(listing)} />
                   </div>
                   {listing.previousPrice ? (
                     <div className="mt-1 flex items-center justify-end gap-1.5">
@@ -300,6 +305,13 @@ export default async function ListingDetailPage({
               <div id="history" className="mt-6 scroll-mt-20">
                 <VehicleHistory report={history} />
               </div>
+
+              {/* Price history */}
+              {priceHistory.length > 0 && (
+                <div className="mt-6">
+                  <PriceHistoryTable points={priceHistory} locale={locale as "en" | "ar"} />
+                </div>
+              )}
 
               {/* Finance calculator */}
               <FinanceCalculator

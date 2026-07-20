@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Link, useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -25,6 +25,7 @@ import {
   Loader2,
   CheckCircle2,
   Sparkles,
+  ScanLine,
 } from "lucide-react";
 
 const STEPS = ["Vehicle", "Details", "Photos", "Contact"];
@@ -54,6 +55,7 @@ function SellWizardInner() {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ id: string; slug: string } | null>(null);
+  const [decodingVin, setDecodingVin] = useState(false);
 
   const [form, setForm] = useState({
     make: sp.get("make") ?? "Toyota",
@@ -82,6 +84,35 @@ function SellWizardInner() {
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const decodeVinNow = async () => {
+    if (!form.vin.trim()) {
+      toast.error("Enter a VIN first.");
+      return;
+    }
+    setDecodingVin(true);
+    try {
+      const res = await fetch(
+        `/api/catalog/decode-vin?vin=${encodeURIComponent(form.vin.trim())}`,
+      );
+      if (!res.ok) {
+        toast.error("Could not decode this VIN — enter the details manually.");
+        return;
+      }
+      const data = await res.json();
+      setForm((f) => ({
+        ...f,
+        make: data.make ?? f.make,
+        model: data.model ?? f.model,
+        year: data.year ?? f.year,
+      }));
+      toast.success(`Decoded: ${data.year ?? ""} ${data.make ?? ""} ${data.model ?? ""}`.trim());
+    } catch {
+      toast.error("Network error — enter the details manually.");
+    } finally {
+      setDecodingVin(false);
+    }
+  };
 
   const suggested =
     form.make && form.year
@@ -192,6 +223,32 @@ function SellWizardInner() {
       <div className="mt-6 rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
         {step === 0 && (
           <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2 rounded-xl bg-[#F3F1E9] border border-[#E7E4DA] p-3">
+              <label className={labelCls}>Have the VIN? Skip typing it all in</label>
+              <div className="flex gap-2">
+                <input
+                  className={field + " flex-1"}
+                  value={form.vin}
+                  onChange={(e) => set("vin", e.target.value)}
+                  placeholder="Chassis / VIN number"
+                />
+                <Button
+                  type="button"
+                  variant="gold_outline"
+                  size="md"
+                  onClick={decodeVinNow}
+                  disabled={decodingVin}
+                  className="flex-shrink-0"
+                >
+                  {decodingVin ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <ScanLine className="h-3.5 w-3.5" />
+                  )}
+                  Decode
+                </Button>
+              </div>
+            </div>
             <div>
               <label className={labelCls}>Make *</label>
               <select

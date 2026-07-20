@@ -1,5 +1,5 @@
 import { SignIn } from "@clerk/nextjs";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { ShieldCheck } from "lucide-react";
 import { AuthShell, clerkAuthAppearance } from "@/components/auth/auth-shell";
 

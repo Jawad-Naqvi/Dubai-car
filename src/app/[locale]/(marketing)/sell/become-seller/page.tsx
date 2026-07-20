@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { BecomeSellerForm } from "@/components/sell/become-seller-form";
 import { CheckCircle2, BarChart3, Inbox, Ship } from "lucide-react";

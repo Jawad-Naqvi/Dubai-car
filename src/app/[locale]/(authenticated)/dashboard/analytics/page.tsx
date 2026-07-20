@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { getDealerAnalytics, type Distribution } from "@/lib/data/dashboard";

@@ -44,6 +44,9 @@ export interface MockListing {
   imageUrls: string[];
   description: string;
   features: string[];
+  /** Real lifetime counters (DB mode only) — power the High Demand badge. */
+  viewCount?: number;
+  inquiryCount?: number;
 }
 
 /**

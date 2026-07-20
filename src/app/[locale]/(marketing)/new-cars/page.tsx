@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { getCatalogMakes, getCatalogModels } from "@/lib/data/catalog";
 import { Reveal } from "@/components/marketing/home/reveal";

@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { brand } from "@/lib/brand";
 import {
@@ -74,11 +73,10 @@ export function DashboardSidebar({
   const items =
     role === "admin" ? adminNav : role === "buyer" ? buyerNav : role === "b2b" ? b2bNav : dealerNav;
   const isAdmin = role === "admin";
-  const locale = pathname.split("/")[1] || "en";
 
   const lockAdmin = async () => {
     await fetch("/api/admin-login", { method: "DELETE" });
-    router.push(`/${locale}/admin-login`);
+    router.push("/admin-login");
     router.refresh();
   };
 

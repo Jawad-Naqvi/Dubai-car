@@ -1,4 +1,4 @@
-import { TrendingDown } from "lucide-react";
+import { TrendingDown, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Rating = "Great" | "Good" | "Fair";
@@ -34,6 +34,32 @@ export function DealBadge({
     >
       {showIcon && <TrendingDown className="h-2.5 w-2.5" />}
       {rating} Deal
+    </span>
+  );
+}
+
+/**
+ * cars.com-style "High Demand" badge — a scarcity signal, distinct from
+ * DealBadge's price-fairness rating. See lib/vehicle-derive.ts: isHighDemand.
+ */
+export function HighDemandBadge({
+  show,
+  className,
+}: {
+  show: boolean;
+  className?: string;
+}) {
+  if (!show) return null;
+  return (
+    <span
+      title="Many buyers are viewing or inquiring about this car"
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none bg-[#FBEAD3] text-[#C97612] border-[#F0941F]/30",
+        className,
+      )}
+    >
+      <Flame className="h-2.5 w-2.5" />
+      High Demand
     </span>
   );
 }

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
+import { useLocale } from "next-intl";
 import { toast } from "sonner";
 import { BellPlus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function SaveSearchButton({ className }: { className?: string }) {
   const params = useSearchParams();
   const { isSignedIn } = useAuth();
   const router = useRouter();
+  const locale = useLocale();
   const [saving, setSaving] = useState(false);
 
   const collectQuery = (): Record<string, string> => {
@@ -46,7 +48,10 @@ export function SaveSearchButton({ className }: { className?: string }) {
   const save = async () => {
     const query = collectQuery();
     if (!isSignedIn) {
-      const back = `/buy${params.toString() ? `?${params.toString()}` : ""}`;
+      // redirect_url is handed to Clerk, which does a plain browser redirect —
+      // it doesn't know about next-intl locale routing, so it must be prefixed
+      // explicitly (unlike a real Link/router.push target).
+      const back = `/${locale}/buy${params.toString() ? `?${params.toString()}` : ""}`;
       router.push(`/sign-up?redirect_url=${encodeURIComponent(back)}`);
       return;
     }

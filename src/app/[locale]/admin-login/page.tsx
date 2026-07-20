@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
 import { RadialGlow, StarField } from "@/components/marketing/radial-glow";
 import { brand } from "@/lib/brand";
@@ -9,8 +9,6 @@ import { ShieldCheck, Loader2, Lock } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const params = useParams();
-  const locale = (params?.locale as string) || "en";
   const [digits, setDigits] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
@@ -57,7 +55,7 @@ export default function AdminLoginPage() {
         return;
       }
       toast.success("Welcome, admin");
-      router.push(`/${locale}/admin`);
+      router.push("/admin");
       router.refresh();
     } catch {
       toast.error("Something went wrong. Try again.");

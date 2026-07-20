@@ -13,7 +13,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { searchListings } from "@/lib/data/listings";
 import { parseListingParams } from "@/lib/data/search-params";
 import { SearchX } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 
 export default async function BuyPage({
   params,
