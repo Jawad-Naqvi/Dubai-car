@@ -32,7 +32,7 @@ export default async function SignInPage() {
         </div>
       }
     >
-      <SignIn appearance={clerkAuthAppearance} />
+      <SignIn appearance={clerkAuthAppearance} fallbackRedirectUrl="/post-auth" />
     </AuthShell>
   );
 }

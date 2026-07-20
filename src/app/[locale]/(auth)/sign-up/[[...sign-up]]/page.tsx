@@ -4,7 +4,9 @@ import { AuthShell, clerkAuthAppearance } from "@/components/auth/auth-shell";
 import { Car, Building2 } from "lucide-react";
 
 const ROLE_REDIRECT: Record<string, string> = {
-  buyer: "/dashboard",
+  // Buyers land back on the site to browse, like any storefront customer —
+  // only sellers get routed into a dedicated flow (KYC intake).
+  buyer: "/",
   seller: "/sell/become-seller",
 };
 
