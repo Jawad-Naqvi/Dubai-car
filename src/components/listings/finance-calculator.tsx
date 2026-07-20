@@ -39,7 +39,7 @@ export function FinanceCalculator({
 
   return (
     <CollapsibleSection
-      icon={Calculator}
+      icon={<Calculator className="h-4 w-4 text-[#F0941F] flex-shrink-0" />}
       title="Estimate monthly payment"
       summary={`${formatAED(emi, locale)}/mo`}
       className={className}

@@ -54,7 +54,7 @@ function SellWizardInner() {
   const sp = useSearchParams();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState<{ id: string; slug: string } | null>(null);
+  const [done, setDone] = useState<{ id: string; slug: string; status: string } | null>(null);
   const [decodingVin, setDecodingVin] = useState(false);
 
   const [form, setForm] = useState({
@@ -148,8 +148,10 @@ function SellWizardInner() {
         throw new Error(err.error ?? "Failed");
       }
       const data = await res.json();
-      setDone({ id: data.id, slug: data.slug });
-      toast.success("Listing submitted for review!");
+      setDone({ id: data.id, slug: data.slug, status: data.status });
+      toast.success(
+        data.status === "active" ? "Listing published!" : "Listing submitted for review!",
+      );
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not submit listing.");
     } finally {
@@ -158,21 +160,25 @@ function SellWizardInner() {
   };
 
   if (done) {
+    const isLive = done.status === "active";
     return (
       <div className="mx-auto max-w-xl px-6 py-20 text-center">
         <div className="h-14 w-14 rounded-full bg-[#F0941F]/10 border border-[#F0941F]/30 grid place-items-center mx-auto">
           <CheckCircle2 className="h-7 w-7 text-[#F0941F]" />
         </div>
         <h1 className="mt-5 text-xl font-bold tracking-tight">
-          Your listing is in review
+          {isLive ? "Your listing is live" : "Your listing is in review"}
         </h1>
         <p className="mt-2 text-sm text-secondary">
-          {form.year} {form.make} {form.model} — our team reviews new listings
-          (usually within a few hours) before they go live in search.
+          {isLive
+            ? `${form.year} ${form.make} ${form.model} is published and visible in search now — your verified seller status skips manual review.`
+            : `${form.year} ${form.make} ${form.model} — our team reviews new listings (usually within a few hours) before they go live in search.`}
         </p>
         <div className="mt-6 flex items-center justify-center gap-2">
           <Button asChild variant="gold" size="md">
-            <Link href={`/listings/${done.id}/${done.slug}`}>Preview listing</Link>
+            <Link href={`/listings/${done.id}/${done.slug}`}>
+              {isLive ? "View listing" : "Preview listing"}
+            </Link>
           </Button>
           <Button asChild variant="ghost" size="md">
             <Link href="/dashboard/inventory">Go to my inventory</Link>

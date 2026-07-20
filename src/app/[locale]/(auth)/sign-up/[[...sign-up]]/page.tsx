@@ -9,13 +9,11 @@ const ROLE_REDIRECT: Record<string, string> = {
 };
 
 export default async function SignUpPage({
-  params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ role?: string }>;
 }) {
-  const { locale } = await params;
   const { role } = await searchParams;
   const redirectUrl = role ? ROLE_REDIRECT[role] : undefined;
 
@@ -34,7 +32,7 @@ export default async function SignUpPage({
         <span>
           Already have an account?{" "}
           <Link
-            href={`/${locale}/sign-in`}
+            href="/sign-in"
             className="font-bold text-[#141414] hover:text-[#C97612] transition-colors"
           >
             Sign In

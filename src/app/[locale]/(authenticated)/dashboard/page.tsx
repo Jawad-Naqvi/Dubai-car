@@ -14,8 +14,10 @@ import {
   getB2BBuyerForUser,
   getExportInquiriesForUser,
 } from "@/lib/data/b2b";
+import { getFeaturedListings } from "@/lib/data/listings";
 import { getDashboardRole, getOrSyncUser } from "@/lib/data/users";
 import { Link } from "@/i18n/routing";
+import { ListingCard } from "@/components/listings/listing-card";
 import Image from "next/image";
 import {
   TrendingUp,
@@ -65,9 +67,14 @@ function statusChip(status: string) {
 /* =========================================================================
    Role router — every login opens its own overview.
    ========================================================================= */
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const role = await getDashboardRole().catch(() => "dealer" as const);
-  if (role === "buyer") return <BuyerOverview />;
+  if (role === "buyer") return <BuyerOverview locale={locale as "en" | "ar"} />;
   if (role === "b2b") return <B2BOverview />;
   return <DealerOverview />;
 }
@@ -271,12 +278,13 @@ async function DealerOverview() {
 /* =========================================================================
    BUYER overview.
    ========================================================================= */
-async function BuyerOverview() {
+async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
   const user = await getOrSyncUser().catch(() => null);
   const firstName = user?.name?.split(" ")[0] ?? "there";
-  const messages = user
-    ? await getMessagesForUser(user.id).catch(() => [])
-    : [];
+  const [messages, recommended] = await Promise.all([
+    user ? getMessagesForUser(user.id).catch(() => []) : Promise.resolve([]),
+    getFeaturedListings(8).catch(() => []),
+  ]);
 
   return (
     <>
@@ -284,23 +292,51 @@ async function BuyerOverview() {
 
       <main className="p-5 space-y-4">
         {/* Greeting / continue browsing */}
-        <div className="rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-5 relative overflow-hidden grain">
-          <Eyebrow tone="gold">WELCOME BACK</Eyebrow>
-          <h2 className="mt-3 text-lg font-bold tracking-tight">Hi {firstName}</h2>
-          <p className="mt-1 text-xs text-secondary max-w-md">
-            Pick up where you left off — browse the latest arrivals, revisit your
-            saved cars, or check for replies from sellers.
-          </p>
-          <Button asChild variant="gold" size="md" className="mt-5">
-            <Link href="/buy">
-              <Search className="h-4 w-4" />
-              Continue browsing
-            </Link>
-          </Button>
+        <div className="rounded-2xl bg-[#141414] shadow-card p-6 relative overflow-hidden grain">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(240,148,31,0.25),transparent_60%)]" />
+          <div className="relative">
+            <Eyebrow tone="gold">WELCOME BACK</Eyebrow>
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-white">
+              Hi {firstName}
+            </h2>
+            <p className="mt-1.5 text-xs text-white/60 max-w-md">
+              Pick up where you left off — browse the latest arrivals, revisit your
+              saved cars, or check for replies from sellers.
+            </p>
+            <Button asChild variant="gold" size="md" className="mt-5">
+              <Link href="/buy">
+                <Search className="h-4 w-4" />
+                Continue browsing
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Stat tiles (saved & alerts read client-side, messages from server) */}
         <BuyerStats messagesCount={messages.length} />
+
+        {/* Recommended for you — real inventory, so the hub is never a dead end */}
+        {recommended.length > 0 && (
+          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <Eyebrow tone="gold">RECOMMENDED FOR YOU</Eyebrow>
+                <h2 className="mt-2 text-xs font-semibold">Fresh arrivals worth a look</h2>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/buy">
+                  Browse all
+                  <ArrowRight className="h-3 w-3 rtl-flip" />
+                </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+              {recommended.slice(0, 4).map((l) => (
+                <ListingCard key={l.id} listing={l} locale={locale} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Recent messages + quick links */}
         <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">

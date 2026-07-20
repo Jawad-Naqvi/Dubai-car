@@ -107,14 +107,19 @@ export async function createListing(
 
   // ---- DB mode ----
   let dealerId: string | undefined;
+  let dealerVerified = false;
   if (user) {
     const d = await db
-      .select({ id: dealers.id })
+      .select({ id: dealers.id, isVerified: dealers.isVerified })
       .from(dealers)
       .where(eq(dealers.userId, user.id))
       .limit(1);
     dealerId = d[0]?.id;
+    dealerVerified = d[0]?.isVerified ?? false;
   }
+  // KYC-approved dealers publish instantly — moderation is for unvetted
+  // sellers (private listings, or dealers still pending approval).
+  const initialStatus = dealerVerified ? "active" : "pending_review";
 
   // Denormalise the cars.com-style facets so search stays a plain column read.
   const drivetrain = deriveDrivetrain({
@@ -158,7 +163,8 @@ export async function createListing(
       description: input.description,
       features: input.features ?? [],
       isExportReady: !!input.isExportReady,
-      status: "pending_review",
+      status: initialStatus,
+      ...(initialStatus === "active" ? { publishedAt: new Date() } : {}),
     })
     .returning({ id: listings.id, slug: listings.slug });
 
@@ -182,5 +188,5 @@ export async function createListing(
   }
 
   bust("listings");
-  return { id: row.id, slug: row.slug, status: "pending_review" };
+  return { id: row.id, slug: row.slug, status: initialStatus };
 }
