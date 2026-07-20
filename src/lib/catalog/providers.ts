@@ -8,7 +8,10 @@
  *  - Wikimedia Commons — free, keyless photo search for model imagery.
  *
  * Optional enrichment (set env keys to activate):
- *  - AUTO_DEV_API_KEY → real retail photos + specs via auto.dev (1k free/mo)
+ *  - AUTO_DEV_API_KEY → VIN decode (decodeVin) for the sell wizard's
+ *    per-listing "Decode from VIN" auto-fill. NOT used for catalog photos/specs
+ *    — auto.dev's photo/spec products are VIN-keyed and/or paywalled beyond
+ *    the free tier, so they don't fit a generic make/model/year catalog.
  *  - API_NINJAS_KEY   → full spec sheets (engine, drive, fuel economy…)
  *  - CARAPI_TOKEN/SECRET → trim-level data via carapi.app
  *  - NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY → studio renders via cdn.imagin.studio
@@ -117,18 +120,31 @@ interface CommonsPage {
 }
 
 /** Best-effort photo lookup for "<year> <make> <model>" on Wikimedia Commons. */
-export async function wikimediaImage(
-  make: string,
-  model: string,
-  year?: number,
-): Promise<string | null> {
-  const term = [year, make, model].filter(Boolean).join(" ");
+const NOT_EXTERIOR =
+  /interior|dashboard|engine|seats?|trunk|badge|logo|steering|console|cockpit/i;
+/** Commons happily thumbnails PDFs/vectors/scans as .jpg — exclude by the
+ *  underlying file title, not just the thumbnail URL's extension. */
+const NOT_PHOTO_FILE = /\.(pdf|svg|djvu|xcf|tiff?|ogv|webm)(\s|$)/i;
+
+/** Escape a string for safe use inside a RegExp constructor. */
+function reEscape(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Wikimedia's free-text search does loose token/description matching, not
+ * topical relevance — e.g. "Toyota Land Cruiser" can match a Bolivia
+ * landscape photo whose caption mentions the vehicle used on that tour, not
+ * a photo of the car itself. Requiring the model name to actually appear in
+ * the matched file's title is a cheap, effective relevance guard.
+ */
+async function wikimediaSearch(term: string, mustContain: string): Promise<string | null> {
   const q = new URLSearchParams({
     action: "query",
     generator: "search",
     gsrsearch: term,
     gsrnamespace: "6",
-    gsrlimit: "3",
+    gsrlimit: "5",
     prop: "imageinfo",
     iiprop: "url",
     iiurlwidth: "1280",
@@ -138,9 +154,11 @@ export async function wikimediaImage(
     `${COMMONS}?${q.toString()}`,
   );
   const pages = Object.values(data?.query?.pages ?? {});
-  const NOT_EXTERIOR = /interior|dashboard|engine|seats?|trunk|badge|logo|steering|console|cockpit/i;
+  const relevance = new RegExp(reEscape(mustContain), "i");
   for (const p of pages.sort((a, b) => ((a as { index?: number }).index ?? 0) - ((b as { index?: number }).index ?? 0))) {
-    if (NOT_EXTERIOR.test(p.title ?? "")) continue;
+    const title = p.title ?? "";
+    if (!relevance.test(title)) continue;
+    if (NOT_EXTERIOR.test(title) || NOT_PHOTO_FILE.test(title)) continue;
     const info = p.imageinfo?.[0];
     const url = info?.thumburl ?? info?.url;
     if (url && /\.(jpe?g|png|webp)/i.test(url) && !NOT_EXTERIOR.test(url)) return url;
@@ -148,7 +166,29 @@ export async function wikimediaImage(
   return null;
 }
 
-/* ---------- Auto.dev photos + specs (optional, 1k free calls/mo) ---------- */
+/**
+ * Best-effort photo lookup for "<year> <make> <model>" on Wikimedia Commons.
+ * Falls back to a year-less search when the qualified search finds nothing —
+ * common for the current/next model year (e.g. vPIC reports next year's
+ * models before any photos of them exist), where a photo of an adjacent
+ * model year is a reasonable stand-in for a generic catalog thumbnail.
+ */
+export async function wikimediaImage(
+  make: string,
+  model: string,
+  year?: number,
+): Promise<string | null> {
+  // Model name is the strongest relevance signal — makes are too generic
+  // (many unrelated files mention "Toyota") but "Land Cruiser" reliably
+  // narrows to the actual car.
+  if (year) {
+    const withYear = await wikimediaSearch(`${year} ${make} ${model}`, model);
+    if (withYear) return withYear;
+  }
+  return wikimediaSearch(`${make} ${model}`, model);
+}
+
+/* ---------- Auto.dev VIN decode (optional; Starter/free tier) ---------- */
 
 const AUTODEV_BASE = "https://api.auto.dev";
 
@@ -172,41 +212,17 @@ async function autodevJson<T>(path: string): Promise<T | null> {
   }
 }
 
-/** First real retail/studio photo for a make/model/year via auto.dev. */
-export async function autodevPhoto(
-  make: string,
-  model: string,
-  year?: number,
-): Promise<string | null> {
-  const q = new URLSearchParams({ make, model });
-  if (year) q.set("year", String(year));
-  const data = await autodevJson<{
-    photos?: (string | { url?: string })[];
-    photoUrls?: string[];
-    data?: { photos?: (string | { url?: string })[] };
-  }>(`/vehicle-photos?${q.toString()}`);
-  const list = data?.photos ?? data?.data?.photos ?? data?.photoUrls ?? [];
-  for (const p of list) {
-    const url = typeof p === "string" ? p : p?.url;
-    if (url && /^https?:\/\//.test(url)) return url;
-  }
-  return null;
-}
-
-/** Structured specifications for a make/model/year via auto.dev. */
-export async function autodevSpecs(
-  make: string,
-  model: string,
-  year?: number,
-): Promise<Record<string, unknown> | null> {
-  const q = new URLSearchParams({ make, model });
-  if (year) q.set("year", String(year));
-  const data = await autodevJson<Record<string, unknown>>(
-    `/specifications?${q.toString()}`,
-  );
-  if (!data || typeof data !== "object") return null;
-  return (data.data as Record<string, unknown>) ?? data;
-}
+/**
+ * auto.dev's per-vehicle photo (`/photos/{vin}`) and spec (`/specs/{vin}`)
+ * products are VIN-keyed, not make/model/year — they return real photos of
+ * one specific indexed vehicle (often empty), and specs require auto.dev's
+ * paid Growth plan ($299/mo; a Starter/free key gets 402 Payment Required).
+ * Neither fits a generic "one representative photo/spec per model" catalog
+ * (vPIC only ever gives us make/model/year, never a VIN), so this file does
+ * not wire them into catalog sync — see decodeVin() below for the one
+ * genuinely-working, free-tier use of this key: per-listing VIN lookup in
+ * the sell wizard.
+ */
 
 export interface VinDecodeResult {
   vin: string;

@@ -11,9 +11,6 @@ import { popularMakes } from "@/lib/brand";
 import {
   vpicModelsForMakeYear,
   wikimediaImage,
-  autodevPhoto,
-  autodevSpecs,
-  autodevKey,
   apiNinjasSpecs,
   carapiTrims,
   slugify,
@@ -159,25 +156,23 @@ export async function runCatalogSync(
 
     for (const m of needImages) {
       const year = m.latestYear ?? undefined;
-      // Prefer auto.dev's real retail photos when a key is set, else Wikimedia.
-      let url: string | null = null;
-      let source = "wikimedia";
-      if (autodevKey()) {
-        url = await autodevPhoto(m.makeName, m.name, year);
-        if (url) source = "autodev";
-      }
-      if (!url) url = await wikimediaImage(m.makeName, m.name, year);
+      // auto.dev's photo product is keyed by a specific VIN (real per-vehicle
+      // listing photos), not by make/model/year, so it can't serve a generic
+      // "one representative photo per model" catalog — Wikimedia is the real
+      // source here. (auto.dev's VIN decode is used elsewhere, for the sell
+      // wizard's per-listing "Decode from VIN" auto-fill.)
+      const url = await wikimediaImage(m.makeName, m.name, year);
       if (url) {
         await db
           .update(catalogModels)
-          .set({ imageUrl: url, imageSource: source, updatedAt: new Date() })
+          .set({ imageUrl: url, imageSource: "wikimedia", updatedAt: new Date() })
           .where(eq(catalogModels.id, m.id));
         stats.imagesResolved++;
       }
     }
 
     /* 3 — spec enrichment for trim-years missing specs */
-    if (autodevKey() || process.env.API_NINJAS_KEY || process.env.CARAPI_TOKEN) {
+    if (process.env.API_NINJAS_KEY || process.env.CARAPI_TOKEN) {
       const needSpecs = await db
         .select({
           id: catalogTrims.id,
@@ -193,18 +188,9 @@ export async function runCatalogSync(
         .limit(SPEC_BUDGET_PER_RUN);
 
       for (const trim of needSpecs) {
-        /* auto.dev specs first when configured */
-        if (autodevKey()) {
-          const adSpecs = await autodevSpecs(trim.makeName, trim.modelName, trim.year);
-          if (adSpecs && Object.keys(adSpecs).length) {
-            await db
-              .update(catalogTrims)
-              .set({ specs: adSpecs, specSource: "autodev", updatedAt: new Date() })
-              .where(eq(catalogTrims.id, trim.id));
-            stats.specsResolved++;
-            continue;
-          }
-        }
+        // auto.dev's specs product is VIN-keyed and gated behind their $299/mo
+        // Growth plan — not usable here (no VIN at this stage, and a Starter
+        // key 402s regardless). API-Ninjas/CarAPI are the real spec sources.
         const specs = await apiNinjasSpecs(trim.makeName, trim.modelName, trim.year);
         if (specs) {
           await db
