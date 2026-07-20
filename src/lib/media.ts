@@ -31,7 +31,8 @@ export function isStorageEnabled(): boolean {
 
 function safeExt(name: string, type: string) {
   const fromName = (name.split(".").pop() || "").toLowerCase();
-  if (/^(jpe?g|png|webp|avif|gif)$/.test(fromName)) return fromName;
+  if (/^(jpe?g|png|webp|avif|gif|pdf)$/.test(fromName)) return fromName;
+  if (type.includes("pdf")) return "pdf";
   if (type.includes("png")) return "png";
   if (type.includes("webp")) return "webp";
   if (type.includes("avif")) return "avif";
@@ -39,6 +40,15 @@ function safeExt(name: string, type: string) {
 }
 
 let counter = 0;
+
+/**
+ * Generic file upload (images or documents) — same storage chain as
+ * uploadImages, just not restricted to image bytes. Used for KYC documents
+ * (Emirates ID scans, trade license PDFs).
+ */
+export async function uploadFiles(files: File[]): Promise<string[]> {
+  return uploadImages(files);
+}
 
 export async function uploadImages(files: File[]): Promise<string[]> {
   // ---- Postgres storage (default once DB is connected) ----

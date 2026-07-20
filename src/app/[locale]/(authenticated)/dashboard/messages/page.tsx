@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Button } from "@/components/ui/button";
+import { ReplyThread } from "@/components/dashboard/reply-thread";
 import { getMessagesForUser } from "@/lib/data/leads";
 import { getOrSyncUser } from "@/lib/data/users";
 import { MessageSquare, Search } from "lucide-react";
@@ -104,6 +105,9 @@ export default async function MessagesPage({
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-[#F3F1E9] text-secondary">
                     {TYPE_LABELS[m.type] ?? m.type}
                   </span>
+                </div>
+                <div className="mt-3 pt-3 border-t border-[#F1EFE9]">
+                  <ReplyThread leadId={m.id} replies={m.replies} senderRole="buyer" />
                 </div>
               </div>
             ))}

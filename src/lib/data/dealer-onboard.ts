@@ -1,20 +1,24 @@
 import "server-only";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { dealers, users } from "@/lib/db/schema";
+import { dealers } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { getOrSyncUser, getCurrentDealer } from "./users";
 import { bust } from "./revalidate";
+import { sendEmail } from "@/lib/notify";
 
 export const becomeDealerSchema = z.object({
   businessName: z.string().min(2, "Business name is required"),
   emirate: z.string().min(2, "Emirate is required"),
   phone: z.string().min(6, "A contact number is required"),
   whatsapp: z.string().optional(),
-  tradeLicense: z.string().optional(),
   tagline: z.string().optional(),
+  emiratesIdNumber: z.string().min(4, "Emirates ID number is required"),
+  emiratesIdFrontUrl: z.string().min(1, "Emirates ID (front) is required"),
+  emiratesIdBackUrl: z.string().min(1, "Emirates ID (back) is required"),
+  tradeLicense: z.string().min(2, "Trade license number is required"),
+  tradeLicenseDocUrl: z.string().min(1, "Trade license document is required"),
 });
 export type BecomeDealerInput = z.infer<typeof becomeDealerSchema>;
 
@@ -34,10 +38,11 @@ export interface BecomeDealerResult {
 }
 
 /**
- * Promote the signed-in user to a dealer (yard owner / vendor): create their
- * dealer record, flip their role to "dealer" in both the DB and Clerk
- * publicMetadata (RBAC source of truth), so their next dashboard load opens the
- * seller area. Idempotent — returns the existing dealer if already onboarded.
+ * Submit (or resubmit) a seller/KYC application for the signed-in user.
+ * Creates the dealer record with kycStatus "pending" — the user's role is
+ * NOT promoted to "dealer" here. That only happens once an admin approves
+ * the application (see /api/admin/dealers/[id]/approve), so a self-service
+ * submission can never list live inventory without review.
  */
 export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
   const input = becomeDealerSchema.parse(raw);
@@ -52,7 +57,33 @@ export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
   }
 
   const existing = await getCurrentDealer();
-  if (existing) return { ok: true, dealerSlug: existing.slug };
+  if (existing) {
+    if (existing.kycStatus === "approved") {
+      return { ok: true, dealerSlug: existing.slug };
+    }
+    // Resubmission after rejection, or an in-flight pending update.
+    await db
+      .update(dealers)
+      .set({
+        businessName: input.businessName,
+        emirate: input.emirate,
+        phone: input.phone,
+        whatsapp: input.whatsapp || input.phone,
+        tagline: input.tagline,
+        tradeLicense: input.tradeLicense,
+        tradeLicenseDocUrl: input.tradeLicenseDocUrl,
+        emiratesIdNumber: input.emiratesIdNumber,
+        emiratesIdFrontUrl: input.emiratesIdFrontUrl,
+        emiratesIdBackUrl: input.emiratesIdBackUrl,
+        kycStatus: "pending",
+        kycRejectionReason: null,
+        kycSubmittedAt: new Date(),
+        kycReviewedAt: null,
+      })
+      .where(eq(dealers.id, existing.id));
+    await notifyApplicationReceived(user.email, input.businessName);
+    return { ok: true, dealerSlug: existing.slug };
+  }
 
   // Unique slug (append a short suffix on collision).
   let slug = slugify(input.businessName) || "dealer";
@@ -73,22 +104,27 @@ export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
       phone: input.phone,
       whatsapp: input.whatsapp || input.phone,
       tradeLicense: input.tradeLicense,
+      tradeLicenseDocUrl: input.tradeLicenseDocUrl,
+      emiratesIdNumber: input.emiratesIdNumber,
+      emiratesIdFrontUrl: input.emiratesIdFrontUrl,
+      emiratesIdBackUrl: input.emiratesIdBackUrl,
       tagline: input.tagline,
       subscriptionTier: "free",
+      kycStatus: "pending",
+      kycSubmittedAt: new Date(),
     })
     .returning({ slug: dealers.slug });
 
-  // Promote the role in the DB and in Clerk (RBAC source of truth).
-  await db.update(users).set({ role: "dealer" }).where(eq(users.id, user.id));
-  try {
-    const client = await clerkClient();
-    await client.users.updateUserMetadata(user.clerkId, {
-      publicMetadata: { role: "dealer" },
-    });
-  } catch {
-    // DB role still updated; Clerk metadata will reconcile on next webhook.
-  }
-
   bust("listings");
+  await notifyApplicationReceived(user.email, input.businessName);
   return { ok: true, dealerSlug: dealer?.slug ?? slug };
+}
+
+async function notifyApplicationReceived(email: string, businessName: string) {
+  await sendEmail({
+    to: email,
+    subject: "We've received your DXB Motors seller application",
+    body: `Thanks for applying to sell on DXB Motors as "${businessName}". Our team reviews Emirates ID and trade license documents before approving new sellers — you'll get an email as soon as a decision is made, usually within 1-2 business days.`,
+    label: "kyc application received",
+  });
 }

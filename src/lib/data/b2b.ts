@@ -6,6 +6,7 @@ import { b2bBuyers, exportInquiries, users } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId, type DemoB2BBuyer } from "./demo-store";
 import type { CurrentUser } from "./users";
+import { sendEmail } from "@/lib/notify";
 
 export const b2bRegisterSchema = z.object({
   companyName: z.string().min(2, "Company name is required"),
@@ -218,6 +219,45 @@ export async function getExportInquiriesForUser(
   } catch {
     return [];
   }
+}
+
+/**
+ * Request an export document for the signed-in importer's most recent
+ * inquiry — appends to that inquiry's real docRequests column and emails the
+ * export desk, replacing the old localStorage-only "Request" button.
+ */
+export async function requestExportDoc(userId: string, docKey: string): Promise<void> {
+  if (!isDbEnabled()) return; // demo mode has no persisted inquiries to attach to
+
+  const [buyer] = await db
+    .select({ id: b2bBuyers.id, companyName: b2bBuyers.companyName })
+    .from(b2bBuyers)
+    .where(eq(b2bBuyers.userId, userId))
+    .limit(1);
+  if (!buyer) throw new Error("No importer account found.");
+
+  const [inquiry] = await db
+    .select({ id: exportInquiries.id, docRequests: exportInquiries.docRequests })
+    .from(exportInquiries)
+    .where(eq(exportInquiries.b2bBuyerId, buyer.id))
+    .orderBy(desc(exportInquiries.createdAt))
+    .limit(1);
+  if (!inquiry) {
+    throw new Error("Submit an export inquiry before requesting documents.");
+  }
+
+  const next = Array.from(new Set([...(inquiry.docRequests ?? []), docKey]));
+  await db
+    .update(exportInquiries)
+    .set({ docRequests: next })
+    .where(eq(exportInquiries.id, inquiry.id));
+
+  await sendEmail({
+    to: process.env.LEADS_NOTIFY_EMAIL,
+    subject: `Document request from ${buyer.companyName}`,
+    body: `${buyer.companyName} requested "${docKey}" for export inquiry ${inquiry.id}. Coordinate with the seller and reply to the importer.`,
+    label: "b2b doc request",
+  });
 }
 
 export async function verifyB2BBuyer(

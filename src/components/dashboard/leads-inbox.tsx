@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { ReplyThread } from "@/components/dashboard/reply-thread";
 import { formatAED } from "@/lib/utils";
 import type { LeadView } from "@/lib/data/leads";
 import {
@@ -121,10 +122,9 @@ export function LeadsInbox({ leads }: { leads: LeadView[] }) {
               return (
                 <div
                   key={l.id}
-                  className={`grid grid-cols-1 md:grid-cols-[1.4fr_1.4fr_130px_110px_130px] items-center gap-4 p-5 hover:bg-[#F1EFE9] ${
-                    busy === l.id ? "opacity-50" : ""
-                  }`}
+                  className={`p-5 hover:bg-[#F1EFE9] ${busy === l.id ? "opacity-50" : ""}`}
                 >
+                <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1.4fr_130px_110px_130px] items-center gap-4">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="h-8 w-10 rounded-full bg-[#F0941F]/10 text-[#C97612] flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {l.buyerName.charAt(0).toUpperCase()}
@@ -176,6 +176,10 @@ export function LeadsInbox({ leads }: { leads: LeadView[] }) {
                       </Dropdown.Content>
                     </Dropdown.Portal>
                   </Dropdown.Root>
+                </div>
+                <div className="mt-3">
+                  <ReplyThread leadId={l.id} replies={l.replies} senderRole="dealer" />
+                </div>
                 </div>
               );
             })}

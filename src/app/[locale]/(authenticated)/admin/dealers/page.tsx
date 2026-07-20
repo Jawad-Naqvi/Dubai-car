@@ -4,13 +4,13 @@ import { getAdminDealers } from "@/lib/data/admin";
 
 export default async function AdminDealersPage() {
   const dealers = await getAdminDealers();
-  const verified = dealers.filter((d) => d.isVerified).length;
+  const pending = dealers.filter((d) => d.kycStatus === "pending").length;
 
   return (
     <>
       <DashboardHeader
         title="Dealers"
-        subtitle={`${dealers.length} registered · ${verified} verified`}
+        subtitle={`${dealers.length} registered · ${pending} awaiting review`}
       />
       <DealersTable dealers={dealers} />
     </>

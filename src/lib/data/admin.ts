@@ -1,5 +1,6 @@
 import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
+import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { listings, dealers, users, listingMedia, leads, payments, b2bBuyers } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
@@ -7,6 +8,7 @@ import { mockDealers, mockListings } from "@/lib/mock-data";
 import { demoStore } from "./demo-store";
 import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
+import { sendEmail } from "@/lib/notify";
 
 export interface ModerationItem {
   id: string;
@@ -159,6 +161,14 @@ export interface AdminDealer {
   isVerified: boolean;
   listingCount: number;
   rating: number;
+  kycStatus: "pending" | "approved" | "rejected";
+  kycSubmittedAt?: string;
+  kycRejectionReason?: string;
+  emiratesIdNumber?: string;
+  tradeLicense?: string;
+  hasEmiratesIdFront: boolean;
+  hasEmiratesIdBack: boolean;
+  hasTradeLicenseDoc: boolean;
 }
 
 export async function getAdminDealers(): Promise<AdminDealer[]> {
@@ -172,6 +182,10 @@ export async function getAdminDealers(): Promise<AdminDealer[]> {
       isVerified: d.isVerified,
       listingCount: mockListings.filter((l) => l.dealer.slug === d.slug).length,
       rating: d.rating,
+      kycStatus: d.isVerified ? "approved" : "pending",
+      hasEmiratesIdFront: false,
+      hasEmiratesIdBack: false,
+      hasTradeLicenseDoc: false,
     }));
   }
   const rows = await db
@@ -192,21 +206,87 @@ export async function getAdminDealers(): Promise<AdminDealer[]> {
     isVerified: r.dealer.isVerified,
     listingCount: r.listingCount,
     rating: r.dealer.rating ?? 0,
+    kycStatus: r.dealer.kycStatus,
+    kycSubmittedAt: r.dealer.kycSubmittedAt?.toISOString(),
+    kycRejectionReason: r.dealer.kycRejectionReason ?? undefined,
+    emiratesIdNumber: r.dealer.emiratesIdNumber ?? undefined,
+    tradeLicense: r.dealer.tradeLicense ?? undefined,
+    hasEmiratesIdFront: !!r.dealer.emiratesIdFrontUrl,
+    hasEmiratesIdBack: !!r.dealer.emiratesIdBackUrl,
+    hasTradeLicenseDoc: !!r.dealer.tradeLicenseDocUrl,
   }));
 }
 
-export async function toggleDealerVerified(
-  id: string,
-  verified: boolean,
-): Promise<boolean> {
+/**
+ * Approve a pending seller application: mark KYC approved + verified, and —
+ * the only place this happens — promote the applicant's role to "dealer" in
+ * both the DB and Clerk publicMetadata (RBAC source of truth).
+ */
+export async function approveDealer(id: string): Promise<boolean> {
   if (!isDbEnabled()) {
     bust("dealers");
     return true;
   }
+  const [dealer] = await db.select().from(dealers).where(eq(dealers.id, id)).limit(1);
+  if (!dealer) return false;
+
   await db
     .update(dealers)
-    .set({ isVerified: verified, verifiedAt: verified ? new Date() : null })
+    .set({
+      kycStatus: "approved",
+      isVerified: true,
+      verifiedAt: new Date(),
+      kycReviewedAt: new Date(),
+      kycRejectionReason: null,
+    })
     .where(eq(dealers.id, id));
+
+  const [owner] = await db.select().from(users).where(eq(users.id, dealer.userId)).limit(1);
+  if (owner) {
+    await db.update(users).set({ role: "dealer" }).where(eq(users.id, owner.id));
+    try {
+      const client = await clerkClient();
+      await client.users.updateUserMetadata(owner.clerkId, {
+        publicMetadata: { role: "dealer" },
+      });
+    } catch {
+      // DB role still updated; Clerk metadata will reconcile on next webhook.
+    }
+    await sendEmail({
+      to: owner.email,
+      subject: "You're approved to sell on DXB Motors",
+      body: `Good news — "${dealer.businessName}" has been verified and approved. Sign in and open your dashboard to start listing inventory.`,
+      label: "kyc approved",
+    });
+  }
+
+  bust("dealers");
+  return true;
+}
+
+export async function rejectDealer(id: string, reason: string): Promise<boolean> {
+  if (!isDbEnabled()) {
+    bust("dealers");
+    return true;
+  }
+  const [dealer] = await db.select().from(dealers).where(eq(dealers.id, id)).limit(1);
+  if (!dealer) return false;
+
+  await db
+    .update(dealers)
+    .set({ kycStatus: "rejected", kycRejectionReason: reason, kycReviewedAt: new Date() })
+    .where(eq(dealers.id, id));
+
+  const [owner] = await db.select().from(users).where(eq(users.id, dealer.userId)).limit(1);
+  if (owner) {
+    await sendEmail({
+      to: owner.email,
+      subject: "Your DXB Motors seller application needs changes",
+      body: `We couldn't approve "${dealer.businessName}" yet: ${reason}\n\nUpdate your application at /sell/become-seller and resubmit.`,
+      label: "kyc rejected",
+    });
+  }
+
   bust("dealers");
   return true;
 }

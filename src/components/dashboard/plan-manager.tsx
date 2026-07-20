@@ -15,10 +15,12 @@ export function PlanManager({
   currentTier,
   listingsUsed,
   listingQuota,
+  gatewayEnabled,
 }: {
   currentTier: string;
   listingsUsed: number;
   listingQuota: number;
+  gatewayEnabled: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -35,11 +37,12 @@ export function PlanManager({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      toast.success(
-        data.gatewayLive
-          ? "Redirecting to secure checkout…"
-          : `Switched to ${subscriptionTiers.find((t) => t.id === tierId)?.name} (demo)`,
-      );
+      if (data.url) {
+        toast.success("Redirecting to secure checkout…");
+        window.location.href = data.url;
+        return;
+      }
+      toast.success(`Switched to ${subscriptionTiers.find((t) => t.id === tierId)?.name}`);
       setOpen(false);
       router.refresh();
     } catch (e) {
@@ -80,6 +83,7 @@ export function PlanManager({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {subscriptionTiers.map((t) => {
             const isCurrent = t.id === currentTier;
+            const locked = t.monthlyAED > 0 && !gatewayEnabled;
             return (
               <div
                 key={t.id}
@@ -112,11 +116,16 @@ export function PlanManager({
                   variant={isCurrent ? "ghost" : "gold"}
                   size="sm"
                   className="mt-4 w-full"
-                  disabled={isCurrent || busy !== null}
+                  disabled={isCurrent || locked || busy !== null}
                   onClick={() => choose(t.id)}
+                  title={locked ? "Payments not yet configured" : undefined}
                 >
                   {busy === t.id && <Loader2 className="h-3 w-3 animate-spin" />}
-                  {isCurrent ? "Current plan" : `Switch to ${t.name}`}
+                  {isCurrent
+                    ? "Current plan"
+                    : locked
+                      ? "Payments not yet configured"
+                      : `Switch to ${t.name}`}
                 </Button>
               </div>
             );
@@ -124,7 +133,9 @@ export function PlanManager({
         </div>
         <p className="mt-3 flex items-center gap-1.5 text-[10px] text-muted">
           <CreditCard className="h-3 w-3" />
-          Secured by PayTabs (UAE) &amp; Stripe. Demo mode simulates checkout.
+          {gatewayEnabled
+            ? "Secured by Stripe. Charges are real."
+            : "Paid plans are disabled until Stripe is configured — no charge is simulated."}
         </p>
       </Modal>
     </>

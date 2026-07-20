@@ -1,10 +1,11 @@
 import "server-only";
+import Stripe from "stripe";
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { payments, dealers, subscriptions } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
-import { demoStore, demoId } from "./demo-store";
-import { getEffectiveDealer } from "./users";
+import { demoStore } from "./demo-store";
+import { getEffectiveDealer, getOrSyncUser } from "./users";
 import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
 
@@ -18,62 +19,129 @@ export interface InvoiceView {
 }
 
 /**
- * Payment gateway adapter. With PayTabs/Stripe keys this would create a hosted
- * checkout and return a redirect URL; in demo mode we simulate an instant
- * successful charge so the subscription / lead-unlock flows are fully testable.
+ * Real payment gateway — Stripe Checkout. Until STRIPE_SECRET_KEY is set,
+ * upgrades are blocked with a clear "not configured" error rather than a
+ * fake-success demo path (the old behavior this replaces).
  */
 export function isGatewayEnabled(): boolean {
-  return Boolean(
-    process.env.PAYTABS_PROFILE_ID || process.env.STRIPE_SECRET_KEY,
-  );
+  return Boolean(process.env.STRIPE_SECRET_KEY);
 }
 
-export async function changePlan(
+function stripeClient(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("Stripe is not configured.");
+  return new Stripe(key);
+}
+
+function appUrl(): string {
+  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+}
+
+const TIER_PRICE_ENV: Record<string, string> = {
+  silver: "STRIPE_PRICE_SILVER",
+  gold: "STRIPE_PRICE_GOLD",
+  platinum: "STRIPE_PRICE_PLATINUM",
+};
+
+/**
+ * Start (or resume) a plan change. Free tier applies immediately — no charge,
+ * no gateway needed. Paid tiers create a real Stripe Checkout session and
+ * return its redirect URL; the subscription only actually activates once the
+ * webhook confirms payment (see /api/webhooks/stripe).
+ */
+export async function startCheckout(
   tierId: string,
-): Promise<{ ok: boolean; tier: string; amountAED: number }> {
+): Promise<{ url?: string; ok: boolean; tier: string }> {
   const tier = subscriptionTiers.find((t) => t.id === tierId);
   if (!tier) throw new Error("Unknown plan");
-  bust("dealers");
 
   if (!isDbEnabled()) {
     const store = demoStore();
     store.currentTier = tier.id;
-    if (tier.monthlyAED > 0) {
-      store.payments.unshift({
-        id: demoId("INV"),
-        amountAED: tier.monthlyAED,
-        type: "subscription",
-        gateway: isGatewayEnabled() ? "paytabs" : "paytabs",
-        status: "paid",
-        description: `${tier.name} subscription`,
-        createdAt: new Date().toISOString(),
-      });
-    }
-    return { ok: true, tier: tier.id, amountAED: tier.monthlyAED };
+    return { ok: true, tier: tier.id };
   }
 
   const dealer = await getEffectiveDealer();
-  if (dealer) {
+  if (!dealer) throw new Error("No dealer account found.");
+
+  if (tier.monthlyAED === 0) {
     await db
       .update(dealers)
-      .set({ subscriptionTier: tier.id as typeof dealer.subscriptionTier })
+      .set({ subscriptionTier: "free", pendingTier: null })
       .where(eq(dealers.id, dealer.id));
     await db.insert(subscriptions).values({
       dealerId: dealer.id,
-      tier: tier.id as typeof dealer.subscriptionTier,
+      tier: "free",
       status: "active",
     });
-    if (tier.monthlyAED > 0) {
-      await db.insert(payments).values({
-        amountAED: tier.monthlyAED,
-        type: "subscription",
-        gateway: "paytabs",
-        status: "paid",
-        metadata: { tier: tier.id },
-      });
-    }
+    bust("dealers");
+    return { ok: true, tier: tier.id };
   }
-  return { ok: true, tier: tier.id, amountAED: tier.monthlyAED };
+
+  if (!isGatewayEnabled()) {
+    throw new Error(
+      "Payments aren't configured yet — add a live STRIPE_SECRET_KEY to enable plan upgrades.",
+    );
+  }
+  const priceEnvVar = TIER_PRICE_ENV[tierId];
+  const priceId = priceEnvVar ? process.env[priceEnvVar] : undefined;
+  if (!priceId) {
+    throw new Error(
+      `Stripe price for "${tier.name}" isn't set up yet (missing ${priceEnvVar}).`,
+    );
+  }
+
+  const stripe = stripeClient();
+  const user = await getOrSyncUser();
+
+  let customerId = dealer.stripeCustomerId ?? undefined;
+  if (!customerId) {
+    const customer = await stripe.customers.create({
+      email: user?.email,
+      name: dealer.businessName,
+      metadata: { dealerId: dealer.id },
+    });
+    customerId = customer.id;
+    await db
+      .update(dealers)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(dealers.id, dealer.id));
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    customer: customerId,
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${appUrl()}/dashboard/billing?checkout=success`,
+    cancel_url: `${appUrl()}/dashboard/billing?checkout=cancelled`,
+    metadata: { dealerId: dealer.id, tier: tierId },
+    subscription_data: { metadata: { dealerId: dealer.id, tier: tierId } },
+  });
+
+  await db
+    .update(dealers)
+    .set({ pendingTier: tierId as typeof dealer.subscriptionTier })
+    .where(eq(dealers.id, dealer.id));
+
+  if (!session.url) throw new Error("Could not start checkout session.");
+  return { ok: true, tier: tierId, url: session.url };
+}
+
+/** Stripe customer billing portal — real card/payment-method management. */
+export async function startBillingPortal(): Promise<{ url: string }> {
+  if (!isGatewayEnabled()) {
+    throw new Error("Payments aren't configured yet.");
+  }
+  const dealer = await getEffectiveDealer();
+  if (!dealer?.stripeCustomerId) {
+    throw new Error("No billing account yet — upgrade a plan first to create one.");
+  }
+  const stripe = stripeClient();
+  const session = await stripe.billingPortal.sessions.create({
+    customer: dealer.stripeCustomerId,
+    return_url: `${appUrl()}/dashboard/billing`,
+  });
+  return { url: session.url };
 }
 
 export async function getInvoices(): Promise<InvoiceView[]> {

@@ -182,7 +182,7 @@ export default async function ListingDetailPage({
         </div>
 
         <div className="mx-auto max-w-7xl px-4 lg:px-6 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
             {/* LEFT */}
             <div className="min-w-0">
               {/* Gallery */}
@@ -199,7 +199,7 @@ export default async function ListingDetailPage({
               />
 
               {/* Title + price */}
-              <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
+              <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <Eyebrow tone="gold">{listing.regionalSpec} SPEC</Eyebrow>
                   <h1 className="mt-2 text-xl lg:text-2xl font-bold tracking-tight leading-tight">
@@ -235,8 +235,8 @@ export default async function ListingDetailPage({
               </div>
 
               {/* Specs grid */}
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="mt-5">
+                <div className="flex items-center gap-2 mb-2.5">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("specs")}</h2>
                   <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
@@ -259,8 +259,8 @@ export default async function ListingDetailPage({
               </div>
 
               {/* Description */}
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="mt-5">
+                <div className="flex items-center gap-2 mb-2.5">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("description")}</h2>
                   <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
@@ -270,8 +270,8 @@ export default async function ListingDetailPage({
               </div>
 
               {/* Features */}
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="mt-5">
+                <div className="flex items-center gap-2 mb-2.5">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("features")}</h2>
                   <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
@@ -290,8 +290,8 @@ export default async function ListingDetailPage({
 
               {/* Inspection report */}
               {inspection && (
-                <div id="inspection" className="mt-6 scroll-mt-20">
-                  <div className="flex items-center gap-2 mb-3">
+                <div id="inspection" className="mt-5 scroll-mt-20">
+                  <div className="flex items-center gap-2 mb-2.5">
                     <h2 className="text-sm font-semibold uppercase tracking-wider">
                       Inspection report
                     </h2>
@@ -301,23 +301,23 @@ export default async function ListingDetailPage({
                 </div>
               )}
 
-              {/* Vehicle history */}
-              <div id="history" className="mt-6 scroll-mt-20">
+              {/* Vehicle history — collapsed by default, one-line summary visible */}
+              <div id="history" className="mt-5 scroll-mt-20">
                 <VehicleHistory report={history} />
               </div>
 
               {/* Price history */}
               {priceHistory.length > 0 && (
-                <div className="mt-6">
+                <div className="mt-5">
                   <PriceHistoryTable points={priceHistory} locale={locale as "en" | "ar"} />
                 </div>
               )}
 
-              {/* Finance calculator */}
+              {/* Finance calculator — collapsed by default, live EMI shown in header */}
               <FinanceCalculator
                 price={listing.priceAED}
                 locale={locale as "en" | "ar"}
-                className="mt-6"
+                className="mt-5"
               />
             </div>
 
@@ -444,7 +444,7 @@ export default async function ListingDetailPage({
 
           {/* Similar */}
           {similar.length > 0 && (
-            <div className="mt-10">
+            <div className="mt-8">
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <Eyebrow tone="gold">SIMILAR CARS</Eyebrow>

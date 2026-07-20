@@ -69,6 +69,12 @@ export const paymentGatewayEnum = pgEnum("payment_gateway", [
   "stripe",
 ]);
 
+export const kycStatusEnum = pgEnum("kyc_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
+
 /* === Users (mirror Clerk) === */
 export const users = pgTable(
   "users",
@@ -106,6 +112,7 @@ export const dealers = pgTable(
     tagline: varchar("tagline", { length: 240 }),
     description: text("description"),
     tradeLicense: varchar("trade_license", { length: 64 }),
+    tradeLicenseDocUrl: text("trade_license_doc_url"),
     emirate: varchar("emirate", { length: 32 }).notNull(),
     address: text("address"),
     lat: doublePrecision("lat"),
@@ -121,6 +128,18 @@ export const dealers = pgTable(
     isVerified: boolean("is_verified").notNull().default(false),
     isFeatured: boolean("is_featured").notNull().default(false),
     verifiedAt: timestamp("verified_at"),
+    /** Seller onboarding review state — gates promotion to the "dealer" role. */
+    kycStatus: kycStatusEnum("kyc_status").notNull().default("pending"),
+    emiratesIdNumber: varchar("emirates_id_number", { length: 32 }),
+    emiratesIdFrontUrl: text("emirates_id_front_url"),
+    emiratesIdBackUrl: text("emirates_id_back_url"),
+    kycRejectionReason: text("kyc_rejection_reason"),
+    kycSubmittedAt: timestamp("kyc_submitted_at"),
+    kycReviewedAt: timestamp("kyc_reviewed_at"),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 128 }),
+    stripeSubscriptionId: varchar("stripe_subscription_id", { length: 128 }),
+    /** Tier a Stripe Checkout session is currently open for, until the webhook confirms it. */
+    pendingTier: subscriptionTierEnum("pending_tier"),
     rating: doublePrecision("rating").default(0),
     reviewCount: integer("review_count").default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -265,6 +284,17 @@ export const leads = pgTable("leads", {
   quantity: integer("quantity"),
   shippingPreference: varchar("shipping_preference", { length: 32 }),
   status: varchar("status", { length: 32 }).notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* === Lead replies (two-way thread on top of a one-shot lead) === */
+export const leadReplies = pgTable("lead_replies", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  leadId: uuid("lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  senderRole: varchar("sender_role", { length: 16 }).notNull(), // "buyer" | "dealer"
+  body: text("body").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -429,6 +459,8 @@ export const payments = pgTable("payments", {
   type: paymentTypeEnum("type").notNull(),
   gateway: paymentGatewayEnum("gateway").notNull(),
   gatewayRef: varchar("gateway_ref", { length: 200 }),
+  /** Stripe event ID (e.g. from checkout.session.completed) — makes webhook processing idempotent. */
+  stripeEventId: varchar("stripe_event_id", { length: 128 }).unique(),
   status: varchar("status", { length: 32 }).notNull().default("pending"),
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

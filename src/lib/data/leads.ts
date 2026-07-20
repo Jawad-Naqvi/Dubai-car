@@ -1,11 +1,11 @@
 import "server-only";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/lib/db";
-import { leads, listings, dealers, users, type Lead } from "@/lib/db/schema";
+import { leads, listings, dealers, users, leadReplies, type Lead } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId, type DemoLead } from "./demo-store";
-import { sendLeadNotification } from "@/lib/notify";
+import { sendLeadNotification, sendEmail } from "@/lib/notify";
 
 const LEAD_TYPE_LABEL: Record<string, string> = {
   inquiry: "enquiry",
@@ -190,6 +190,113 @@ export async function updateLeadStatus(
   return true;
 }
 
+export interface LeadReplyView {
+  senderRole: "buyer" | "dealer";
+  body: string;
+  createdAt: string;
+}
+
+/** Who can see/reply to a lead, and where to email the *other* party. */
+export interface LeadOwnership {
+  buyerId?: string;
+  dealerId?: string;
+  buyerEmail?: string;
+  dealerEmail?: string;
+  listingTitle?: string;
+}
+
+export async function getLeadOwnership(id: string): Promise<LeadOwnership | null> {
+  if (!isDbEnabled()) {
+    const lead = demoStore().leads.find((l) => l.id === id);
+    if (!lead) return null;
+    return { buyerEmail: lead.buyerEmail };
+  }
+  const dealerUser = alias(users, "dealer_user_lookup");
+  const [row] = await db
+    .select({
+      buyerId: leads.buyerId,
+      dealerId: leads.dealerId,
+      buyerEmail: leads.buyerEmail,
+      dealerEmail: dealerUser.email,
+      make: listings.make,
+      model: listings.model,
+      year: listings.year,
+    })
+    .from(leads)
+    .leftJoin(dealers, eq(leads.dealerId, dealers.id))
+    .leftJoin(dealerUser, eq(dealers.userId, dealerUser.id))
+    .leftJoin(listings, eq(leads.listingId, listings.id))
+    .where(eq(leads.id, id))
+    .limit(1);
+  if (!row) return null;
+  return {
+    buyerId: row.buyerId ?? undefined,
+    dealerId: row.dealerId ?? undefined,
+    buyerEmail: row.buyerEmail ?? undefined,
+    dealerEmail: row.dealerEmail ?? undefined,
+    listingTitle: row.make ? `${row.year} ${row.make} ${row.model}` : undefined,
+  };
+}
+
+/** Post a reply on a lead thread and notify the other party by email. */
+export async function addLeadReply(
+  leadId: string,
+  senderRole: "buyer" | "dealer",
+  body: string,
+): Promise<void> {
+  if (!isDbEnabled()) {
+    demoStore().leadReplies.push({
+      id: demoId("REPLY"),
+      leadId,
+      senderRole,
+      body,
+      createdAt: new Date().toISOString(),
+    });
+  } else {
+    await db.insert(leadReplies).values({ leadId, senderRole, body });
+  }
+
+  const ownership = await getLeadOwnership(leadId);
+  if (!ownership) return;
+  const to = senderRole === "dealer" ? ownership.buyerEmail : ownership.dealerEmail;
+  if (!to) return;
+  await sendEmail({
+    to,
+    subject: `New reply on your ${ownership.listingTitle ?? "listing"} enquiry`,
+    body: `${body}\n\n— sent via DXB Motors, reply to this thread from your dashboard.`,
+    label: "lead reply",
+  });
+}
+
+async function getRepliesFor(leadIds: string[]): Promise<Map<string, LeadReplyView[]>> {
+  const map = new Map<string, LeadReplyView[]>();
+  if (leadIds.length === 0) return map;
+  if (!isDbEnabled()) {
+    for (const r of demoStore().leadReplies) {
+      if (!leadIds.includes(r.leadId)) continue;
+      const arr = map.get(r.leadId) ?? [];
+      arr.push({ senderRole: r.senderRole, body: r.body, createdAt: r.createdAt });
+      map.set(r.leadId, arr);
+    }
+    return map;
+  }
+  const rows = await db
+    .select()
+    .from(leadReplies)
+    .where(inArray(leadReplies.leadId, leadIds))
+    .orderBy(leadReplies.createdAt);
+  for (const r of rows) {
+    const arr = map.get(r.leadId) ?? [];
+    arr.push({
+      senderRole: r.senderRole as "buyer" | "dealer",
+      body: r.body,
+      createdAt: r.createdAt.toISOString(),
+    });
+    map.set(r.leadId, arr);
+  }
+  return map;
+}
+
 export interface LeadView {
   id: string;
   type: string;
@@ -202,10 +309,12 @@ export interface LeadView {
   status: string;
   createdAt: string;
   listingId?: string;
+  replies: LeadReplyView[];
 }
 
 export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> {
   if (!isDbEnabled()) {
+    const replyMap = await getRepliesFor(demoStore().leads.map((l) => l.id));
     return demoStore().leads.map((l) => ({
       id: l.id,
       type: l.type,
@@ -218,6 +327,7 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
       status: l.status,
       createdAt: l.createdAt,
       listingId: l.listingId,
+      replies: replyMap.get(l.id) ?? [],
     }));
   }
     const baseQuery = db.select().from(leads);
@@ -227,6 +337,7 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
   )
     .orderBy(desc(leads.createdAt))
     .limit(200);
+  const replyMap = await getRepliesFor(rows.map((l) => l.id));
   return rows.map((l) => ({
     id: l.id,
     type: l.type,
@@ -239,6 +350,7 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
     status: l.status,
     createdAt: l.createdAt.toISOString(),
     listingId: l.listingId ?? undefined,
+    replies: replyMap.get(l.id) ?? [],
   }));
 }
 
@@ -251,6 +363,7 @@ export interface MessageThread {
   createdAt: string;
   listingTitle?: string;
   dealerName?: string;
+  replies: LeadReplyView[];
 }
 
 /**
@@ -271,6 +384,7 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
         createdAt: new Date(now - 2 * 3600_000).toISOString(),
         listingTitle: "2022 BMW X5 xDrive40i",
         dealerName: "Al Habtoor Motors",
+        replies: [],
       },
       {
         id: "MSG-2",
@@ -280,6 +394,7 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
         createdAt: new Date(now - 26 * 3600_000).toISOString(),
         listingTitle: "2021 Mercedes-Benz C 300",
         dealerName: "Deals on Wheels",
+        replies: [],
       },
       {
         id: "MSG-3",
@@ -289,6 +404,7 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
         createdAt: new Date(now - 5 * 24 * 3600_000).toISOString(),
         listingTitle: "2020 Toyota Land Cruiser GXR",
         dealerName: "Gargash Motors",
+        replies: [],
       },
     ];
   }
@@ -311,6 +427,7 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
       .where(eq(leads.buyerId, userId))
       .orderBy(desc(leads.createdAt))
       .limit(100);
+    const replyMap = await getRepliesFor(rows.map((r) => r.id));
     return rows.map((r) => ({
       id: r.id,
       type: r.type,
@@ -319,6 +436,7 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
       createdAt: r.createdAt.toISOString(),
       listingTitle: r.make ? `${r.year} ${r.make} ${r.model}` : undefined,
       dealerName: r.dealerName ?? undefined,
+      replies: replyMap.get(r.id) ?? [],
     }));
   } catch {
     return [];

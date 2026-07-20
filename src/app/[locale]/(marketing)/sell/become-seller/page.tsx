@@ -4,7 +4,8 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { BecomeSellerForm } from "@/components/sell/become-seller-form";
-import { CheckCircle2, BarChart3, Inbox, Ship } from "lucide-react";
+import { getCurrentDealer } from "@/lib/data/users";
+import { CheckCircle2, BarChart3, Inbox, Ship, Clock, XCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Become a Seller — list your yard on DXB Motors",
@@ -26,6 +27,7 @@ export default async function BecomeSellerPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const dealer = await getCurrentDealer();
 
   return (
     <div className="mx-auto max-w-5xl px-4 lg:px-6 pt-10 lg:pt-14">
@@ -57,7 +59,56 @@ export default async function BecomeSellerPage({
 
         <div>
           <SignedIn>
-            <BecomeSellerForm />
+            {dealer?.kycStatus === "approved" ? (
+              <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8 text-center">
+                <span className="mx-auto h-11 w-11 rounded-full bg-[#137A43]/10 flex items-center justify-center">
+                  <CheckCircle2 className="h-5 w-5 text-[#137A43]" />
+                </span>
+                <h2 className="mt-3 text-base font-bold text-[#141414]">You&apos;re a verified seller</h2>
+                <p className="mt-2 text-xs text-secondary leading-relaxed">
+                  {dealer.businessName} is approved and ready to list inventory.
+                </p>
+                <Button asChild variant="gold" size="lg" className="mt-5 w-full">
+                  <Link href="/dashboard">Open dashboard</Link>
+                </Button>
+              </div>
+            ) : dealer?.kycStatus === "pending" ? (
+              <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8 text-center">
+                <span className="mx-auto h-11 w-11 rounded-full bg-[#F0941F]/10 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-[#F0941F]" />
+                </span>
+                <h2 className="mt-3 text-base font-bold text-[#141414]">Application under review</h2>
+                <p className="mt-2 text-xs text-secondary leading-relaxed">
+                  We&apos;re verifying {dealer.businessName}&apos;s Emirates ID and trade license.
+                  You&apos;ll get an email as soon as a decision is made, usually within 1-2
+                  business days.
+                </p>
+              </div>
+            ) : dealer?.kycStatus === "rejected" ? (
+              <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8">
+                <div className="text-center">
+                  <span className="mx-auto h-11 w-11 rounded-full bg-[#DC2626]/10 flex items-center justify-center">
+                    <XCircle className="h-5 w-5 text-[#DC2626]" />
+                  </span>
+                  <h2 className="mt-3 text-base font-bold text-[#141414]">
+                    Application needs changes
+                  </h2>
+                  {dealer.kycRejectionReason && (
+                    <p className="mt-2 text-xs text-[#DC2626] bg-[#DC2626]/5 rounded-xl px-3 py-2 leading-relaxed">
+                      {dealer.kycRejectionReason}
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs text-secondary leading-relaxed">
+                    Update the details below and resubmit.
+                  </p>
+                </div>
+                <div className="mt-5">
+                  <BecomeSellerForm />
+                </div>
+              </div>
+            ) : (
+              <BecomeSellerForm />
+            )}
           </SignedIn>
           <SignedOut>
             <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8 text-center">

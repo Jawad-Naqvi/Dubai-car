@@ -1,26 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Doc requests are recorded per-browser in localStorage. No document is
-// processed by the platform — DXB Motors only connects buyer and seller; the
-// yard provides the physical originals. This button simply signals intent so
-// the export desk can follow up.
-const STORAGE_KEY = "dxb:doc-requests";
-
-function read(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as string[]) : [];
-  } catch {
-    return [];
-  }
-}
-
+// No document is processed by the platform — DXB Motors only connects buyer
+// and seller; the yard provides the physical originals. This button records
+// a real request against the importer's most recent export inquiry and
+// emails the export desk (see /api/b2b/doc-request).
 export function DocRequestButton({
   docKey,
   requested = false,
@@ -28,21 +17,28 @@ export function DocRequestButton({
   docKey: string;
   requested?: boolean;
 }) {
+  const router = useRouter();
   const [done, setDone] = useState(requested);
+  const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (read().includes(docKey)) setDone(true);
-  }, [docKey]);
-
-  const request = () => {
-    const next = Array.from(new Set([...read(), docKey]));
+  const request = async () => {
+    setBusy(true);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      /* storage unavailable */
+      const res = await fetch("/api/b2b/doc-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ docKey }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setDone(true);
+      toast.success("Request sent — our export desk will follow up");
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not send request");
+    } finally {
+      setBusy(false);
     }
-    setDone(true);
-    toast.success("Request sent — our export desk will follow up");
   };
 
   if (done) {
@@ -55,8 +51,8 @@ export function DocRequestButton({
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={request}>
-      Request
+    <Button variant="ghost" size="sm" onClick={request} disabled={busy}>
+      {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : "Request"}
     </Button>
   );
 }

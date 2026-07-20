@@ -10,6 +10,7 @@ import {
   BadgeCheck,
 } from "lucide-react";
 import type { VehicleHistoryReport } from "@/lib/vehicle-history";
+import { CollapsibleSection } from "./collapsible-section";
 
 const TITLE_LABEL: Record<string, string> = {
   clean: "Clean title",
@@ -59,24 +60,24 @@ export function VehicleHistory({ report }: { report: VehicleHistoryReport }) {
         ? `${report.accidents.length || "Yes"} on record`
         : "None reported";
 
-  return (
-    <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-2">
-          <FileClock className="h-4 w-4 text-[#F0941F]" />
-          <h2 className="text-sm font-bold">Vehicle history</h2>
-        </div>
-        {report.source === "provider" ? (
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#137A43]">
-            <BadgeCheck className="h-3 w-3" /> Verified report
-          </span>
-        ) : report.source === "dealer" ? (
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#137A43]">
-            <BadgeCheck className="h-3 w-3" /> Dealer reported
-          </span>
-        ) : null}
-      </div>
+  const summary = [
+    TITLE_LABEL[report.titleStatus] ?? "Title unreported",
+    report.owners === null ? null : `${report.owners} owner${report.owners === 1 ? "" : "s"}`,
+    report.accidentsReported === false ? "No accidents reported" : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
+  const badge =
+    report.source === "provider" || report.source === "dealer" ? (
+      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#137A43]">
+        <BadgeCheck className="h-3 w-3" />
+        {report.source === "provider" ? "Verified" : "Dealer reported"}
+      </span>
+    ) : undefined;
+
+  return (
+    <CollapsibleSection icon={FileClock} title="Vehicle history" badge={badge} summary={summary}>
       <div className="divide-y divide-[#F1EFE9]">
         <Row
           icon={report.titleStatus === "clean" ? ShieldCheck : ShieldAlert}
@@ -153,6 +154,6 @@ export function VehicleHistory({ report }: { report: VehicleHistoryReport }) {
           history report can be requested from the seller.
         </p>
       )}
-    </div>
+    </CollapsibleSection>
   );
 }
