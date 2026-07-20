@@ -25,6 +25,7 @@ import {
 } from "@/lib/mock-data";
 import { deriveDrivetrain, computeDealRating } from "@/lib/vehicle-derive";
 import type { DealRating } from "@/lib/brand";
+import { carImageUrl } from "@/lib/car-images";
 import { demoStore } from "./demo-store";
 
 /** Public universe in demo mode: seeded mock cars + approved user-created cars. */
@@ -166,9 +167,13 @@ function rowToView(r: DbRow): MockListing {
     status: (l.status === "reserved" || l.status === "sold"
       ? l.status
       : "active") as MockListing["status"],
+    // A listing with no dealer-uploaded photo gets a real (IMAGIN, if
+    // configured) or branded-placeholder image — never a generic stock
+    // photo, which could show the wrong item entirely (this replaced a
+    // hardcoded Unsplash fallback that was showing earbuds on car listings).
     imageUrl:
       r.heroUrl ||
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80",
+      carImageUrl({ make: l.make, model: l.model, year: l.year }),
     imageUrls: r.heroUrl ? [r.heroUrl] : [],
     description: l.description ?? "",
     features: (l.features as string[] | null) ?? [],

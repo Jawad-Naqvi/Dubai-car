@@ -51,7 +51,7 @@ export function PlanManager({
 
   return (
     <>
-      <div className="lg:col-span-2 rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-7 relative overflow-hidden grain">
+      <div className="lg:col-span-2 rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-5 relative overflow-hidden grain">
         <Eyebrow tone="gold">CURRENT PLAN</Eyebrow>
         <div className="mt-4 flex items-baseline gap-3 flex-wrap">
           <span className="text-base font-bold">{active?.name ?? "Free"}</span>

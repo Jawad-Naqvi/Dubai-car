@@ -40,7 +40,7 @@ const buyerNav = [
   { href: "/dashboard/saved", label: "Saved cars", icon: Heart },
   { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
   { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
-  { href: "/dashboard/inventory", label: "My listings", icon: Car },
+  { href: "/dashboard/my-listings", label: "My listings", icon: Car },
   { href: "/sell", label: "Sell a car", icon: Tag },
 ];
 

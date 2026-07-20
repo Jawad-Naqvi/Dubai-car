@@ -53,13 +53,13 @@ export default async function AdminCatalogPage({
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="rounded-2xl bg-white shadow-card p-4">
             <Icon className="h-4 w-4 text-[#F0941F] mb-2" />
-            <div className="text-2xl font-bold text-[#141414]">{value}</div>
+            <div className="text-base font-bold text-[#141414]">{value}</div>
             <div className="mt-0.5 text-[10px] text-secondary uppercase tracking-wider">{label}</div>
           </div>
         ))}
       </div>
 
-      <div className="mt-8 rounded-2xl bg-white shadow-card overflow-hidden">
+      <div className="mt-5 rounded-2xl bg-white shadow-card overflow-hidden">
         <div className="px-5 py-4 border-b border-[#E7E4DA] text-sm font-semibold">
           Recent sync runs
         </div>
@@ -110,7 +110,7 @@ export default async function AdminCatalogPage({
         )}
       </div>
 
-      <div className="mt-8">
+      <div className="mt-5">
         <div className="text-sm font-semibold mb-3">Coverage by make</div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
           {makes.map((m) => (

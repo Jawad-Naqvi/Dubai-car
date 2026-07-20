@@ -6,7 +6,7 @@ export function DashboardHeader({ title, subtitle }: { title: string; subtitle?:
     <header className="border-b border-[#E7E4DA] bg-white sticky top-0 z-30">
       <div className="px-8 py-5 flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-xs font-bold tracking-tight truncate">{title}</h1>
+          <h1 className="text-sm font-bold tracking-tight truncate">{title}</h1>
           {subtitle && (
             <p className="text-xs text-muted truncate">{subtitle}</p>
           )}

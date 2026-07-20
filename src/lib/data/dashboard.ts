@@ -181,6 +181,80 @@ export async function getDealerInventory(): Promise<InventoryRow[]> {
   }));
 }
 
+/**
+ * Listings a signed-in BUYER has submitted themselves via /sell/new (private
+ * seller, no dealer account) — scoped strictly by sellerId/ownerUserId, with
+ * NO dealer fallback and NO "unclaimed listing" fallback. This is
+ * intentionally separate from getDealerInventory/getEffectiveDealer, which
+ * are dealer-role concepts and must never leak another dealer's inventory
+ * into a buyer's "my listings" view.
+ */
+export async function getSellerListings(userId: string): Promise<InventoryRow[]> {
+  if (!isDbEnabled()) {
+    return demoStore()
+      .newListings.filter((l) => l.ownerUserId === userId)
+      .map((l) => ({
+        id: l.id,
+        slug: l.slug,
+        title: `${l.year} ${l.make} ${l.model}`,
+        trim: l.trim,
+        priceAED: l.priceAED,
+        year: l.year,
+        kms: l.kms,
+        emirate: l.emirate,
+        bodyType: l.bodyType,
+        imageUrl: l.imageUrl,
+        status: l.moderationStatus,
+        isFeatured: l.isFeatured,
+        isExportReady: l.isExportReady,
+        viewCount: l.viewCount,
+        inquiryCount: l.inquiryCount,
+        createdAt: l.createdAt,
+      }));
+  }
+
+  const hero = db.$with("hero").as(
+    db
+      .select({
+        listingId: listingMedia.listingId,
+        url: sql<string>`min(${listingMedia.url})`.as("hero_url"),
+      })
+      .from(listingMedia)
+      .where(eq(listingMedia.isHero, true))
+      .groupBy(listingMedia.listingId),
+  );
+
+  const rows = await db
+    .with(hero)
+    .select({ listing: listings, heroUrl: hero.url })
+    .from(listings)
+    .leftJoin(hero, eq(hero.listingId, listings.id))
+    .where(eq(listings.sellerId, userId))
+    .orderBy(desc(listings.createdAt))
+    .limit(200);
+
+  return rows.map(({ listing: l, heroUrl }) => ({
+    id: l.id,
+    slug: l.slug,
+    title: `${l.year} ${l.make} ${l.model}`,
+    trim: l.trim ?? undefined,
+    priceAED: l.priceAED,
+    year: l.year,
+    kms: l.kms,
+    emirate: l.emirate,
+    bodyType: l.bodyType ?? "—",
+    imageUrl:
+      heroUrl ||
+      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80",
+    status: l.status,
+    isFeatured: l.isFeatured,
+    isExportReady: l.isExportReady,
+    viewCount: l.viewCount,
+    inquiryCount: l.inquiryCount,
+    createdAt: l.createdAt.toISOString(),
+  }));
+}
+
 export interface DashboardStats {
   activeListings: number;
   totalViews: number;

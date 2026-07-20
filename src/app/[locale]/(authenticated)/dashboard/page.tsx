@@ -284,7 +284,7 @@ async function BuyerOverview() {
 
       <main className="p-5 space-y-4">
         {/* Greeting / continue browsing */}
-        <div className="rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-6 relative overflow-hidden grain">
+        <div className="rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-5 relative overflow-hidden grain">
           <Eyebrow tone="gold">WELCOME BACK</Eyebrow>
           <h2 className="mt-3 text-lg font-bold tracking-tight">Hi {firstName}</h2>
           <p className="mt-1 text-xs text-secondary max-w-md">
