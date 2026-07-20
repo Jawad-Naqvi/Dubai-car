@@ -57,10 +57,24 @@ ADMIN_SESSION_TOKEN=<random-secret>
 DATABASE_URL=postgres://...           # Neon (or any Postgres)
 # Mode
 OPEN_DASHBOARDS=false
+# Email (SMTP) — leads, saved-search alerts, finance pre-approvals
+SMTP_HOST=   SMTP_PORT=587   SMTP_USER=   SMTP_PASS=   SMTP_FROM=
+LEADS_NOTIFY_EMAIL=                   # ops fallback recipient
+# Crons — protects both /api/catalog/sync AND /api/cron/alerts (saved searches)
+CRON_SECRET=
 # Optional data/imagery providers (see .env.example)
 AUTO_DEV_API_KEY=   API_NINJAS_KEY=   NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY=
-CRON_SECRET=                          # protects the daily catalog sync
+VIN_HISTORY_API_KEY=                  # optional real vehicle-history provider
 ```
+
+### Email & alerts (now wired)
+
+- **SMTP delivery** is live in code (nodemailer). Set the `SMTP_*` vars and new
+  buyer enquiries, finance pre-approvals, and saved-search digests all send in
+  real time; with SMTP unset they log to the server console.
+- **Saved-search alerts**: `vercel.json` schedules `/api/cron/alerts` hourly.
+  Set `CRON_SECRET`; Vercel Cron sends it automatically. Off Vercel, hit that
+  URL from any scheduler with `Authorization: Bearer $CRON_SECRET`.
 
 Also: in `src/app/api/admin-login/route.ts` set the cookie `secure: true` once
 you're behind HTTPS.
@@ -86,7 +100,7 @@ setup pass away and require Android Studio (Android) and a Mac with Xcode
 ## 6. What still needs hardening before scale
 
 - Payments (PayTabs/Stripe) are scaffolded (`/api/payments`) — wire live keys.
-- Email/SMS (Resend + an SMS provider) for lead alerts & saved-search digests.
+- Email is done (SMTP). Optional: add an SMS/WhatsApp provider for lead alerts.
 - Rate-limiting on public write endpoints (leads, onboarding, b2b register).
 - Replace the admin PIN with Clerk `admin` role + org RBAC if you want per-admin
   audit identity (the audit log already records actions).

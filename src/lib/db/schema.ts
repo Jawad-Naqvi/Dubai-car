@@ -344,6 +344,53 @@ export const priceHistory = pgTable("price_history", {
 });
 export type PriceHistory = typeof priceHistory.$inferSelect;
 
+/* === Vehicle inspection reports === */
+export const listingInspections = pgTable("listing_inspections", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" })
+    .unique(),
+  inspectorName: varchar("inspector_name", { length: 160 }).notNull(),
+  inspectedAt: timestamp("inspected_at").defaultNow().notNull(),
+  /** [{ name, items: [{ label, status, note }] }] — see lib/inspection.ts */
+  categories: jsonb("categories")
+    .$type<import("@/lib/inspection").InspectionCategory[]>()
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ListingInspection = typeof listingInspections.$inferSelect;
+
+/**
+ * Vehicle history report for a listing — a dealer/admin-submitted or
+ * provider-fetched record (title, owners, accidents, service). One per listing.
+ * See lib/vehicle-history.ts for the payload shape.
+ */
+export const vehicleHistory = pgTable("vehicle_history", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" })
+    .unique(),
+  source: varchar("source", { length: 16 }).notNull().default("dealer"),
+  vin: varchar("vin", { length: 32 }),
+  titleStatus: varchar("title_status", { length: 16 }).notNull().default("clean"),
+  owners: integer("owners"),
+  accidentsReported: boolean("accidents_reported"),
+  odometerConsistent: boolean("odometer_consistent"),
+  /** [{ date, severity, note }] */
+  accidents: jsonb("accidents")
+    .$type<import("@/lib/vehicle-history").AccidentRecord[]>()
+    .default([]),
+  /** [{ date, km, note }] */
+  serviceRecords: jsonb("service_records")
+    .$type<import("@/lib/vehicle-history").ServiceRecord[]>()
+    .default([]),
+  reportedAt: timestamp("reported_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type VehicleHistoryRow = typeof vehicleHistory.$inferSelect;
+
 /* === B2B === */
 export const b2bBuyers = pgTable("b2b_buyers", {
   id: uuid("id").defaultRandom().primaryKey(),

@@ -21,6 +21,10 @@ import { ListingCard } from "@/components/listings/listing-card";
 import { ContactPaywall } from "@/components/listings/paywall";
 import { DealBadge } from "@/components/listings/deal-badge";
 import { ReportListingButton } from "@/components/listings/report-listing-button";
+import { InspectionReport } from "@/components/listings/inspection-report";
+import { getInspection } from "@/lib/data/inspection";
+import { VehicleHistory } from "@/components/listings/vehicle-history";
+import { getVehicleHistory } from "@/lib/data/vehicle-history";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import {
   Heart,
@@ -95,9 +99,11 @@ export default async function ListingDetailPage({
   if (!listing) notFound();
 
   const t = await getTranslations("listing");
-  const [similar, media] = await Promise.all([
+  const [similar, media, inspection, history] = await Promise.all([
     getSimilarListings(listing, 4),
     getListingMedia(id),
+    getInspection(listing),
+    getVehicleHistory(listing),
   ]);
   // fire-and-forget view counter (no-op when DB is off)
   void incrementViewCount(id);
@@ -277,6 +283,24 @@ export default async function ListingDetailPage({
                 </div>
               </div>
 
+              {/* Inspection report */}
+              {inspection && (
+                <div id="inspection" className="mt-6 scroll-mt-20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <h2 className="text-sm font-semibold uppercase tracking-wider">
+                      Inspection report
+                    </h2>
+                    <div className="h-px bg-[#E7E4DA] flex-1" />
+                  </div>
+                  <InspectionReport report={inspection} />
+                </div>
+              )}
+
+              {/* Vehicle history */}
+              <div id="history" className="mt-6 scroll-mt-20">
+                <VehicleHistory report={history} />
+              </div>
+
               {/* Finance calculator */}
               <FinanceCalculator
                 price={listing.priceAED}
@@ -379,22 +403,22 @@ export default async function ListingDetailPage({
                       Full service history
                     </div>
                   )}
-                  <div
-                    className={cn(
-                      "flex items-center gap-1.5",
-                      listing.isInspected ? "text-secondary" : "text-muted",
-                    )}
-                  >
-                    <Sparkles
-                      className={cn(
-                        "h-3 w-3",
-                        listing.isInspected ? "text-[#137A43]" : "text-[#B8B2A0]",
-                      )}
-                    />
-                    {listing.isInspected
-                      ? "Inspection report available"
-                      : "Inspection on request"}
-                  </div>
+                  {inspection ? (
+                    <a
+                      href="#inspection"
+                      className="flex items-center gap-1.5 text-secondary hover:text-[#137A43] transition-colors"
+                    >
+                      <Sparkles className="h-3 w-3 text-[#137A43]" />
+                      <span className="underline decoration-dotted underline-offset-2">
+                        {inspection.points}-point inspection report
+                      </span>
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-1.5 text-muted">
+                      <Sparkles className="h-3 w-3 text-[#B8B2A0]" />
+                      Inspection on request
+                    </div>
+                  )}
                   {listing.vin && (
                     <div className="flex items-center gap-1.5 text-secondary">
                       <FileText className="h-3 w-3 text-[#F0941F]" />
