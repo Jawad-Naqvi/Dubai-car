@@ -43,8 +43,8 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#0B0B10] p-3 sm:p-5 flex">
-      <div className="relative flex-1 grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[2rem] overflow-hidden shadow-card-hover">
+    <div className="min-h-screen bg-[#0B0B10] p-2 sm:p-5 flex">
+      <div className="relative flex-1 grid grid-cols-1 lg:grid-cols-2 bg-white rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-card-hover">
         {/* ==== Left — gradient art panel ==== */}
         <div className="relative hidden lg:flex flex-col justify-between m-4 rounded-[1.6rem] overflow-hidden p-10 min-h-[640px]">
           <GradientArt />
@@ -72,9 +72,9 @@ export function AuthShell({
         </div>
 
         {/* ==== Right — form column ==== */}
-        <div className="relative flex flex-col px-6 sm:px-12 py-8 lg:py-10">
+        <div className="relative flex flex-col px-5 sm:px-12 py-6 sm:py-8 lg:py-10">
           {/* compact art banner on mobile */}
-          <div className="lg:hidden relative rounded-3xl overflow-hidden h-28 mb-8">
+          <div className="lg:hidden relative rounded-2xl overflow-hidden h-20 sm:h-28 mb-5 sm:mb-8">
             <GradientArt />
             <div className="relative h-full flex items-center justify-between px-6">
               <span className="text-white text-[10px] font-semibold uppercase tracking-[0.3em]">
@@ -90,18 +90,18 @@ export function AuthShell({
             </span>
           </Link>
 
-          <div className="flex-1 flex flex-col justify-center py-10 w-full max-w-sm mx-auto">
+          <div className="flex-1 flex flex-col justify-center py-6 sm:py-10 w-full max-w-sm mx-auto">
             <h1
-              className="text-4xl sm:text-[44px] text-[#141414] text-center leading-tight"
+              className="text-3xl sm:text-4xl lg:text-[44px] text-[#141414] text-center leading-tight"
               style={{ fontFamily: SERIF }}
             >
               {title}
             </h1>
-            <p className="mt-3 text-xs text-secondary text-center leading-relaxed">
+            <p className="mt-2.5 text-xs text-secondary text-center leading-relaxed">
               {subtitle}
             </p>
 
-            <div className="mt-9">{children}</div>
+            <div className="mt-6 sm:mt-8">{children}</div>
           </div>
 
           <div className="text-center text-xs text-secondary">{footer}</div>

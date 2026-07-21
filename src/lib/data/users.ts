@@ -137,22 +137,13 @@ export async function getCurrentDealer() {
 }
 
 /**
- * Dealer context for the dashboard. Uses the signed-in user's dealer; when
- * dashboards are open for testing and the user has none, falls back to the
- * first seeded dealer so the dashboard shows real data.
+ * The signed-in user's own dealer record, or null. Strictly per-user — there
+ * is NO fallback to a shared/seeded dealer. A dealer-role user without their
+ * own record must see an empty "finish your setup" state, never another
+ * dealer's inventory. (A previous demo fallback to "the first seeded dealer"
+ * caused cross-dealer inventory leakage and has been removed.)
  */
 export async function getEffectiveDealer() {
   if (!isDbEnabled()) return null;
-  const own = await getCurrentDealer();
-  if (own) return own;
-  if (process.env.OPEN_DASHBOARDS === "true") {
-    // Deterministic pick so the dashboard always shows the same dealer.
-    const rows = await db
-      .select()
-      .from(dealers)
-      .orderBy(dealers.businessName)
-      .limit(1);
-    return rows[0] ?? null;
-  }
-  return null;
+  return getCurrentDealer();
 }

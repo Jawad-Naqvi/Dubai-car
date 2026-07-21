@@ -23,6 +23,7 @@ import {
   Trash2,
   Clock,
   TrendingDown,
+  Upload,
 } from "lucide-react";
 
 const TABS = ["All", "Active", "Pending", "Reserved", "Sold", "Archived"] as const;
@@ -151,6 +152,11 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
             className="flex-1 bg-transparent outline-none text-[#141414] placeholder:text-muted"
           />
         </div>
+        <Button variant="ghost" size="md" asChild>
+          <Link href="/dashboard/inventory/bulk">
+            <Upload className="h-4 w-4" /> Bulk upload
+          </Link>
+        </Button>
         <Button variant="gold" size="md" asChild>
           <Link href="/sell/new">
             <Plus className="h-4 w-4" /> Add listing

@@ -179,6 +179,7 @@ function rowToView(r: DbRow): MockListing {
     features: (l.features as string[] | null) ?? [],
     viewCount: l.viewCount,
     inquiryCount: l.inquiryCount,
+    listedAt: (l.publishedAt ?? l.createdAt)?.toISOString(),
   };
 }
 

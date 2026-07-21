@@ -5,7 +5,7 @@ import { listings, listingMedia, leads, type Listing } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { mockListings } from "@/lib/mock-data";
 import { demoStore } from "./demo-store";
-import { getEffectiveDealer, getOrSyncUser, dashboardsOpen } from "./users";
+import { getEffectiveDealer, getOrSyncUser } from "./users";
 import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
 
@@ -141,13 +141,12 @@ export async function getDealerInventory(): Promise<InventoryRow[]> {
       .where(eq(listingMedia.isHero, true))
       .groupBy(listingMedia.listingId),
   );
+  // Strict per-owner scoping: a dealer sees ONLY listings tied to their own
+  // dealer record or their own user id. No guest/unclaimed-listing fallback —
+  // that previously leaked null-owner listings into every dealer's inventory.
   const ownerConds = [];
   if (dealer) ownerConds.push(eq(listings.dealerId, dealer.id));
   if (user) ownerConds.push(eq(listings.sellerId, user.id));
-  // In testing mode (OPEN_DASHBOARDS), also surface guest-created listings that
-  // aren't tied to any dealer/seller, so what you list shows up here.
-  if (dashboardsOpen())
-    ownerConds.push(sql`(${listings.dealerId} is null and ${listings.sellerId} is null)`);
   const cond = ownerConds.length ? or(...ownerConds) : sql`false`;
 
   const rows = await db
