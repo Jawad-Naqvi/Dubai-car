@@ -47,20 +47,31 @@ export async function updateListingPrice(
   return { ok: true, oldPrice, newPrice };
 }
 
+/** True for a canonical UUID — mock/demo listing ids ("L-001") are not. */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Full price history for a listing, newest first. */
 export async function getPriceHistory(listingId: string): Promise<PricePoint[]> {
-  if (!isDbEnabled()) return [];
-  const rows = await db
-    .select()
-    .from(priceHistory)
-    .where(eq(priceHistory.listingId, listingId))
-    .orderBy(desc(priceHistory.changedAt))
-    .limit(50);
-  return rows.map((r) => ({
-    oldPrice: r.oldPrice,
-    newPrice: r.newPrice,
-    changedAt: r.changedAt.toISOString(),
-  }));
+  // Skip the DB round-trip for non-uuid (demo/mock) ids: Postgres rejects them
+  // as "invalid input syntax for type uuid" and would 500 the detail page.
+  if (!isDbEnabled() || !UUID_RE.test(listingId)) return [];
+  try {
+    const rows = await db
+      .select()
+      .from(priceHistory)
+      .where(eq(priceHistory.listingId, listingId))
+      .orderBy(desc(priceHistory.changedAt))
+      .limit(50);
+    return rows.map((r) => ({
+      oldPrice: r.oldPrice,
+      newPrice: r.newPrice,
+      changedAt: r.changedAt.toISOString(),
+    }));
+  } catch {
+    // Table not migrated / transient error — degrade to no history.
+    return [];
+  }
 }
 
 /** Listing ids that had a price DROP since `since` (for saved-search alerts). */

@@ -313,6 +313,21 @@ export const savedListings = pgTable(
   (t) => ({ pk: primaryKey({ columns: [t.userId, t.listingId] }) }),
 );
 
+/** Cross-device compare tray for signed-in users (mirrors saved_listings). */
+export const compareListings = pgTable(
+  "compare_listings",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    listingId: uuid("listing_id")
+      .notNull()
+      .references(() => listings.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.userId, t.listingId] }) }),
+);
+
 export const savedSearches = pgTable("saved_searches", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id")
