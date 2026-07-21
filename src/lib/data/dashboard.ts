@@ -38,6 +38,9 @@ export interface DealerContext {
   monthlyAED: number;
   listingQuota: number;
   listingsUsed: number;
+  /** KYC review state — drives the "verification pending" banner. */
+  kycStatus: "pending" | "approved" | "rejected";
+  isVerified: boolean;
 }
 
 // Deterministic pseudo-metrics so demo numbers are stable across renders.
@@ -63,6 +66,8 @@ export async function getDealerContext(): Promise<DealerContext> {
       listingsUsed:
         mockListings.filter((l) => l.dealer.slug === PRIMARY_DEMO_DEALER).length +
         created,
+      kycStatus: "approved",
+      isVerified: true,
     };
   }
   const dealer = await getEffectiveDealer();
@@ -84,6 +89,8 @@ export async function getDealerContext(): Promise<DealerContext> {
     monthlyAED: tier.monthlyAED,
     listingQuota: tier.listings,
     listingsUsed: used,
+    kycStatus: dealer?.kycStatus ?? "pending",
+    isVerified: dealer?.isVerified ?? false,
   };
 }
 

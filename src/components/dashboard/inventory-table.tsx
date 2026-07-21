@@ -158,7 +158,7 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
           </Link>
         </Button>
         <Button variant="gold" size="md" asChild>
-          <Link href="/sell/new">
+          <Link href="/dashboard/sell/new">
             <Plus className="h-4 w-4" /> Add listing
           </Link>
         </Button>

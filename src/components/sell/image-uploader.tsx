@@ -8,9 +8,13 @@ import { Upload, X, Loader2, Star } from "lucide-react";
 export function ImageUploader({
   value,
   onChange,
+  onAuthRequired,
 }: {
   value: string[];
   onChange: (urls: string[]) => void;
+  /** Called instead of a toast when the upload is rejected for being signed out
+   *  — lets the parent open an in-place login wall. */
+  onAuthRequired?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -23,7 +27,8 @@ export function ImageUploader({
       Array.from(files).forEach((f) => fd.append("files", f));
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       if (res.status === 401) {
-        toast.error("Please sign in to upload photos.");
+        if (onAuthRequired) onAuthRequired();
+        else toast.error("Please sign in to upload photos.");
         return;
       }
       if (!res.ok) throw new Error(await res.text());
