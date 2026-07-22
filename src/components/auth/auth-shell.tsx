@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/routing";
 import { brand } from "@/lib/brand";
+import { GradientArt } from "@/components/marketing/gradient-art";
 
 /**
  * Split-screen auth shell (Cogie-style reference):
@@ -9,21 +10,6 @@ import { brand } from "@/lib/brand";
  */
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
-
-function GradientArt({ className = "" }: { className?: string }) {
-  return (
-    <div className={`absolute inset-0 overflow-hidden bg-[#0B0B10] ${className}`}>
-      {/* silky gradient waves */}
-      <div className="absolute -top-1/4 -left-1/3 h-[80%] w-[110%] rotate-[-18deg] rounded-[100%] bg-[radial-gradient(ellipse_at_center,#FF2E9A_0%,#B01E8F_35%,transparent_70%)] opacity-80 blur-2xl" />
-      <div className="absolute top-1/4 -right-1/3 h-[70%] w-[110%] rotate-[15deg] rounded-[100%] bg-[radial-gradient(ellipse_at_center,#4F46E5_0%,#2563EB_40%,transparent_72%)] opacity-70 blur-2xl" />
-      <div className="absolute -bottom-1/4 -left-1/4 h-[75%] w-[120%] rotate-[8deg] rounded-[100%] bg-[radial-gradient(ellipse_at_center,#7C3AED_0%,#3B0764_45%,transparent_75%)] opacity-80 blur-2xl" />
-      <div className="absolute bottom-0 right-0 h-[55%] w-[80%] rotate-[-12deg] rounded-[100%] bg-[radial-gradient(ellipse_at_center,#F0941F_0%,#C2410C_40%,transparent_70%)] opacity-40 blur-3xl animate-pulse-glow" />
-      {/* fine sheen lines */}
-      <div className="absolute inset-0 bg-[repeating-linear-gradient(115deg,transparent_0px,transparent_9px,rgba(255,255,255,0.035)_10px,transparent_11px)]" />
-      <div className="absolute inset-0 bg-black/35" />
-    </div>
-  );
-}
 
 export function AuthShell({
   eyebrow,
@@ -43,8 +29,8 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#0B0B10] p-3 sm:p-5 flex">
-      <div className="relative flex-1 grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[2rem] overflow-hidden shadow-card-hover">
+    <div className="min-h-screen bg-[#0B0B10] p-2 sm:p-5 flex">
+      <div className="relative flex-1 grid grid-cols-1 lg:grid-cols-2 bg-white rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-card-hover">
         {/* ==== Left — gradient art panel ==== */}
         <div className="relative hidden lg:flex flex-col justify-between m-4 rounded-[1.6rem] overflow-hidden p-10 min-h-[640px]">
           <GradientArt />
@@ -72,9 +58,9 @@ export function AuthShell({
         </div>
 
         {/* ==== Right — form column ==== */}
-        <div className="relative flex flex-col px-6 sm:px-12 py-8 lg:py-10">
+        <div className="relative flex flex-col px-5 sm:px-12 py-6 sm:py-8 lg:py-10">
           {/* compact art banner on mobile */}
-          <div className="lg:hidden relative rounded-3xl overflow-hidden h-28 mb-8">
+          <div className="lg:hidden relative rounded-2xl overflow-hidden h-20 sm:h-28 mb-5 sm:mb-8">
             <GradientArt />
             <div className="relative h-full flex items-center justify-between px-6">
               <span className="text-white text-[10px] font-semibold uppercase tracking-[0.3em]">
@@ -90,18 +76,18 @@ export function AuthShell({
             </span>
           </Link>
 
-          <div className="flex-1 flex flex-col justify-center py-10 w-full max-w-sm mx-auto">
+          <div className="flex-1 flex flex-col justify-center py-6 sm:py-10 w-full max-w-sm mx-auto">
             <h1
-              className="text-4xl sm:text-[44px] text-[#141414] text-center leading-tight"
+              className="text-3xl sm:text-4xl lg:text-[44px] text-[#141414] text-center leading-tight"
               style={{ fontFamily: SERIF }}
             >
               {title}
             </h1>
-            <p className="mt-3 text-xs text-secondary text-center leading-relaxed">
+            <p className="mt-2.5 text-xs text-secondary text-center leading-relaxed">
               {subtitle}
             </p>
 
-            <div className="mt-9">{children}</div>
+            <div className="mt-6 sm:mt-8">{children}</div>
           </div>
 
           <div className="text-center text-xs text-secondary">{footer}</div>

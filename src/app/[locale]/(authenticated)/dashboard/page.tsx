@@ -18,6 +18,7 @@ import { getFeaturedListings } from "@/lib/data/listings";
 import { getDashboardRole, getOrSyncUser } from "@/lib/data/users";
 import { Link } from "@/i18n/routing";
 import { ListingCard } from "@/components/listings/listing-card";
+import { GradientArt } from "@/components/marketing/gradient-art";
 import Image from "next/image";
 import {
   TrendingUp,
@@ -114,6 +115,45 @@ async function DealerOverview() {
       />
 
       <main className="p-5 space-y-4">
+        {/* Verification state — a seller can set up their workspace, but their
+            listings stay in review until an admin verifies their KYC. */}
+        {!ctx.isVerified && (
+          <div
+            className={`rounded-2xl border shadow-card p-4 flex items-start gap-3 ${
+              ctx.kycStatus === "rejected"
+                ? "bg-[#DC2626]/5 border-[#DC2626]/25"
+                : "bg-[#F0941F]/5 border-[#F0941F]/25"
+            }`}
+          >
+            <ShieldCheck
+              className={`h-5 w-5 flex-shrink-0 ${
+                ctx.kycStatus === "rejected" ? "text-[#DC2626]" : "text-[#C97612]"
+              }`}
+            />
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xs font-semibold">
+                {ctx.kycStatus === "rejected"
+                  ? "Verification needs changes"
+                  : "Verification in review"}
+              </h2>
+              <p className="mt-1 text-xs text-secondary">
+                {ctx.kycStatus === "rejected"
+                  ? "Your documents need an update. Resubmit to get verified and go live."
+                  : "You can set up inventory and your profile now. New listings stay in review until our team verifies your Emirates ID and trade license — usually within 1–2 business days."}
+              </p>
+            </div>
+            <Button
+              asChild
+              variant={ctx.kycStatus === "rejected" ? "gold" : "gold_outline"}
+              size="sm"
+            >
+              <Link href="/sell/become-seller">
+                {ctx.kycStatus === "rejected" ? "Resubmit" : "View status"}
+              </Link>
+            </Button>
+          </div>
+        )}
+
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((k) => (
@@ -215,7 +255,7 @@ async function DealerOverview() {
               <h3 className="font-semibold">Quick actions</h3>
               <div className="mt-4 space-y-2">
                 <Button asChild variant="gold" size="md" className="w-full justify-start">
-                  <Link href="/sell/new">
+                  <Link href="/dashboard/sell/new">
                     <Plus className="h-4 w-4" />
                     Add listing
                   </Link>
@@ -291,9 +331,9 @@ async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
       <DashboardHeader title="Your hub" subtitle="Saved cars, alerts & messages" />
 
       <main className="p-5 space-y-4">
-        {/* Greeting / continue browsing */}
-        <div className="rounded-2xl bg-[#141414] shadow-card p-6 relative overflow-hidden grain">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(240,148,31,0.25),transparent_60%)]" />
+        {/* Greeting / continue browsing — carries the auth-page gradient signature */}
+        <div className="rounded-2xl shadow-card p-6 relative overflow-hidden">
+          <GradientArt />
           <div className="relative">
             <Eyebrow tone="gold">WELCOME BACK</Eyebrow>
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-white">

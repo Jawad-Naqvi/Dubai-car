@@ -49,10 +49,22 @@ import {
   FileText,
   ShieldCheck,
   Sparkles,
+  Clock,
 } from "lucide-react";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://dxbmotors.ae";
+
+/** Human "days on market" signal from a listing's listed/created date. */
+function daysOnMarket(listedAt?: string): string | null {
+  if (!listedAt) return null;
+  const days = Math.floor((Date.now() - new Date(listedAt).getTime()) / 86_400_000);
+  if (days < 0) return null;
+  if (days === 0) return "Listed today";
+  if (days === 1) return "Listed yesterday";
+  if (days <= 30) return `Listed ${days} days ago`;
+  return `On the market ${Math.floor(days / 30)} mo`;
+}
 
 /** Per-car SEO: unique title, description and OG image so each listing ranks. */
 export async function generateMetadata({
@@ -205,9 +217,17 @@ export default async function ListingDetailPage({
                   <h1 className="mt-2 text-xl lg:text-2xl font-bold tracking-tight leading-tight">
                     {listingTitle}
                   </h1>
-                  {listing.trim && (
-                    <p className="mt-1 text-xs text-secondary">{listing.trim}</p>
-                  )}
+                  <div className="mt-1 flex items-center gap-2 flex-wrap">
+                    {listing.trim && (
+                      <p className="text-xs text-secondary">{listing.trim}</p>
+                    )}
+                    {daysOnMarket(listing.listedAt) && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-muted">
+                        <Clock className="h-3 w-3" />
+                        {daysOnMarket(listing.listedAt)}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="flex items-center justify-end gap-2">
