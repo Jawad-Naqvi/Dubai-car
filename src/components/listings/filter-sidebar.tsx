@@ -53,22 +53,21 @@ function FilterGroup({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-[#E7E4DA] py-3">
+    <div className="py-3">
+      {/* cars.com rail: bold section title over a heavy black rule */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full text-left"
+        className="flex items-center justify-between w-full text-left pb-2 border-b-2 border-[#141414]"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#141414]">
-          {title}
-        </span>
+        <span className="text-[13px] font-bold text-[#141414]">{title}</span>
         <ChevronDown
           className={cn(
-            "h-3 w-3 text-muted transition-transform",
+            "h-3.5 w-3.5 text-[#141414] transition-transform",
             open && "rotate-180",
           )}
         />
       </button>
-      {open && <div className="mt-2.5 space-y-1.5">{children}</div>}
+      {open && <div className="mt-3 space-y-1.5">{children}</div>}
     </div>
   );
 }
@@ -177,7 +176,7 @@ function Pill({
 }
 
 const inputCls =
-  "h-7 rounded-lg bg-white border border-[#E7E4DA] text-xs text-[#141414] placeholder:text-muted px-2 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
+  "h-7 rounded-lg bg-white border border-[#E5E5EA] text-xs text-[#141414] placeholder:text-muted px-2 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
 
 export function FilterSidebar({
   className,
@@ -360,20 +359,20 @@ export function FilterSidebar({
 
   return (
     <aside className={cn("w-full", className)}>
-      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E7E4DA]">
+      {/* cars.com filter rail sits flat on the page — no card chrome */}
+      <div className="bg-white">
+        <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-1.5">
-            <SlidersHorizontal className="h-3 w-3 text-[#F0941F]" />
-            <span className="text-xs font-semibold">{t("title")}</span>
+            <SlidersHorizontal className="h-3 w-3 text-[#141414]" />
             {total !== undefined && (
-              <span className="text-[10px] text-muted">
-                · {total.toLocaleString()} {t("results")}
+              <span className="text-xs font-bold text-[#141414]">
+                {total.toLocaleString()} {t("results")}
               </span>
             )}
           </div>
           <button
             onClick={reset}
-            className="flex items-center gap-1 text-[10px] text-muted hover:text-[#141414]"
+            className="flex items-center gap-1 text-[11px] text-[#141414] underline underline-offset-2 hover:opacity-70"
           >
             <RotateCw className="h-2.5 w-2.5" />
             {t("reset")}
@@ -383,8 +382,7 @@ export function FilterSidebar({
         {/* In the drawer the parent already scrolls, so don't nest a scroller. */}
         <div
           className={cn(
-            "px-4",
-            !onApplied && "max-h-[calc(100vh-180px)] overflow-y-auto",
+            !onApplied && "max-h-[calc(100vh-180px)] overflow-y-auto pr-1",
           )}
         >
           <FilterGroup title={t("emirate")}>
@@ -412,7 +410,7 @@ export function FilterSidebar({
             {makeList.length > 8 && (
               <button
                 onClick={() => setShowAllMakes((v) => !v)}
-                className="text-[10px] text-[#C97612] font-semibold hover:underline pt-0.5"
+                className="text-[10px] text-[#6B21A8] font-semibold hover:underline pt-0.5"
               >
                 {showAllMakes ? t("showLess") : t("showMore")}
               </button>
@@ -762,10 +760,10 @@ export function FilterSidebar({
           </div>
         </div>
 
-        <div className="p-3 border-t border-[#E7E4DA]">
+        <div className="pt-3 border-t border-[#E5E5EA]">
           <button
             onClick={apply}
-            className="w-full h-9 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#141414]/90 transition-colors"
+            className="w-full h-10 rounded-md bg-[#8136B2] text-white text-sm font-semibold hover:bg-[#6B21A8] transition-colors"
           >
             {t("apply")}
           </button>

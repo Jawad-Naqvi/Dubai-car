@@ -45,7 +45,7 @@ export function LoginWall({
           New to DXB Motors?{" "}
           <Link
             href="/sign-up?role=buyer"
-            className="font-semibold text-[#141414] hover:text-[#C97612] transition-colors"
+            className="font-semibold text-[#141414] hover:text-[#6B21A8] transition-colors"
           >
             Create a free account
           </Link>

@@ -107,7 +107,7 @@ export function FinancePreapprovalButton({
             role="dialog"
             aria-modal="true"
             aria-label="Loan pre-approval"
-            className="relative w-full max-w-md rounded-2xl bg-white shadow-xl border border-[#E7E4DA] p-5"
+            className="relative w-full max-w-md rounded-2xl bg-white shadow-xl border border-[#E5E5EA] p-5"
           >
             {done ? (
               <div className="text-center py-6">

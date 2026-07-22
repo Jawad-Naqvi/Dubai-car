@@ -56,13 +56,13 @@ const LEAD_LABELS: Record<string, string> = {
 
 const STATUS_CHIP: Record<string, string> = {
   new: "bg-[#1B4FA0]/10 text-[#1B4FA0]",
-  contacted: "bg-[#F0941F]/10 text-[#C97612]",
-  quoted: "bg-[#F0941F]/10 text-[#C97612]",
-  closed: "bg-[#F3F1E9] text-secondary",
+  contacted: "bg-[#8136B2]/10 text-[#6B21A8]",
+  quoted: "bg-[#8136B2]/10 text-[#6B21A8]",
+  closed: "bg-[#F4F4F6] text-secondary",
 };
 
 function statusChip(status: string) {
-  return STATUS_CHIP[status] ?? "bg-[#F3F1E9] text-secondary";
+  return STATUS_CHIP[status] ?? "bg-[#F4F4F6] text-secondary";
 }
 
 /* =========================================================================
@@ -122,12 +122,12 @@ async function DealerOverview() {
             className={`rounded-2xl border shadow-card p-4 flex items-start gap-3 ${
               ctx.kycStatus === "rejected"
                 ? "bg-[#DC2626]/5 border-[#DC2626]/25"
-                : "bg-[#F0941F]/5 border-[#F0941F]/25"
+                : "bg-[#8136B2]/5 border-[#8136B2]/25"
             }`}
           >
             <ShieldCheck
               className={`h-5 w-5 flex-shrink-0 ${
-                ctx.kycStatus === "rejected" ? "text-[#DC2626]" : "text-[#C97612]"
+                ctx.kycStatus === "rejected" ? "text-[#DC2626]" : "text-[#6B21A8]"
               }`}
             />
             <div className="flex-1 min-w-0">
@@ -159,9 +159,9 @@ async function DealerOverview() {
           {kpis.map((k) => (
             <div
               key={k.label}
-              className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
+              className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
             >
-              <k.icon className="h-5 w-5 text-[#F0941F]" />
+              <k.icon className="h-5 w-5 text-[#8136B2]" />
               <div className="mt-4 text-base font-bold tracking-tight">{k.value}</div>
               <div className="text-xs text-muted mt-1">{k.label}</div>
             </div>
@@ -170,8 +170,8 @@ async function DealerOverview() {
 
         <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
           {/* Leads */}
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5E5EA]">
               <div>
                 <Eyebrow tone="gold">RECENT LEADS</Eyebrow>
                 <h2 className="mt-2 text-xs font-semibold">
@@ -192,7 +192,7 @@ async function DealerOverview() {
             ) : (
               <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-[#F3F1E9] text-[10px] uppercase tracking-widest text-muted">
+                <thead className="bg-[#F4F4F6] text-[10px] uppercase tracking-widest text-muted">
                   <tr>
                     <th className="text-start px-4 py-3 font-medium">Buyer</th>
                     <th className="text-start px-4 py-3 font-medium">Type</th>
@@ -202,7 +202,7 @@ async function DealerOverview() {
                 </thead>
                 <tbody>
                   {leads.slice(0, 6).map((l) => (
-                    <tr key={l.id} className="border-t border-[#E7E4DA] hover:bg-[#F1EFE9]">
+                    <tr key={l.id} className="border-t border-[#E5E5EA] hover:bg-[#FFFFFF]">
                       <td className="px-4 py-2.5">
                         <div className="font-semibold text-xs">{l.buyerName}</div>
                         <div className="text-xs text-muted">{timeAgo(l.createdAt)}</div>
@@ -210,7 +210,7 @@ async function DealerOverview() {
                       <td className="px-4 py-2.5 text-xs text-secondary">
                         {LEAD_LABELS[l.type] ?? l.type}
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-[#F0941F]">
+                      <td className="px-4 py-2.5 text-xs text-[#8136B2]">
                         {l.feeAED ? formatAED(l.feeAED) : "—"}
                       </td>
                       <td className="px-4 py-2.5">
@@ -228,7 +228,7 @@ async function DealerOverview() {
 
           {/* Plan + quick actions */}
           <div className="space-y-5">
-            <div className="rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-4 relative overflow-hidden grain">
+            <div className="rounded-2xl bg-bento-dark border border-[#8136B2]/25 shadow-card p-4 relative overflow-hidden grain">
               <Eyebrow tone="gold">PLAN</Eyebrow>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-base font-bold">{ctx.tierName}</span>
@@ -240,9 +240,9 @@ async function DealerOverview() {
                 {ctx.listingsUsed} /{" "}
                 {ctx.listingQuota === Infinity ? "∞" : ctx.listingQuota} listings used
               </div>
-              <div className="mt-2 h-2 rounded-full bg-[#E7E4DA] overflow-hidden">
+              <div className="mt-2 h-2 rounded-full bg-[#E5E5EA] overflow-hidden">
                 <div
-                  className="h-full bg-[#F0941F]"
+                  className="h-full bg-[#8136B2]"
                   style={{ width: `${quotaPct}%` }}
                 />
               </div>
@@ -251,7 +251,7 @@ async function DealerOverview() {
               </Button>
             </div>
 
-            <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+            <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
               <h3 className="font-semibold">Quick actions</h3>
               <div className="mt-4 space-y-2">
                 <Button asChild variant="gold" size="md" className="w-full justify-start">
@@ -272,8 +272,8 @@ async function DealerOverview() {
         </div>
 
         {/* Top performing inventory */}
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-[#E5E5EA]">
             <div>
               <Eyebrow tone="emerald">TOP PERFORMERS</Eyebrow>
               <h2 className="mt-2 text-xs font-semibold">Your highest-traffic listings</h2>
@@ -285,10 +285,10 @@ async function DealerOverview() {
               </Link>
             </Button>
           </div>
-          <div className="divide-y divide-[#E7E4DA]">
+          <div className="divide-y divide-[#E5E5EA]">
             {topPerformers.map((l) => (
-              <div key={l.id} className="flex items-center gap-4 p-5 hover:bg-[#F1EFE9]">
-                <div className="relative h-14 w-20 rounded-lg overflow-hidden bg-[#F3F1E9] flex-shrink-0">
+              <div key={l.id} className="flex items-center gap-4 p-5 hover:bg-[#FFFFFF]">
+                <div className="relative h-14 w-20 rounded-lg overflow-hidden bg-[#F4F4F6] flex-shrink-0">
                   <Image src={l.imageUrl} alt="" fill sizes="80px" className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -357,7 +357,7 @@ async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
 
         {/* Recommended for you — real inventory, so the hub is never a dead end */}
         {recommended.length > 0 && (
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <Eyebrow tone="gold">RECOMMENDED FOR YOU</Eyebrow>
@@ -380,8 +380,8 @@ async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
 
         {/* Recent messages + quick links */}
         <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5E5EA]">
               <div>
                 <Eyebrow tone="gold">RECENT MESSAGES</Eyebrow>
                 <h2 className="mt-2 text-xs font-semibold">{messages.length} total</h2>
@@ -398,9 +398,9 @@ async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
                 No messages yet. Inquire on a listing and replies show up here.
               </div>
             ) : (
-              <div className="divide-y divide-[#E7E4DA]">
+              <div className="divide-y divide-[#E5E5EA]">
                 {messages.slice(0, 4).map((m) => (
-                  <div key={m.id} className="flex items-start gap-3 p-4 hover:bg-[#F1EFE9]">
+                  <div key={m.id} className="flex items-start gap-3 p-4 hover:bg-[#FFFFFF]">
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-xs truncate">
                         {m.listingTitle ?? "Listing"}
@@ -426,7 +426,7 @@ async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
             )}
           </div>
 
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
             <h3 className="font-semibold">Quick links</h3>
             <div className="mt-4 space-y-2">
               <Button asChild variant="ghost" size="md" className="w-full justify-start">
@@ -481,12 +481,12 @@ async function B2BOverview() {
           className={`rounded-2xl border shadow-card p-5 flex items-start gap-3 ${
             verified
               ? "bg-[#1A7A4A]/5 border-[#1A7A4A]/20"
-              : "bg-[#F0941F]/5 border-[#F0941F]/25"
+              : "bg-[#8136B2]/5 border-[#8136B2]/25"
           }`}
         >
           <ShieldCheck
             className={`h-5 w-5 flex-shrink-0 ${
-              verified ? "text-[#1A7A4A]" : "text-[#C97612]"
+              verified ? "text-[#1A7A4A]" : "text-[#6B21A8]"
             }`}
           />
           <div className="flex-1 min-w-0">
@@ -498,7 +498,7 @@ async function B2BOverview() {
                 className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                   verified
                     ? "bg-[#1A7A4A]/10 text-[#1A7A4A]"
-                    : "bg-[#F0941F]/10 text-[#C97612]"
+                    : "bg-[#8136B2]/10 text-[#6B21A8]"
                 }`}
               >
                 {verified ? "VERIFIED" : "PENDING"}
@@ -517,9 +517,9 @@ async function B2BOverview() {
           {tiles.map((t) => (
             <div
               key={t.label}
-              className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
+              className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
             >
-              <t.icon className="h-5 w-5 text-[#F0941F]" />
+              <t.icon className="h-5 w-5 text-[#8136B2]" />
               <div className="mt-4 text-base font-bold tracking-tight">{t.value}</div>
               <div className="text-xs text-muted mt-1">{t.label}</div>
             </div>
@@ -528,8 +528,8 @@ async function B2BOverview() {
 
         {/* Recent inquiries + quick actions */}
         <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5E5EA]">
               <div>
                 <Eyebrow tone="gold">RECENT INQUIRIES</Eyebrow>
                 <h2 className="mt-2 text-xs font-semibold">{inquiries.length} total</h2>
@@ -546,9 +546,9 @@ async function B2BOverview() {
                 No export inquiries yet. Build a shipment on the export desk.
               </div>
             ) : (
-              <div className="divide-y divide-[#E7E4DA]">
+              <div className="divide-y divide-[#E5E5EA]">
                 {inquiries.slice(0, 4).map((i) => (
-                  <div key={i.id} className="flex items-center gap-3 p-4 hover:bg-[#F1EFE9]">
+                  <div key={i.id} className="flex items-center gap-3 p-4 hover:bg-[#FFFFFF]">
                     <Ship className="h-4 w-4 text-muted flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-xs truncate">
@@ -574,7 +574,7 @@ async function B2BOverview() {
             )}
           </div>
 
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
             <h3 className="font-semibold">Quick actions</h3>
             <div className="mt-4 space-y-2">
               <Button asChild variant="gold" size="md" className="w-full justify-start">

@@ -40,25 +40,25 @@ export function HomeSearch() {
   };
 
   return (
-    <div className="mt-8 max-w-2xl mx-auto">
-      <div className="relative">
-        <div className="relative flex items-center gap-2 bg-white border border-[#E7E4DA] rounded-full shadow-card hover:shadow-card-hover transition-shadow p-1.5 pl-5">
-          <Search className="h-5 w-5 text-[#F0941F] flex-shrink-0" />
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && go()}
-            placeholder={t("hero.searchPlaceholder")}
-            suppressHydrationWarning
-            className="flex-1 bg-transparent text-[#141414] placeholder:text-muted text-sm outline-none py-2.5"
-          />
-          <Button variant="gold" size="lg" className="rounded-full px-6" onClick={go}>
-            <Search className="h-4 w-4" />
-            {t("common.search")}
-          </Button>
-        </div>
-      </div>
+    <div className="relative flex items-center gap-2 bg-white border border-[#D9D9E0] rounded-full transition-colors focus-within:border-[#8136B2] focus-within:ring-1 focus-within:ring-[#8136B2] p-1 pl-4">
+      <Search className="h-4 w-4 text-[#141414] flex-shrink-0" />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && go()}
+        placeholder={t("hero.searchPlaceholder")}
+        suppressHydrationWarning
+        className="flex-1 bg-transparent text-[#141414] placeholder:text-muted text-sm outline-none py-2"
+      />
+      <Button
+        variant="gold"
+        size="md"
+        className="rounded-full px-5"
+        onClick={go}
+      >
+        {t("common.search")}
+      </Button>
     </div>
   );
 }

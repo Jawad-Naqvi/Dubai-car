@@ -18,9 +18,9 @@ export default async function SettingsPage() {
       <DashboardHeader title="Settings" subtitle="Account & preferences" />
       <main className="p-5 space-y-4 max-w-3xl">
         {/* Account */}
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <User className="h-4 w-4 text-[#F0941F]" />
+            <User className="h-4 w-4 text-[#8136B2]" />
             <Eyebrow tone="gold">ACCOUNT</Eyebrow>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -43,18 +43,18 @@ export default async function SettingsPage() {
         </div>
 
         {/* Preferences */}
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Globe className="h-4 w-4 text-[#F0941F]" />
+            <Globe className="h-4 w-4 text-[#8136B2]" />
             <Eyebrow tone="gold">PREFERENCES</Eyebrow>
           </div>
           <NotificationPrefs />
         </div>
 
         {/* Plan shortcut */}
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 flex items-center justify-between">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-[#F0941F]" />
+            <ShieldCheck className="h-4 w-4 text-[#8136B2]" />
             <span className="text-sm">Subscription & billing</span>
           </div>
           <Button asChild variant="ghost" size="sm">

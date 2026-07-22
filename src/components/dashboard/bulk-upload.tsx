@@ -135,10 +135,10 @@ export function BulkUpload() {
   return (
     <div className="space-y-4">
       {/* Step 1 — template */}
-      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
+      <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
         <div className="flex items-start gap-3">
-          <span className="h-10 w-10 rounded-xl bg-[#F3F1E9] flex items-center justify-center flex-shrink-0">
-            <FileSpreadsheet className="h-5 w-5 text-[#F0941F]" />
+          <span className="h-10 w-10 rounded-xl bg-[#F4F4F6] flex items-center justify-center flex-shrink-0">
+            <FileSpreadsheet className="h-5 w-5 text-[#8136B2]" />
           </span>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-bold text-[#141414]">1. Download the template</h3>
@@ -162,7 +162,7 @@ export function BulkUpload() {
           e.preventDefault();
           handleFile(e.dataTransfer.files);
         }}
-        className="cursor-pointer rounded-2xl border border-dashed border-[#D8D4C6] bg-[#F3F1E9] hover:border-[#141414]/30 transition-colors p-8 text-center"
+        className="cursor-pointer rounded-2xl border border-dashed border-[#D8D4C6] bg-[#F4F4F6] hover:border-[#141414]/30 transition-colors p-8 text-center"
       >
         <input
           ref={inputRef}
@@ -171,7 +171,7 @@ export function BulkUpload() {
           className="hidden"
           onChange={(e) => handleFile(e.target.files)}
         />
-        <Upload className="h-6 w-6 text-[#F0941F] mx-auto" />
+        <Upload className="h-6 w-6 text-[#8136B2] mx-auto" />
         <p className="mt-3 text-xs text-secondary">
           {fileName ? (
             <span className="font-semibold text-[#141414]">{fileName}</span>
@@ -188,8 +188,8 @@ export function BulkUpload() {
 
       {/* Step 3 — preview + import */}
       {rows.length > 0 && !results && (
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-[#E5E5EA]">
             <h3 className="text-sm font-bold">
               Preview — {validCount} of {rows.length} rows ready
             </h3>
@@ -199,7 +199,7 @@ export function BulkUpload() {
           </div>
           <div className="overflow-x-auto max-h-80">
             <table className="w-full text-xs">
-              <thead className="bg-[#F3F1E9] text-[10px] uppercase tracking-widest text-muted sticky top-0">
+              <thead className="bg-[#F4F4F6] text-[10px] uppercase tracking-widest text-muted sticky top-0">
                 <tr>
                   <th className="text-start px-3 py-2 font-medium">#</th>
                   <th className="text-start px-3 py-2 font-medium">Car</th>
@@ -212,7 +212,7 @@ export function BulkUpload() {
                 {rows.map((r, i) => {
                   const err = rowError(r);
                   return (
-                    <tr key={i} className="border-t border-[#E7E4DA]">
+                    <tr key={i} className="border-t border-[#E5E5EA]">
                       <td className="px-3 py-2 text-muted">{i + 1}</td>
                       <td className="px-3 py-2 text-[#141414]">
                         {[r.year, r.make, r.model, r.trim].filter(Boolean).join(" ") || "—"}
@@ -241,8 +241,8 @@ export function BulkUpload() {
 
       {/* Results */}
       {results && (
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-          <div className="p-4 border-b border-[#E7E4DA] flex items-center justify-between">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden">
+          <div className="p-4 border-b border-[#E5E5EA] flex items-center justify-between">
             <h3 className="text-sm font-bold">
               Import complete — {results.filter((r) => r.ok).length} added
             </h3>
@@ -254,7 +254,7 @@ export function BulkUpload() {
             <table className="w-full text-xs">
               <tbody>
                 {results.map((r) => (
-                  <tr key={r.row} className="border-t border-[#E7E4DA]">
+                  <tr key={r.row} className="border-t border-[#E5E5EA]">
                     <td className="px-3 py-2 text-muted w-10">{r.row}</td>
                     <td className="px-3 py-2">
                       {r.ok ? (

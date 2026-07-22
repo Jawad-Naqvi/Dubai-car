@@ -26,13 +26,13 @@ export function MockListingCard({
   return (
     <div
       className={cn(
-        "rounded-2xl bg-white border border-[#E7E4DA] p-3.5 shadow-card",
+        "rounded-2xl bg-white border border-[#E5E5EA] p-3.5 shadow-card",
         className,
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-[9px] uppercase tracking-widest text-[#C97612] font-semibold">
+          <div className="text-[9px] uppercase tracking-widest text-[#6B21A8] font-semibold">
             Listing
           </div>
           <div className="mt-0.5 text-xs font-semibold text-[#141414] truncate">

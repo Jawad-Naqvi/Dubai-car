@@ -16,19 +16,19 @@ function StarRow() {
   return (
     <span className="inline-flex gap-0.5">
       {[0, 1, 2, 3].map((i) => (
-        <Star key={i} className="h-3 w-3 fill-[#F0941F] text-[#F0941F]" />
+        <Star key={i} className="h-3 w-3 fill-[#8136B2] text-[#8136B2]" />
       ))}
-      <Star className="h-3 w-3 text-[#E7E4DA] fill-[#E7E4DA]" />
+      <Star className="h-3 w-3 text-[#E5E5EA] fill-[#E5E5EA]" />
     </span>
   );
 }
 
 function Card({ item }: { item: Testimonial }) {
   return (
-    <div className="rounded-3xl bg-white shadow-card p-6 h-full flex flex-col">
+    <div className="rounded-2xl bg-white shadow-card p-6 h-full flex flex-col">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="relative h-9 w-9 rounded-full overflow-hidden bg-[#F3F1E9] flex-shrink-0">
+          <div className="relative h-9 w-9 rounded-full overflow-hidden bg-[#F4F4F6] flex-shrink-0">
             <Image
               src={`https://api.dicebear.com/9.x/notionists/png?seed=${encodeURIComponent(item.name)}&backgroundColor=fbe7d4,cfe3f3,dfede0`}
               alt={item.name}
@@ -78,7 +78,7 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
         <ArrowRight className="h-4 w-4 rtl-flip" />
       </button>
 
-      <div className="overflow-hidden rounded-3xl bg-[#F3F1E9] p-3 sm:p-4">
+      <div className="overflow-hidden rounded-2xl bg-[#F4F4F6] p-3 sm:p-4">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={page}

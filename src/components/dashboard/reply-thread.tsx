@@ -46,7 +46,7 @@ export function ReplyThread({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="text-[11px] font-semibold text-[#141414] underline underline-offset-2 hover:text-[#C97612]"
+        className="text-[11px] font-semibold text-[#141414] underline underline-offset-2 hover:text-[#6B21A8]"
       >
         {replies.length > 0 ? `${replies.length} repl${replies.length === 1 ? "y" : "ies"}` : "Reply"}
       </button>
@@ -58,7 +58,7 @@ export function ReplyThread({
               className={`rounded-lg px-2.5 py-1.5 text-xs max-w-[85%] ${
                 r.senderRole === senderRole
                   ? "bg-[#141414] text-white ms-auto"
-                  : "bg-[#F3F1E9] text-secondary"
+                  : "bg-[#F4F4F6] text-secondary"
               }`}
             >
               {r.body}
@@ -69,7 +69,7 @@ export function ReplyThread({
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Type a reply…"
-              className="flex-1 h-8 rounded-lg bg-white border border-[#E7E4DA] px-2.5 text-xs focus:outline-none focus:border-[#141414]/30"
+              className="flex-1 h-8 rounded-lg bg-white border border-[#E5E5EA] px-2.5 text-xs focus:outline-none focus:border-[#141414]/30"
               onKeyDown={(e) => e.key === "Enter" && send()}
             />
             <button

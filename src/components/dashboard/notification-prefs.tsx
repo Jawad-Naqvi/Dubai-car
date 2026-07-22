@@ -51,7 +51,7 @@ export function NotificationPrefs() {
           type="checkbox"
           checked={prefs.emailLeads}
           onChange={(e) => update("emailLeads", "Email lead notifications")(e.target.checked)}
-          className="h-4 w-4 accent-[#F0941F]"
+          className="h-4 w-4 accent-[#8136B2]"
         />
       </label>
       <label className="flex items-center justify-between">
@@ -62,7 +62,7 @@ export function NotificationPrefs() {
           type="checkbox"
           checked={prefs.whatsappAlerts}
           onChange={(e) => update("whatsappAlerts", "WhatsApp lead alerts")(e.target.checked)}
-          className="h-4 w-4 accent-[#F0941F]"
+          className="h-4 w-4 accent-[#8136B2]"
         />
       </label>
     </div>

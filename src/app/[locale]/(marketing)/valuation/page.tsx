@@ -75,14 +75,14 @@ function ValuationForm() {
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-5xl mx-auto">
           {/* Form */}
-          <div className="rounded-3xl bg-white border border-[#E7E4DA] shadow-card p-5">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
             <div className="space-y-5">
               <div>
                 <label className="text-xs text-muted mb-2 block">Make</label>
                 <select
                   value={make}
                   onChange={(e) => setMake(e.target.value)}
-                  className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
+                  className="w-full h-11 rounded-xl bg-white border border-[#E5E5EA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                 >
                   {popularMakes.map((m) => (
                     <option key={m}>{m}</option>
@@ -94,7 +94,7 @@ function ValuationForm() {
                 <input
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
+                  className="w-full h-11 rounded-xl bg-white border border-[#E5E5EA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -106,7 +106,7 @@ function ValuationForm() {
                     onChange={(e) => setYear(Number(e.target.value))}
                     min={1990}
                     max={2026}
-                    className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
+                    className="w-full h-11 rounded-xl bg-white border border-[#E5E5EA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                   />
                 </div>
                 <div>
@@ -115,7 +115,7 @@ function ValuationForm() {
                     type="number"
                     value={kms}
                     onChange={(e) => setKms(Number(e.target.value))}
-                    className="w-full h-11 rounded-xl bg-white border border-[#E7E4DA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
+                    className="w-full h-11 rounded-xl bg-white border border-[#E5E5EA] text-[#141414] placeholder:text-muted px-3 text-sm focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10"
                   />
                 </div>
               </div>
@@ -141,11 +141,11 @@ function ValuationForm() {
           </div>
 
           {/* Estimate */}
-          <div className="rounded-3xl bg-[#FBE7D4] border border-[#E7E4DA] shadow-card p-5 relative overflow-hidden">
+          <div className="rounded-2xl bg-[#F3EDF9] border border-[#E5E5EA] shadow-card p-5 relative overflow-hidden">
             <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-40" />
             <div className="relative">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-5 w-5 text-[#F0941F]" />
+                <Sparkles className="h-5 w-5 text-[#8136B2]" />
                 <Eyebrow tone="gold">ESTIMATE</Eyebrow>
               </div>
               <div className="mt-4 text-sm text-secondary">
@@ -159,7 +159,7 @@ function ValuationForm() {
               </div>
 
               {comps !== null && (
-                <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#C97612] bg-white/70 border border-[#F0941F]/25 rounded-full px-2.5 py-1">
+                <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#6B21A8] bg-white/70 border border-[#8136B2]/25 rounded-full px-2.5 py-1">
                   <BadgeCheck className="h-3 w-3" />
                   {comps > 0
                     ? `Blended with ${comps} live comparables`

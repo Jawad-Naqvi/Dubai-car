@@ -114,7 +114,7 @@ export function DashboardSidebar({
                 )}
               >
                 <item.icon
-                  className={cn("h-4 w-4", isActive ? "text-[#F0941F]" : "")}
+                  className={cn("h-4 w-4", isActive ? "text-[#8136B2]" : "")}
                 />
                 {item.label}
               </Link>
@@ -127,7 +127,7 @@ export function DashboardSidebar({
         {role === "buyer" && (
           <Link
             href="/dashboard/sell/new"
-            className="flex items-center justify-center gap-2 h-9 rounded-xl bg-[#F0941F] text-[#141414] text-xs font-bold hover:bg-[#e0891a] transition-colors"
+            className="flex items-center justify-center gap-2 h-9 rounded-xl bg-[#8136B2] text-white text-xs font-bold hover:bg-[#370B55] transition-colors"
           >
             <Tag className="h-4 w-4" />
             Sell your car

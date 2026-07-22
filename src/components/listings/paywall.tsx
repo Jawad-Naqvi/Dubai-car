@@ -88,10 +88,10 @@ export function ContactPaywall({
             whatsappMsg={whatsappMsg}
           />
         ) : (
-          <div className="rounded-2xl bg-[#F3F1E9] border border-[#E7E4DA] shadow-card p-3">
+          <div className="rounded-2xl bg-[#F4F4F6] border border-[#E5E5EA] shadow-card p-3">
             <div className="flex items-center gap-1.5 mb-2.5">
-              <Lock className="h-3 w-3 text-[#F0941F]" />
-              <span className="text-[10px] uppercase tracking-widest text-[#C97612] font-semibold">
+              <Lock className="h-3 w-3 text-[#8136B2]" />
+              <span className="text-[10px] uppercase tracking-widest text-[#6B21A8] font-semibold">
                 Reveal seller contact
               </span>
             </div>
@@ -106,7 +106,7 @@ export function ContactPaywall({
               No account needed.{" "}
               <Link
                 href={`/sign-in?redirect_url=${encodeURIComponent(`/${locale}/listings/${listingId}`)}`}
-                className="font-semibold text-[#141414] hover:text-[#C97612] underline underline-offset-2"
+                className="font-semibold text-[#141414] hover:text-[#6B21A8] underline underline-offset-2"
               >
                 Sign in
               </Link>{" "}
