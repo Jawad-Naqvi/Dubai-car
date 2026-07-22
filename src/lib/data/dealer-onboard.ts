@@ -1,10 +1,11 @@
 import "server-only";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
+import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { dealers } from "@/lib/db/schema";
+import { dealers, users } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
-import { getOrSyncUser, getCurrentDealer } from "./users";
+import { getOrSyncUser, getCurrentDealer, type CurrentUser } from "./users";
 import { bust } from "./revalidate";
 import { sendEmail } from "@/lib/notify";
 
@@ -39,10 +40,14 @@ export interface BecomeDealerResult {
 
 /**
  * Submit (or resubmit) a seller/KYC application for the signed-in user.
- * Creates the dealer record with kycStatus "pending" — the user's role is
- * NOT promoted to "dealer" here. That only happens once an admin approves
- * the application (see /api/admin/dealers/[id]/approve), so a self-service
- * submission can never list live inventory without review.
+ *
+ * Creates the dealer record with kycStatus "pending" AND promotes the user to
+ * the "dealer" role immediately, so they land on the SELLER dashboard (not the
+ * buyer hub) right after onboarding. This grants the seller *workspace* (a
+ * view) — it does NOT grant the *power* to publish: listings from an unverified
+ * dealer are held for review (see createListing's isVerified gate), and an
+ * admin must approve KYC before they go live. Seeing the dashboard and being
+ * allowed to sell are deliberately separate steps.
  */
 export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
   const input = becomeDealerSchema.parse(raw);
@@ -81,6 +86,7 @@ export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
         kycReviewedAt: null,
       })
       .where(eq(dealers.id, existing.id));
+    await promoteToDealer(user);
     await notifyApplicationReceived(user.email, input.businessName);
     return { ok: true, dealerSlug: existing.slug };
   }
@@ -115,9 +121,25 @@ export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
     })
     .returning({ slug: dealers.slug });
 
+  await promoteToDealer(user);
   bust("listings");
   await notifyApplicationReceived(user.email, input.businessName);
   return { ok: true, dealerSlug: dealer?.slug ?? slug };
+}
+
+/** Promote a user to the "dealer" role in both the DB and Clerk (RBAC source
+ *  of truth), so their next dashboard load opens the seller workspace. */
+async function promoteToDealer(user: CurrentUser) {
+  if (user.role === "dealer") return;
+  await db.update(users).set({ role: "dealer" }).where(eq(users.id, user.id));
+  try {
+    const client = await clerkClient();
+    await client.users.updateUserMetadata(user.clerkId, {
+      publicMetadata: { role: "dealer" },
+    });
+  } catch {
+    // DB role still updated; Clerk metadata reconciles on next sync.
+  }
 }
 
 async function notifyApplicationReceived(email: string, businessName: string) {

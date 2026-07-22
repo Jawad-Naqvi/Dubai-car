@@ -18,7 +18,7 @@ export default async function AuthenticatedLayout({
   const role = await getDashboardRole();
 
   return (
-    <div className="flex flex-col lg:flex-row bg-page min-h-screen overflow-x-hidden">
+    <div className="flex flex-col lg:flex-row bg-[#F6F7F9] min-h-screen overflow-x-hidden">
       <DashboardSidebar role={role} />
       <div className="flex-1 min-w-0 overflow-x-hidden">{children}</div>
     </div>

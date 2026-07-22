@@ -81,7 +81,7 @@ export default async function LandingPage({
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-start">
             <Reveal>
-              <h1 className="text-4xl sm:text-5xl lg:text-[64px] leading-[1.08] tracking-tight font-light text-[#141414] max-w-3xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl leading-[1.1] tracking-tight font-light text-[#141414] max-w-3xl">
                 {t("hero.titlePre")}{" "}
                 <span className="font-extrabold">{t("hero.titleHighlight")}</span>{" "}
                 <span>
@@ -205,7 +205,7 @@ export default async function LandingPage({
       </section>
 
       {/* ================ WHY CHOOSE US ================ */}
-      <section className="relative pt-16 lg:pt-24">
+      <section className="relative pt-12 lg:pt-16">
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Reveal className="relative min-h-[320px] lg:min-h-[460px] rounded-3xl overflow-hidden bg-[#CFE3F3]">
@@ -238,7 +238,7 @@ export default async function LandingPage({
       </section>
 
       {/* ================ VALUE PROPS + OFFER TILE ================ */}
-      <section className="relative pt-16 lg:pt-24">
+      <section className="relative pt-12 lg:pt-16">
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {values.map((v, i) => (
@@ -302,7 +302,7 @@ export default async function LandingPage({
       </section>
 
       {/* ================ COLLECTION BANNER ================ */}
-      <section className="relative pt-16 lg:pt-24">
+      <section className="relative pt-12 lg:pt-16">
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <Reveal className="relative rounded-[2rem] bg-[#FBE7D4] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
@@ -340,7 +340,7 @@ export default async function LandingPage({
       </section>
 
       {/* ================ ALL CARS GRID ================ */}
-      <section className="relative pt-16 lg:pt-24">
+      <section className="relative pt-12 lg:pt-16">
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <Reveal>
             <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#141414]">
@@ -411,7 +411,7 @@ export default async function LandingPage({
       </section>
 
       {/* ================ TESTIMONIALS ================ */}
-      <section className="relative pt-16 lg:pt-24 pb-8">
+      <section className="relative pt-12 lg:pt-16 pb-8">
         <div className="mx-auto max-w-4xl px-4 lg:px-6">
           <Reveal>
             <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#141414] text-center">

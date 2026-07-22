@@ -14,12 +14,12 @@ export default async function SignInPage() {
       footer={
         <div className="flex flex-col items-center gap-3">
           <span>
-            Don&apos;t have an account?{" "}
+            New to DXB Motors?{" "}
             <Link
               href="/sign-up"
               className="font-bold text-[#141414] hover:text-[#C97612] transition-colors"
             >
-              Sign Up
+              Create an account
             </Link>
           </span>
           <Link
@@ -32,6 +32,8 @@ export default async function SignInPage() {
         </div>
       }
     >
+      {/* Login is a single form — the account already knows its role. The
+          buyer/seller choice lives on sign-up (the "Create an account" link). */}
       <SignIn appearance={clerkAuthAppearance} fallbackRedirectUrl="/post-auth" />
     </AuthShell>
   );

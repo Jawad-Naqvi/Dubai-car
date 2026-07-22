@@ -122,7 +122,10 @@ export function BecomeSellerForm() {
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        toast.success("Application submitted — we'll review it shortly.");
+        toast.success("You're set up as a seller — opening your dashboard.");
+        // They're now a dealer (pending verification); land them on the
+        // seller workspace, not the buyer hub.
+        router.push("/dashboard");
         router.refresh();
       } else {
         toast.error(data.error ?? "Could not submit application.");

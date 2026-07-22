@@ -47,6 +47,8 @@ export interface MockListing {
   /** Real lifetime counters (DB mode only) — power the High Demand badge. */
   viewCount?: number;
   inquiryCount?: number;
+  /** When the listing went live / was created — powers the days-on-market signal. */
+  listedAt?: string;
 }
 
 /**

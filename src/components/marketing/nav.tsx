@@ -173,6 +173,24 @@ export function Nav() {
                 {t(item.key)}
               </Link>
             ))}
+            <SignedOut>
+              <Link
+                href="/sign-in"
+                onClick={() => setOpen(false)}
+                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E7E4DA]"
+              >
+                {t("signIn")}
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E7E4DA]"
+              >
+                Dashboard
+              </Link>
+            </SignedIn>
             <button
               onClick={() => {
                 switchLocale();
