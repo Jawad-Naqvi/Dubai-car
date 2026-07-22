@@ -1,14 +1,13 @@
 import { DashboardHeader } from "@/components/dashboard/header";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { PlanManager } from "@/components/dashboard/plan-manager";
+import { PaymentMethodCard } from "@/components/dashboard/payment-method-card";
 import { InvoicesExport } from "@/components/dashboard/invoices-export";
 import { formatAED } from "@/lib/utils";
-import { brand } from "@/lib/brand";
 import { getDealerContext } from "@/lib/data/dashboard";
-import { getInvoices } from "@/lib/data/payments";
-import { CreditCard, Receipt } from "lucide-react";
+import { getInvoices, isGatewayEnabled } from "@/lib/data/payments";
+import { Receipt } from "lucide-react";
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-AE", {
@@ -31,28 +30,10 @@ export default async function BillingPage() {
             currentTier={ctx.tier}
             listingsUsed={ctx.listingsUsed}
             listingQuota={ctx.listingQuota}
+            gatewayEnabled={isGatewayEnabled()}
           />
 
-          {/* Payment method */}
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-7">
-            <Eyebrow tone="emerald">PAYMENT METHOD</Eyebrow>
-            <div className="mt-4 flex items-center gap-4">
-              <div className="h-12 w-16 rounded-lg bg-[#141414] flex items-center justify-center">
-                <CreditCard className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <div className="font-semibold">Visa · ••• 4242</div>
-                <div className="text-xs text-muted">Expires 09/27</div>
-              </div>
-            </div>
-            <Button asChild variant="ghost" size="sm" className="mt-5 w-full">
-              <a
-                href={`mailto:${brand.supportEmail}?subject=${encodeURIComponent("Change payment method")}`}
-              >
-                Change payment method
-              </a>
-            </Button>
-          </div>
+          <PaymentMethodCard gatewayEnabled={isGatewayEnabled()} />
         </div>
 
         {/* Invoices */}

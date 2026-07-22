@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getOrSyncUser, getCurrentRole } from "@/lib/data/users";
 import { NotificationPrefs } from "@/components/dashboard/notification-prefs";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { User, Globe, ShieldCheck } from "lucide-react";
 
 export default async function SettingsPage() {

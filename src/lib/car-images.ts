@@ -1,15 +1,20 @@
 /**
  * Car imagery provider chain.
  *
- * Priority:
- *  1. IMAGIN.studio CDN render (studio-quality, by make/model/year/angle) when
- *     NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY is configured — https://www.imagin.studio/car-image-api
- *  2. The image URL stored on the record (dealer upload / catalog-synced URL,
- *     e.g. a Wikimedia Commons image resolved at sync time)
+ * Priority (synchronous render-time chain):
+ *  1. The image URL stored on the record — a real dealer/seller upload, or a
+ *     catalog-synced retail photo (auto.dev / Wikimedia Commons). A real photo
+ *     of the actual car ALWAYS wins: never replace a seller's uploaded photo
+ *     with a generic stock render.
+ *  2. IMAGIN.studio CDN render (studio-quality generic render by make/model/
+ *     year/angle) when NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY is set — used only when
+ *     the record has no real photo — https://www.imagin.studio/car-image-api
  *  3. Branded SVG placeholder (never a broken image)
  *
- * Used by the landing page, catalog pages, and anywhere a car must be shown
- * without a dealer-uploaded photo.
+ * auto.dev and Wikimedia require an async lookup, so they run during catalog
+ * sync and persist a URL that this chain then serves as `fallbackUrl`.
+ *
+ * Used by the landing page, catalog pages, and anywhere a car must be shown.
  */
 
 const IMAGIN_BASE = "https://cdn.imagin.studio/getImage";
@@ -57,5 +62,6 @@ export function placeholderCarImage(label = "DXB Motors"): string {
 
 /** Resolve the best available image URL for a car. */
 export function carImageUrl(p: CarImageParams): string {
-  return imaginUrl(p) ?? p.fallbackUrl ?? placeholderCarImage(`${p.make} ${p.model}`);
+  // Real stored photo of the actual car wins over a generic stock render.
+  return p.fallbackUrl ?? imaginUrl(p) ?? placeholderCarImage(`${p.make} ${p.model}`);
 }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { brand } from "@/lib/brand";
 import {

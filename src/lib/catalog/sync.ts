@@ -155,7 +155,13 @@ export async function runCatalogSync(
       .limit(IMAGE_BUDGET_PER_RUN);
 
     for (const m of needImages) {
-      const url = await wikimediaImage(m.makeName, m.name, m.latestYear ?? undefined);
+      const year = m.latestYear ?? undefined;
+      // auto.dev's photo product is keyed by a specific VIN (real per-vehicle
+      // listing photos), not by make/model/year, so it can't serve a generic
+      // "one representative photo per model" catalog — Wikimedia is the real
+      // source here. (auto.dev's VIN decode is used elsewhere, for the sell
+      // wizard's per-listing "Decode from VIN" auto-fill.)
+      const url = await wikimediaImage(m.makeName, m.name, year);
       if (url) {
         await db
           .update(catalogModels)
@@ -182,6 +188,9 @@ export async function runCatalogSync(
         .limit(SPEC_BUDGET_PER_RUN);
 
       for (const trim of needSpecs) {
+        // auto.dev's specs product is VIN-keyed and gated behind their $299/mo
+        // Growth plan — not usable here (no VIN at this stage, and a Starter
+        // key 402s regardless). API-Ninjas/CarAPI are the real spec sources.
         const specs = await apiNinjasSpecs(trim.makeName, trim.modelName, trim.year);
         if (specs) {
           await db

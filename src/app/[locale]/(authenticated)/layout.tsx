@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { getDashboardRole } from "@/lib/data/users";
 
 export const dynamic = "force-dynamic";
 
@@ -13,12 +14,11 @@ export default async function AuthenticatedLayout({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Real role-routing happens via Clerk session claims in middleware; default
-  // to dealer for the demo since that's the primary monetised user type.
-  const role = "dealer" as const;
+  // Real per-user role routing: each login opens its own dashboard.
+  const role = await getDashboardRole();
 
   return (
-    <div className="flex flex-col lg:flex-row bg-page min-h-screen overflow-x-hidden">
+    <div className="flex flex-col lg:flex-row bg-[#F6F7F9] min-h-screen overflow-x-hidden">
       <DashboardSidebar role={role} />
       <div className="flex-1 min-w-0 overflow-x-hidden">{children}</div>
     </div>

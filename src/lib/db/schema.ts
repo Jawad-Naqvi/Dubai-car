@@ -13,8 +13,16 @@ import {
   index,
   uniqueIndex,
   primaryKey,
+  customType,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+
+/** Postgres bytea <-> Node Buffer (node-postgres maps these natively). */
+export const bytea = customType<{ data: Buffer; default: false }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 /* === Enums === */
 export const roleEnum = pgEnum("role", [
@@ -46,6 +54,7 @@ export const leadTypeEnum = pgEnum("lead_type", [
   "contact_unlock",
   "test_drive",
   "export_inquiry",
+  "finance_preapproval",
 ]);
 
 export const paymentTypeEnum = pgEnum("payment_type", [
@@ -58,6 +67,12 @@ export const paymentTypeEnum = pgEnum("payment_type", [
 export const paymentGatewayEnum = pgEnum("payment_gateway", [
   "paytabs",
   "stripe",
+]);
+
+export const kycStatusEnum = pgEnum("kyc_status", [
+  "pending",
+  "approved",
+  "rejected",
 ]);
 
 /* === Users (mirror Clerk) === */
@@ -97,6 +112,7 @@ export const dealers = pgTable(
     tagline: varchar("tagline", { length: 240 }),
     description: text("description"),
     tradeLicense: varchar("trade_license", { length: 64 }),
+    tradeLicenseDocUrl: text("trade_license_doc_url"),
     emirate: varchar("emirate", { length: 32 }).notNull(),
     address: text("address"),
     lat: doublePrecision("lat"),
@@ -112,6 +128,18 @@ export const dealers = pgTable(
     isVerified: boolean("is_verified").notNull().default(false),
     isFeatured: boolean("is_featured").notNull().default(false),
     verifiedAt: timestamp("verified_at"),
+    /** Seller onboarding review state — gates promotion to the "dealer" role. */
+    kycStatus: kycStatusEnum("kyc_status").notNull().default("pending"),
+    emiratesIdNumber: varchar("emirates_id_number", { length: 32 }),
+    emiratesIdFrontUrl: text("emirates_id_front_url"),
+    emiratesIdBackUrl: text("emirates_id_back_url"),
+    kycRejectionReason: text("kyc_rejection_reason"),
+    kycSubmittedAt: timestamp("kyc_submitted_at"),
+    kycReviewedAt: timestamp("kyc_reviewed_at"),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 128 }),
+    stripeSubscriptionId: varchar("stripe_subscription_id", { length: 128 }),
+    /** Tier a Stripe Checkout session is currently open for, until the webhook confirms it. */
+    pendingTier: subscriptionTierEnum("pending_tier"),
     rating: doublePrecision("rating").default(0),
     reviewCount: integer("review_count").default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -158,6 +186,9 @@ export const listings = pgTable(
     bodyType: varchar("body_type", { length: 32 }),
     fuel: varchar("fuel", { length: 24 }),
     transmission: varchar("transmission", { length: 24 }),
+    drivetrain: varchar("drivetrain", { length: 32 }),
+    /** Denormalised deal score ("Great"|"Good"|"Fair") vs make/model median. */
+    dealRating: varchar("deal_rating", { length: 16 }),
     kms: integer("kms").notNull().default(0),
     colorExterior: varchar("color_exterior", { length: 32 }),
     colorInterior: varchar("color_interior", { length: 32 }),
@@ -168,6 +199,9 @@ export const listings = pgTable(
     seats: integer("seats"),
     horsepower: integer("horsepower"),
     priceAED: bigint("price_aed", { mode: "number" }).notNull(),
+    /** Denormalised: the price before the most recent change (for drop badges). */
+    previousPrice: bigint("previous_price", { mode: "number" }),
+    priceUpdatedAt: timestamp("price_updated_at"),
     monthlyEMI: integer("monthly_emi"),
     condition: varchar("condition", { length: 32 }),
     description: text("description"),
@@ -212,6 +246,20 @@ export const listingMedia = pgTable("listing_media", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+/**
+ * Uploaded image bytes stored in Postgres (no external object store / no local
+ * disk needed — survives serverless deploys). Served by GET /api/media/[id].
+ * Used when Cloudflare R2 is not configured.
+ */
+export const mediaAssets = pgTable("media_assets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  mimeType: varchar("mime_type", { length: 64 }).notNull().default("image/jpeg"),
+  size: integer("size").notNull().default(0),
+  data: bytea("data").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type MediaAsset = typeof mediaAssets.$inferSelect;
+
 /* === Leads === */
 export const leads = pgTable("leads", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -239,9 +287,35 @@ export const leads = pgTable("leads", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+/* === Lead replies (two-way thread on top of a one-shot lead) === */
+export const leadReplies = pgTable("lead_replies", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  leadId: uuid("lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  senderRole: varchar("sender_role", { length: 16 }).notNull(), // "buyer" | "dealer"
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 /* === Saved listings & searches === */
 export const savedListings = pgTable(
   "saved_listings",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    listingId: uuid("listing_id")
+      .notNull()
+      .references(() => listings.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.userId, t.listingId] }) }),
+);
+
+/** Cross-device compare tray for signed-in users (mirrors saved_listings). */
+export const compareListings = pgTable(
+  "compare_listings",
   {
     userId: uuid("user_id")
       .notNull()
@@ -260,10 +334,107 @@ export const savedSearches = pgTable("saved_searches", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 120 }),
-  query: jsonb("query").notNull(),
+  query: jsonb("query").$type<Record<string, string>>().notNull(),
   alertFrequency: varchar("alert_frequency", { length: 16 }).default("daily"),
+  /** High-water mark: only listings newer than this are "new matches". */
+  lastNotifiedAt: timestamp("last_notified_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+export type SavedSearch = typeof savedSearches.$inferSelect;
+
+/* === Trust: dealer reviews === */
+export const dealerReviews = pgTable("dealer_reviews", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  dealerId: uuid("dealer_id")
+    .notNull()
+    .references(() => dealers.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  authorName: varchar("author_name", { length: 120 }),
+  rating: integer("rating").notNull(),
+  title: varchar("title", { length: 160 }),
+  body: text("body"),
+  /** published | pending | rejected */
+  status: varchar("status", { length: 16 }).notNull().default("published"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type DealerReview = typeof dealerReviews.$inferSelect;
+
+/* === Trust: listing reports (fraud / scam flags) === */
+export const listingReports = pgTable("listing_reports", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" }),
+  reporterId: uuid("reporter_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  reason: varchar("reason", { length: 64 }).notNull(),
+  details: text("details"),
+  reporterEmail: varchar("reporter_email", { length: 200 }),
+  /** open | reviewing | resolved | dismissed */
+  status: varchar("status", { length: 16 }).notNull().default("open"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ListingReport = typeof listingReports.$inferSelect;
+
+/* === Price history (price-drop tracking + alerts) === */
+export const priceHistory = pgTable("price_history", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" }),
+  oldPrice: bigint("old_price", { mode: "number" }).notNull(),
+  newPrice: bigint("new_price", { mode: "number" }).notNull(),
+  changedAt: timestamp("changed_at").defaultNow().notNull(),
+});
+export type PriceHistory = typeof priceHistory.$inferSelect;
+
+/* === Vehicle inspection reports === */
+export const listingInspections = pgTable("listing_inspections", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" })
+    .unique(),
+  inspectorName: varchar("inspector_name", { length: 160 }).notNull(),
+  inspectedAt: timestamp("inspected_at").defaultNow().notNull(),
+  /** [{ name, items: [{ label, status, note }] }] — see lib/inspection.ts */
+  categories: jsonb("categories")
+    .$type<import("@/lib/inspection").InspectionCategory[]>()
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ListingInspection = typeof listingInspections.$inferSelect;
+
+/**
+ * Vehicle history report for a listing — a dealer/admin-submitted or
+ * provider-fetched record (title, owners, accidents, service). One per listing.
+ * See lib/vehicle-history.ts for the payload shape.
+ */
+export const vehicleHistory = pgTable("vehicle_history", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  listingId: uuid("listing_id")
+    .notNull()
+    .references(() => listings.id, { onDelete: "cascade" })
+    .unique(),
+  source: varchar("source", { length: 16 }).notNull().default("dealer"),
+  vin: varchar("vin", { length: 32 }),
+  titleStatus: varchar("title_status", { length: 16 }).notNull().default("clean"),
+  owners: integer("owners"),
+  accidentsReported: boolean("accidents_reported"),
+  odometerConsistent: boolean("odometer_consistent"),
+  /** [{ date, severity, note }] */
+  accidents: jsonb("accidents")
+    .$type<import("@/lib/vehicle-history").AccidentRecord[]>()
+    .default([]),
+  /** [{ date, km, note }] */
+  serviceRecords: jsonb("service_records")
+    .$type<import("@/lib/vehicle-history").ServiceRecord[]>()
+    .default([]),
+  reportedAt: timestamp("reported_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type VehicleHistoryRow = typeof vehicleHistory.$inferSelect;
 
 /* === B2B === */
 export const b2bBuyers = pgTable("b2b_buyers", {
@@ -303,6 +474,8 @@ export const payments = pgTable("payments", {
   type: paymentTypeEnum("type").notNull(),
   gateway: paymentGatewayEnum("gateway").notNull(),
   gatewayRef: varchar("gateway_ref", { length: 200 }),
+  /** Stripe event ID (e.g. from checkout.session.completed) — makes webhook processing idempotent. */
+  stripeEventId: varchar("stripe_event_id", { length: 128 }).unique(),
   status: varchar("status", { length: 32 }).notNull().default("pending"),
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

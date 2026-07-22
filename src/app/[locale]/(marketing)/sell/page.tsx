@@ -1,5 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { BentoCard, BentoTitle, BentoDesc } from "@/components/marketing/bento-card";
@@ -62,6 +62,17 @@ export default async function SellPage({
                     <Link href="/valuation">Get a free valuation</Link>
                   </Button>
                 </div>
+
+                <p className="mt-4 text-xs text-secondary">
+                  Run a yard or dealership?{" "}
+                  <Link
+                    href="/sell/become-seller"
+                    className="font-semibold text-[#141414] underline underline-offset-2 hover:text-[#C97612]"
+                  >
+                    Open a seller account
+                  </Link>{" "}
+                  for inventory tools, lead inbox, and analytics.
+                </p>
 
                 <div className="mt-10 flex flex-wrap gap-6">
                   {[

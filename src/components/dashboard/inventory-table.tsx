@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -22,6 +22,8 @@ import {
   Star,
   Trash2,
   Clock,
+  TrendingDown,
+  Upload,
 } from "lucide-react";
 
 const TABS = ["All", "Active", "Pending", "Reserved", "Sold", "Archived"] as const;
@@ -95,6 +97,34 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
     }
   };
 
+  const changePrice = async (id: string, current: number) => {
+    const input = window.prompt("New price (AED):", String(current));
+    if (input == null) return;
+    const price = Number(input.replace(/[^0-9.]/g, ""));
+    if (!Number.isFinite(price) || price < 1000) {
+      toast.error("Enter a valid price (min AED 1,000)");
+      return;
+    }
+    if (price === current) return;
+    setBusy(id);
+    try {
+      const res = await fetch(`/api/listings/${id}/price`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(
+        price < current ? "Price dropped — buyers will be alerted" : "Price updated",
+      );
+      router.refresh();
+    } catch {
+      toast.error("Could not update price");
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const remove = async (id: string) => {
     setBusy(id);
     try {
@@ -122,8 +152,13 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
             className="flex-1 bg-transparent outline-none text-[#141414] placeholder:text-muted"
           />
         </div>
+        <Button variant="ghost" size="md" asChild>
+          <Link href="/dashboard/inventory/bulk">
+            <Upload className="h-4 w-4" /> Bulk upload
+          </Link>
+        </Button>
         <Button variant="gold" size="md" asChild>
-          <Link href="/sell/new">
+          <Link href="/dashboard/sell/new">
             <Plus className="h-4 w-4" /> Add listing
           </Link>
         </Button>
@@ -230,6 +265,9 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
                         </Item>
                         <Item onClick={() => act(l.id, { status: "sold" }, "Marked sold")}>
                           <Tag className="h-3.5 w-3.5" /> Mark sold
+                        </Item>
+                        <Item onClick={() => changePrice(l.id, l.priceAED)}>
+                          <TrendingDown className="h-3.5 w-3.5" /> Change price
                         </Item>
                         <Item
                           onClick={() =>

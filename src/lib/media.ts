@@ -1,14 +1,22 @@
 import "server-only";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { db } from "@/lib/db";
+import { mediaAssets } from "@/lib/db/schema";
+import { isDbEnabled } from "@/lib/db/enabled";
 
 /**
- * Media upload adapter. When Cloudflare R2 credentials are present we upload to
- * R2 and return CDN URLs. Otherwise we save the real uploaded files to
- * `public/uploads/` and return same-origin `/uploads/...` paths — so the
- * seller's actual photos are shown (works for local + single-server deploys).
+ * Media upload adapter. Storage backend, in priority order:
+ *  1. Cloudflare R2 (CDN URLs) when the CF_R2_* env vars are set.
+ *  2. Postgres — the real bytes are stored in the `media_assets` table and
+ *     served by GET /api/media/[id]. Survives serverless deploys, no external
+ *     bucket needed. This is the default once the DB is connected.
+ *  3. Local `public/uploads/` — only when there's no DB (pure demo mode).
+ *
+ * `isStorageEnabled()` reports whether uploads are durably stored (R2 or DB),
+ * i.e. anything other than the ephemeral local-disk fallback.
  */
-export function isStorageEnabled(): boolean {
+export function isR2Enabled(): boolean {
   return Boolean(
     process.env.CF_R2_ACCOUNT_ID &&
       process.env.CF_R2_ACCESS_KEY_ID &&
@@ -17,9 +25,14 @@ export function isStorageEnabled(): boolean {
   );
 }
 
+export function isStorageEnabled(): boolean {
+  return isR2Enabled() || isDbEnabled();
+}
+
 function safeExt(name: string, type: string) {
   const fromName = (name.split(".").pop() || "").toLowerCase();
-  if (/^(jpe?g|png|webp|avif|gif)$/.test(fromName)) return fromName;
+  if (/^(jpe?g|png|webp|avif|gif|pdf)$/.test(fromName)) return fromName;
+  if (type.includes("pdf")) return "pdf";
   if (type.includes("png")) return "png";
   if (type.includes("webp")) return "webp";
   if (type.includes("avif")) return "avif";
@@ -28,8 +41,36 @@ function safeExt(name: string, type: string) {
 
 let counter = 0;
 
+/**
+ * Generic file upload (images or documents) — same storage chain as
+ * uploadImages, just not restricted to image bytes. Used for KYC documents
+ * (Emirates ID scans, trade license PDFs).
+ */
+export async function uploadFiles(files: File[]): Promise<string[]> {
+  return uploadImages(files);
+}
+
 export async function uploadImages(files: File[]): Promise<string[]> {
-  if (!isStorageEnabled()) {
+  // ---- Postgres storage (default once DB is connected) ----
+  if (!isR2Enabled() && isDbEnabled()) {
+    const urls: string[] = [];
+    for (const file of files) {
+      const bytes = Buffer.from(await file.arrayBuffer());
+      const [row] = await db
+        .insert(mediaAssets)
+        .values({
+          mimeType: file.type || "image/jpeg",
+          size: bytes.length,
+          data: bytes,
+        })
+        .returning({ id: mediaAssets.id });
+      urls.push(`/api/media/${row.id}`);
+    }
+    return urls;
+  }
+
+  // ---- Local disk fallback (pure demo / no DB, no R2) ----
+  if (!isR2Enabled()) {
     // Save the real uploaded files to /public/uploads and return their paths.
     const dir = path.join(process.cwd(), "public", "uploads");
     await mkdir(dir, { recursive: true });

@@ -1,6 +1,7 @@
+import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import {
   getListingById,
@@ -8,7 +9,7 @@ import {
   getListingMedia,
   incrementViewCount,
 } from "@/lib/data/listings";
-import { formatAED, formatKm, monthlyEMI } from "@/lib/utils";
+import { formatAED, formatKm, monthlyEMI, cn } from "@/lib/utils";
 import { ListingGallery } from "@/components/listings/listing-gallery";
 import { FinanceCalculator } from "@/components/listings/finance-calculator";
 import { SaveButton } from "@/components/listings/save-button";
@@ -18,6 +19,15 @@ import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ListingCard } from "@/components/listings/listing-card";
 import { ContactPaywall } from "@/components/listings/paywall";
+import { DealBadge, HighDemandBadge } from "@/components/listings/deal-badge";
+import { isHighDemand } from "@/lib/vehicle-derive";
+import { ReportListingButton } from "@/components/listings/report-listing-button";
+import { InspectionReport } from "@/components/listings/inspection-report";
+import { getInspection } from "@/lib/data/inspection";
+import { VehicleHistory } from "@/components/listings/vehicle-history";
+import { getVehicleHistory } from "@/lib/data/vehicle-history";
+import { PriceHistoryTable } from "@/components/listings/price-history-table";
+import { getPriceHistory } from "@/lib/data/price";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import {
   Heart,
@@ -39,7 +49,59 @@ import {
   FileText,
   ShieldCheck,
   Sparkles,
+  Clock,
 } from "lucide-react";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://dxbmotors.ae";
+
+/** Human "days on market" signal from a listing's listed/created date. */
+function daysOnMarket(listedAt?: string): string | null {
+  if (!listedAt) return null;
+  const days = Math.floor((Date.now() - new Date(listedAt).getTime()) / 86_400_000);
+  if (days < 0) return null;
+  if (days === 0) return "Listed today";
+  if (days === 1) return "Listed yesterday";
+  if (days <= 30) return `Listed ${days} days ago`;
+  return `On the market ${Math.floor(days / 30)} mo`;
+}
+
+/** Per-car SEO: unique title, description and OG image so each listing ranks. */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, id, slug } = await params;
+  const listing = await getListingById(id);
+  if (!listing) return { title: "Car not found — DXB Motors" };
+
+  const title = `${listing.year} ${listing.make} ${listing.model}${listing.trim ? ` ${listing.trim}` : ""} for sale in ${listing.emirate} — ${formatAED(listing.priceAED)}`;
+  const description = `${listing.year} ${listing.make} ${listing.model} · ${formatKm(listing.kms, locale as "en" | "ar")} · ${listing.fuel} · ${listing.transmission} · ${listing.regionalSpec} spec. ${formatAED(listing.priceAED)} at ${listing.dealer.name}, ${listing.emirate}. View photos, specs and finance options on DXB Motors.`;
+  const image = listing.imageUrl?.startsWith("http")
+    ? listing.imageUrl
+    : `${SITE_URL}${listing.imageUrl ?? ""}`;
+  const canonical = `${SITE_URL}/${locale}/listings/${id}/${slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "website",
+      images: image ? [{ url: image, width: 1200, height: 630 }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
+}
 
 export default async function ListingDetailPage({
   params,
@@ -52,9 +114,12 @@ export default async function ListingDetailPage({
   if (!listing) notFound();
 
   const t = await getTranslations("listing");
-  const [similar, media] = await Promise.all([
+  const [similar, media, inspection, history, priceHistory] = await Promise.all([
     getSimilarListings(listing, 4),
     getListingMedia(id),
+    getInspection(listing),
+    getVehicleHistory(listing),
+    getPriceHistory(id),
   ]);
   // fire-and-forget view counter (no-op when DB is off)
   void incrementViewCount(id);
@@ -62,6 +127,10 @@ export default async function ListingDetailPage({
   const gallery = media.length > 0 ? media : [listing.imageUrl];
   const emi = monthlyEMI(listing.priceAED);
   const listingTitle = `${listing.year} ${listing.make} ${listing.model}`;
+  // "Service history" is a real signal only when the seller listed it as a feature.
+  const hasServiceHistory = (listing.features ?? []).some((f) =>
+    /service history|full history|dealer history/i.test(f),
+  );
 
   const specs = [
     { icon: Calendar, label: t("year"), value: listing.year },
@@ -125,7 +194,7 @@ export default async function ListingDetailPage({
         </div>
 
         <div className="mx-auto max-w-7xl px-4 lg:px-6 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
             {/* LEFT */}
             <div className="min-w-0">
               {/* Gallery */}
@@ -142,29 +211,52 @@ export default async function ListingDetailPage({
               />
 
               {/* Title + price */}
-              <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
+              <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <Eyebrow tone="gold">{listing.regionalSpec} SPEC</Eyebrow>
                   <h1 className="mt-2 text-xl lg:text-2xl font-bold tracking-tight leading-tight">
                     {listingTitle}
                   </h1>
-                  {listing.trim && (
-                    <p className="mt-1 text-xs text-secondary">{listing.trim}</p>
-                  )}
+                  <div className="mt-1 flex items-center gap-2 flex-wrap">
+                    {listing.trim && (
+                      <p className="text-xs text-secondary">{listing.trim}</p>
+                    )}
+                    {daysOnMarket(listing.listedAt) && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-muted">
+                        <Clock className="h-3 w-3" />
+                        {daysOnMarket(listing.listedAt)}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xl lg:text-2xl font-bold text-[#141414] leading-none">
-                    {formatAED(listing.priceAED, locale as "en" | "ar")}
+                  <div className="flex items-center justify-end gap-2">
+                    <div className="text-xl lg:text-2xl font-bold text-[#141414] leading-none">
+                      {formatAED(listing.priceAED, locale as "en" | "ar")}
+                    </div>
+                    <DealBadge rating={listing.dealRating} />
+                    <HighDemandBadge show={isHighDemand(listing)} />
                   </div>
-                  <div className="mt-1 text-[10px] text-muted">
-                    From {formatAED(emi, locale as "en" | "ar")} / month
-                  </div>
+                  {listing.previousPrice ? (
+                    <div className="mt-1 flex items-center justify-end gap-1.5">
+                      <span className="text-[11px] text-muted line-through">
+                        {formatAED(listing.previousPrice, locale as "en" | "ar")}
+                      </span>
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-[#137A43] text-white px-1.5 py-0.5 text-[10px] font-semibold">
+                        {formatAED(listing.previousPrice - listing.priceAED, locale as "en" | "ar")} price drop
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-[10px] text-muted">
+                      From {formatAED(emi, locale as "en" | "ar")} / month
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Specs grid */}
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="mt-5">
+                <div className="flex items-center gap-2 mb-2.5">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("specs")}</h2>
                   <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
@@ -187,8 +279,8 @@ export default async function ListingDetailPage({
               </div>
 
               {/* Description */}
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="mt-5">
+                <div className="flex items-center gap-2 mb-2.5">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("description")}</h2>
                   <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
@@ -198,8 +290,8 @@ export default async function ListingDetailPage({
               </div>
 
               {/* Features */}
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="mt-5">
+                <div className="flex items-center gap-2 mb-2.5">
                   <h2 className="text-sm font-semibold uppercase tracking-wider">{t("features")}</h2>
                   <div className="h-px bg-[#E7E4DA] flex-1" />
                 </div>
@@ -216,11 +308,36 @@ export default async function ListingDetailPage({
                 </div>
               </div>
 
-              {/* Finance calculator */}
+              {/* Inspection report */}
+              {inspection && (
+                <div id="inspection" className="mt-5 scroll-mt-20">
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <h2 className="text-sm font-semibold uppercase tracking-wider">
+                      Inspection report
+                    </h2>
+                    <div className="h-px bg-[#E7E4DA] flex-1" />
+                  </div>
+                  <InspectionReport report={inspection} />
+                </div>
+              )}
+
+              {/* Vehicle history — collapsed by default, one-line summary visible */}
+              <div id="history" className="mt-5 scroll-mt-20">
+                <VehicleHistory report={history} />
+              </div>
+
+              {/* Price history */}
+              {priceHistory.length > 0 && (
+                <div className="mt-5">
+                  <PriceHistoryTable points={priceHistory} locale={locale as "en" | "ar"} />
+                </div>
+              )}
+
+              {/* Finance calculator — collapsed by default, live EMI shown in header */}
               <FinanceCalculator
                 price={listing.priceAED}
                 locale={locale as "en" | "ar"}
-                className="mt-6"
+                className="mt-5"
               />
             </div>
 
@@ -254,6 +371,8 @@ export default async function ListingDetailPage({
                   <ContactPaywall
                     listingId={listing.id}
                     listingTitle={listingTitle}
+                    dealerPhone={listing.dealer.phone}
+                    dealerWhatsapp={listing.dealer.whatsapp}
                   />
                 </div>
 
@@ -263,6 +382,9 @@ export default async function ListingDetailPage({
                 >
                   View storefront →
                 </Link>
+                <div className="mt-2 flex justify-center">
+                  <ReportListingButton listingId={listing.id} />
+                </div>
               </div>
 
               {/* Export panel */}
@@ -284,21 +406,57 @@ export default async function ListingDetailPage({
                 </div>
               )}
 
-              {/* Trust strip */}
+              {/* Trust strip — reflects real listing/dealer data, not static text */}
               <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-3">
                 <div className="space-y-1.5 text-[11px]">
-                  <div className="flex items-center gap-1.5 text-secondary">
-                    <ShieldCheck className="h-3 w-3 text-[#F0941F]" />
-                    Verified dealer
+                  <div
+                    className={cn(
+                      "flex items-center gap-1.5",
+                      listing.dealer.isVerified
+                        ? "text-secondary"
+                        : "text-muted",
+                    )}
+                  >
+                    <ShieldCheck
+                      className={cn(
+                        "h-3 w-3",
+                        listing.dealer.isVerified
+                          ? "text-[#137A43]"
+                          : "text-[#B8B2A0]",
+                      )}
+                    />
+                    {listing.dealer.isVerified
+                      ? "Verified dealer"
+                      : "Dealer not yet verified"}
                   </div>
-                  <div className="flex items-center gap-1.5 text-secondary">
-                    <FileText className="h-3 w-3 text-[#F0941F]" />
-                    Full service history
-                  </div>
-                  <div className="flex items-center gap-1.5 text-secondary">
-                    <Sparkles className="h-3 w-3 text-[#F0941F]" />
-                    Inspection on request
-                  </div>
+                  {hasServiceHistory && (
+                    <div className="flex items-center gap-1.5 text-secondary">
+                      <FileText className="h-3 w-3 text-[#F0941F]" />
+                      Full service history
+                    </div>
+                  )}
+                  {inspection ? (
+                    <a
+                      href="#inspection"
+                      className="flex items-center gap-1.5 text-secondary hover:text-[#137A43] transition-colors"
+                    >
+                      <Sparkles className="h-3 w-3 text-[#137A43]" />
+                      <span className="underline decoration-dotted underline-offset-2">
+                        {inspection.points}-point inspection report
+                      </span>
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-1.5 text-muted">
+                      <Sparkles className="h-3 w-3 text-[#B8B2A0]" />
+                      Inspection on request
+                    </div>
+                  )}
+                  {listing.vin && (
+                    <div className="flex items-center gap-1.5 text-secondary">
+                      <FileText className="h-3 w-3 text-[#F0941F]" />
+                      VIN: <span className="font-mono">{listing.vin}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -306,7 +464,7 @@ export default async function ListingDetailPage({
 
           {/* Similar */}
           {similar.length > 0 && (
-            <div className="mt-16">
+            <div className="mt-8">
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <Eyebrow tone="gold">SIMILAR CARS</Eyebrow>

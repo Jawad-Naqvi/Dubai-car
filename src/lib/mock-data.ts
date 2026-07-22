@@ -12,10 +12,18 @@ export interface MockListing {
   kms: number;
   priceAED: number;
   bodyType: string;
+  /** Prior price before the latest change — set → show a price-drop badge. */
+  previousPrice?: number;
   fuel: string;
   transmission: string;
+  /** Optional — derived from body/model when absent (see vehicle-derive.ts). */
+  drivetrain?: string;
+  /** Great / Good / Fair vs peer prices — see computeDealRating. */
+  dealRating?: "Great" | "Good" | "Fair";
   regionalSpec: string;
   exteriorColor: string;
+  /** Chassis / VIN, shown on the detail page when the seller provided it. */
+  vin?: string;
   emirate: string;
   dealer: {
     id: string;
@@ -24,6 +32,8 @@ export interface MockListing {
     isVerified: boolean;
     rating: number;
     reviewCount: number;
+    phone?: string;
+    whatsapp?: string;
   };
   isFeatured: boolean;
   isInspected: boolean;
@@ -34,6 +44,11 @@ export interface MockListing {
   imageUrls: string[];
   description: string;
   features: string[];
+  /** Real lifetime counters (DB mode only) — power the High Demand badge. */
+  viewCount?: number;
+  inquiryCount?: number;
+  /** When the listing went live / was created — powers the days-on-market signal. */
+  listedAt?: string;
 }
 
 /**

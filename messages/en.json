@@ -164,6 +164,8 @@
     "title": "Filters",
     "make": "Make",
     "model": "Model",
+    "modelSearchPlaceholder": "Search models…",
+    "modelNoCatalog": "No model list available for this make yet.",
     "yearFrom": "Year from",
     "yearTo": "Year to",
     "priceFrom": "Price from",
@@ -203,7 +205,10 @@
       "yearDesc": "Year: Newest",
       "kmAsc": "Km: Lowest",
       "relevance": "Relevance"
-    }
+    },
+    "drivetrain": "Drivetrain",
+    "dealRating": "Deal rating",
+    "trim": "Trim"
   },
   "export": {
     "eyebrow": "B2B EXPORT",
@@ -259,7 +264,25 @@
           "cta": "Explore",
           "href": "/export"
         }
-      ]
+      ],
+      "orSearchBy": "or search by",
+      "shopTab": "Shop cars for sale",
+      "sellTab": "Sell your car",
+      "sell": {
+        "heading": "What's your car worth?",
+        "make": "Make",
+        "makePlaceholder": "Select make",
+        "model": "Model",
+        "modelPlaceholder": "e.g. Land Cruiser",
+        "year": "Year",
+        "kms": "Kilometers",
+        "intentLabel": "I want to:",
+        "intentEstimate": "Get an instant estimate",
+        "intentList": "List my car for sale",
+        "cta": "Get estimate",
+        "ctaList": "Start listing",
+        "hint": "Free · No obligation · Blended with live market data"
+      }
     },
     "featuredWork": "Featured Inventory",
     "topSelling": {

@@ -34,6 +34,14 @@ export interface DemoLead {
   createdAt: string;
 }
 
+export interface DemoLeadReply {
+  id: string;
+  leadId: string;
+  senderRole: "buyer" | "dealer";
+  body: string;
+  createdAt: string;
+}
+
 export interface DemoValuation {
   id: string;
   make: string;
@@ -69,6 +77,7 @@ export interface DemoPayment {
 
 interface Store {
   leads: DemoLead[];
+  leadReplies: DemoLeadReply[];
   newListings: DemoListing[];
   valuations: DemoValuation[];
   b2bBuyers: DemoB2BBuyer[];
@@ -82,6 +91,7 @@ export function demoStore(): Store {
   const s = (g.__dxbDemo ??= {});
   // Backfill any fields added after the global was first created (survives HMR).
   s.leads ??= [];
+  s.leadReplies ??= [];
   s.newListings ??= [];
   s.valuations ??= [];
   s.b2bBuyers ??= [];

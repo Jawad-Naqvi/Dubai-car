@@ -15,6 +15,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import type { PgColumn } from "drizzle-orm/pg-core";
 import { db } from "@/lib/db";
 import { listings, dealers, listingMedia, type Listing } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
@@ -22,6 +23,9 @@ import {
   mockListings,
   type MockListing,
 } from "@/lib/mock-data";
+import { deriveDrivetrain, computeDealRating } from "@/lib/vehicle-derive";
+import type { DealRating } from "@/lib/brand";
+import { carImageUrl } from "@/lib/car-images";
 import { demoStore } from "./demo-store";
 
 /** Public universe in demo mode: seeded mock cars + approved user-created cars. */
@@ -37,14 +41,21 @@ export type SortKey =
   | "price_asc"
   | "price_desc"
   | "year_desc"
-  | "kms_asc";
+  | "kms_asc"
+  /** cars.com "Best deal" — Great Deal first, then Good, then Fair/unrated. */
+  | "deal_desc";
 
 export interface ListingSearchParams {
   q?: string;
   make?: string[];
+  model?: string[];
+  trim?: string[];
   bodyType?: string[];
   fuel?: string[];
   transmission?: string[];
+  drivetrain?: string[];
+  /** Computed vs peer pricing: "Great" | "Good" | "Fair" */
+  dealRating?: string[];
   regionalSpec?: string[];
   emirate?: string[];
   condition?: string[];
@@ -68,6 +79,10 @@ export interface ListingSearchParams {
   dealerId?: string;
   sellerId?: string;
   status?: string;
+  /** Only listings created after this instant (used by saved-search alerts). */
+  createdAfter?: Date;
+  /** Restrict to these listing ids (used by price-drop alert matching). */
+  ids?: string[];
   sort?: SortKey;
   page?: number;
   perPage?: number;
@@ -81,11 +96,15 @@ export interface ListingSearchResult {
   totalPages: number;
   facets: {
     makes: { value: string; count: number }[];
+    models: { value: string; count: number }[];
+    trims: { value: string; count: number }[];
     bodyTypes: { value: string; count: number }[];
     emirates: { value: string; count: number }[];
     fuels: { value: string; count: number }[];
+    drivetrains: { value: string; count: number }[];
     colors: { value: string; count: number }[];
     conditions: { value: string; count: number }[];
+    dealRatings: { value: string; count: number }[];
   };
 }
 
@@ -102,6 +121,8 @@ type DbRow = {
   dealerVerified: boolean | null;
   dealerRating: number | null;
   dealerReviews: number | null;
+  dealerPhone: string | null;
+  dealerWhatsapp: string | null;
   heroUrl: string | null;
 };
 
@@ -116,11 +137,18 @@ function rowToView(r: DbRow): MockListing {
     year: l.year,
     kms: l.kms,
     priceAED: l.priceAED,
+    previousPrice:
+      l.previousPrice && l.previousPrice > l.priceAED
+        ? l.previousPrice
+        : undefined,
     bodyType: l.bodyType ?? "—",
     fuel: l.fuel ?? "—",
     transmission: l.transmission ?? "—",
+    drivetrain: l.drivetrain ?? undefined,
+    dealRating: (l.dealRating as MockListing["dealRating"]) ?? undefined,
     regionalSpec: l.regionalSpec ?? "—",
     exteriorColor: l.colorExterior ?? "—",
+    vin: l.vin ?? undefined,
     emirate: l.emirate,
     dealer: {
       id: l.dealerId ?? "private",
@@ -129,6 +157,8 @@ function rowToView(r: DbRow): MockListing {
       isVerified: r.dealerVerified ?? false,
       rating: r.dealerRating ?? 0,
       reviewCount: r.dealerReviews ?? 0,
+      phone: r.dealerPhone ?? undefined,
+      whatsapp: r.dealerWhatsapp ?? undefined,
     },
     isFeatured: l.isFeatured,
     isInspected: l.isInspected,
@@ -137,12 +167,19 @@ function rowToView(r: DbRow): MockListing {
     status: (l.status === "reserved" || l.status === "sold"
       ? l.status
       : "active") as MockListing["status"],
+    // A listing with no dealer-uploaded photo gets a real (IMAGIN, if
+    // configured) or branded-placeholder image — never a generic stock
+    // photo, which could show the wrong item entirely (this replaced a
+    // hardcoded Unsplash fallback that was showing earbuds on car listings).
     imageUrl:
       r.heroUrl ||
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80",
+      carImageUrl({ make: l.make, model: l.model, year: l.year }),
     imageUrls: r.heroUrl ? [r.heroUrl] : [],
     description: l.description ?? "",
     features: (l.features as string[] | null) ?? [],
+    viewCount: l.viewCount,
+    inquiryCount: l.inquiryCount,
+    listedAt: (l.publishedAt ?? l.createdAt)?.toISOString(),
   };
 }
 
@@ -201,6 +238,16 @@ function matchSellerType(l: MockListing, sellerType?: string) {
   return sellerType === "private" ? isPrivate : !isPrivate;
 }
 
+/** Deal rating is computed vs the whole public universe; memoize per listing. */
+const _dealRatingCache = new WeakMap<MockListing, DealRating | null>();
+function dealRatingOf(l: MockListing): DealRating | null {
+  const hit = _dealRatingCache.get(l);
+  if (hit !== undefined) return hit;
+  const r = computeDealRating(l, demoUniverse());
+  _dealRatingCache.set(l, r);
+  return r;
+}
+
 function filterMock(p: ListingSearchParams): MockListing[] {
   let items = demoUniverse().filter((l) => {
     if (p.q) {
@@ -208,10 +255,18 @@ function filterMock(p: ListingSearchParams): MockListing[] {
         `${l.year} ${l.make} ${l.model} ${l.trim ?? ""} ${l.exteriorColor} ${l.bodyType} ${l.description} ${(l.features ?? []).join(" ")}`.toLowerCase();
       if (!hay.includes(p.q.toLowerCase())) return false;
     }
+    if (p.ids?.length && !p.ids.includes(l.id)) return false;
     if (!matchMulti(l.make, p.make)) return false;
+    if (!matchMulti(l.model, p.model)) return false;
+    if (p.trim?.length && !matchMulti(l.trim ?? "", p.trim)) return false;
     if (!matchMulti(l.bodyType, p.bodyType)) return false;
     if (!matchMulti(l.fuel, p.fuel)) return false;
     if (!matchMulti(l.transmission, p.transmission)) return false;
+    if (!matchMulti(deriveDrivetrain(l), p.drivetrain)) return false;
+    if (p.dealRating?.length) {
+      const r = dealRatingOf(l);
+      if (!r || !p.dealRating.includes(r)) return false;
+    }
     if (!matchMulti(l.regionalSpec, p.regionalSpec)) return false;
     if (!matchMulti(l.emirate, p.emirate)) return false;
     if (!matchCondition(l, p.condition)) return false;
@@ -245,6 +300,15 @@ function filterMock(p: ListingSearchParams): MockListing[] {
     case "kms_asc":
       items = items.sort((a, b) => a.kms - b.kms);
       break;
+    case "deal_desc": {
+      const rank: Record<DealRating, number> = { Great: 0, Good: 1, Fair: 2 };
+      items = items.sort((a, b) => {
+        const ra = dealRatingOf(a);
+        const rb = dealRatingOf(b);
+        return (ra ? rank[ra] : 3) - (rb ? rank[rb] : 3);
+      });
+      break;
+    }
     default:
       // "newest" — featured first, then keep declared order
       items = items.sort(
@@ -295,7 +359,9 @@ async function runSearchListings(
     const all = filterMock(p);
     const total = all.length;
     const start = (page - 1) * perPage;
-    const items = all.slice(start, start + perPage);
+    const items = all
+      .slice(start, start + perPage)
+      .map((l) => ({ ...l, dealRating: dealRatingOf(l) ?? undefined }));
     return {
       items,
       total,
@@ -304,6 +370,14 @@ async function runSearchListings(
       totalPages: Math.max(1, Math.ceil(total / perPage)),
       facets: {
         makes: facetCounts(filterMock({ ...p, make: undefined }), (l) => l.make),
+        models: facetCounts(
+          filterMock({ ...p, model: undefined }),
+          (l) => l.model,
+        ),
+        trims: facetCounts(
+          filterMock({ ...p, trim: undefined }).filter((l) => l.trim),
+          (l) => l.trim!,
+        ),
         bodyTypes: facetCounts(
           filterMock({ ...p, bodyType: undefined }),
           (l) => l.bodyType,
@@ -313,6 +387,10 @@ async function runSearchListings(
           (l) => l.emirate,
         ),
         fuels: facetCounts(filterMock({ ...p, fuel: undefined }), (l) => l.fuel),
+        drivetrains: facetCounts(
+          filterMock({ ...p, drivetrain: undefined }),
+          (l) => deriveDrivetrain(l),
+        ),
         colors: facetCounts(
           filterMock({ ...p, color: undefined }).filter((l) =>
             colorFamily(l.exteriorColor, EXTERIOR_COLOR_FAMILIES),
@@ -322,6 +400,10 @@ async function runSearchListings(
         conditions: facetCounts(
           filterMock({ ...p, condition: undefined }),
           (l) => (l.isNew ? "New" : "Used"),
+        ),
+        dealRatings: facetCounts(
+          filterMock({ ...p, dealRating: undefined }).filter((l) => dealRatingOf(l)),
+          (l) => dealRatingOf(l)!,
         ),
       },
     };
@@ -350,6 +432,8 @@ async function runSearchListings(
         return desc(listings.year);
       case "kms_asc":
         return asc(listings.kms);
+      case "deal_desc":
+        return sql`case ${listings.dealRating} when 'Great' then 0 when 'Good' then 1 when 'Fair' then 2 else 3 end`;
       default:
         return [desc(listings.isFeatured), desc(listings.publishedAt)];
     }
@@ -375,6 +459,8 @@ async function runSearchListings(
       dealerVerified: dealers.isVerified,
       dealerRating: dealers.rating,
       dealerReviews: dealers.reviewCount,
+      dealerPhone: dealers.phone,
+      dealerWhatsapp: dealers.whatsapp,
       heroUrl: hero.url,
     })
     .from(listings)
@@ -393,28 +479,60 @@ async function runSearchListings(
     .where(and(...conds));
   const total = countRows[0]?.c ?? 0;
 
-  const facetRows = (await db
-    .select({
-      make: listings.make,
-      bodyType: listings.bodyType,
-      emirate: listings.emirate,
-      fuel: listings.fuel,
-      colorExterior: listings.colorExterior,
-      condition: listings.condition,
-    })
-    .from(listings)
-    .where(and(...conds))) as Pick<
-    Listing,
-    "make" | "bodyType" | "emirate" | "fuel" | "colorExterior" | "condition"
-  >[];
-
-  const tally = (vals: (string | null)[]) => {
-    const m = new Map<string, number>();
-    for (const v of vals) if (v) m.set(v, (m.get(v) ?? 0) + 1);
-    return Array.from(m.entries())
-      .map(([value, count]) => ({ value, count }))
+  /**
+   * Each facet is counted with its OWN filter excluded, so picking "Toyota"
+   * still shows how many BMWs you'd get if you switched — the way cars.com and
+   * every mature faceted search behaves. Counting with the full condition set
+   * would collapse each list to just the selected value.
+   */
+  const facetFor = async (
+    key: keyof ListingSearchParams,
+    column: PgColumn,
+  ): Promise<{ value: string; count: number }[]> => {
+    const rows = (await db
+      .select({ value: column, count: sql<number>`count(*)::int` })
+      .from(listings)
+      .where(and(...buildConditions({ ...resolved, [key]: undefined })))
+      .groupBy(column)) as { value: string | null; count: number }[];
+    return rows
+      .filter((r) => Boolean(r.value))
+      .map((r) => ({ value: r.value as string, count: r.count }))
       .sort((a, b) => b.count - a.count);
   };
+
+  const [
+    makes,
+    models,
+    trims,
+    bodyTypesF,
+    emiratesF,
+    fuels,
+    drivetrainsF,
+    colorRows,
+    conditionsF,
+    dealRatingsF,
+  ] = await Promise.all([
+    facetFor("make", listings.make),
+    facetFor("model", listings.model),
+    facetFor("trim", listings.trim),
+    facetFor("bodyType", listings.bodyType),
+    facetFor("emirate", listings.emirate),
+    facetFor("fuel", listings.fuel),
+    facetFor("drivetrain", listings.drivetrain),
+    facetFor("color", listings.colorExterior),
+    facetFor("condition", listings.condition),
+    facetFor("dealRating", listings.dealRating),
+  ]);
+
+  // Free-text colors ("Nardo Grey") roll up into the swatch families.
+  const colorMap = new Map<string, number>();
+  for (const r of colorRows) {
+    const fam = colorFamily(r.value, EXTERIOR_COLOR_FAMILIES);
+    if (fam) colorMap.set(fam, (colorMap.get(fam) ?? 0) + r.count);
+  }
+  const colors = Array.from(colorMap, ([value, count]) => ({ value, count })).sort(
+    (a, b) => b.count - a.count,
+  );
 
   return {
     items: rows.map(rowToView),
@@ -423,17 +541,18 @@ async function runSearchListings(
     perPage,
     totalPages: Math.max(1, Math.ceil(total / perPage)),
     facets: {
-      makes: tally(facetRows.map((r) => r.make)),
-      bodyTypes: tally(facetRows.map((r) => r.bodyType)),
-      emirates: tally(facetRows.map((r) => r.emirate)),
-      fuels: tally(facetRows.map((r) => r.fuel)),
-      colors: tally(
-        facetRows.map((r) =>
-          colorFamily(r.colorExterior ?? undefined, EXTERIOR_COLOR_FAMILIES) ??
-          null,
-        ),
-      ),
-      conditions: tally(facetRows.map((r) => r.condition)),
+      makes,
+      models,
+      trims,
+      bodyTypes: bodyTypesF,
+      emirates: emiratesF,
+      fuels,
+      drivetrains: drivetrainsF,
+      colors,
+      conditions: conditionsF,
+      // Deal rating is denormalised onto listings.deal_rating (set on write +
+      // backfill), so it faceted like any other column.
+      dealRatings: dealRatingsF,
     },
   };
 }
@@ -456,10 +575,20 @@ function buildConditions(p: ListingSearchParams) {
     );
   }
   if (p.make?.length) conds.push(inArray(listings.make, p.make));
+  // Model values are entered by dealers with inconsistent casing (e.g. "m5" vs
+  // "M5"), so match case-insensitively rather than with an exact inArray.
+  if (p.model?.length) {
+    conds.push(or(...p.model.map((m) => ilike(listings.model, m)))!);
+  }
+  if (p.trim?.length) conds.push(inArray(listings.trim, p.trim));
   if (p.bodyType?.length) conds.push(inArray(listings.bodyType, p.bodyType));
   if (p.fuel?.length) conds.push(inArray(listings.fuel, p.fuel));
   if (p.transmission?.length)
     conds.push(inArray(listings.transmission, p.transmission));
+  if (p.drivetrain?.length)
+    conds.push(inArray(listings.drivetrain, p.drivetrain));
+  if (p.dealRating?.length)
+    conds.push(inArray(listings.dealRating, p.dealRating));
   if (p.regionalSpec?.length)
     conds.push(inArray(listings.regionalSpec, p.regionalSpec));
   if (p.emirate?.length) conds.push(inArray(listings.emirate, p.emirate));
@@ -501,6 +630,8 @@ function buildConditions(p: ListingSearchParams) {
   if (p.featured) conds.push(eq(listings.isFeatured, true));
   if (p.dealerId) conds.push(eq(listings.dealerId, p.dealerId));
   if (p.sellerId) conds.push(eq(listings.sellerId, p.sellerId));
+  if (p.createdAfter) conds.push(gte(listings.createdAt, p.createdAfter));
+  if (p.ids?.length) conds.push(inArray(listings.id, p.ids));
   return conds;
 }
 
@@ -510,14 +641,26 @@ const cachedGetById = unstable_cache(
   { revalidate: 120, tags: ["listings"] },
 );
 
+/**
+ * Postgres ids are UUIDs; seeded mock ids ("L-004") are not. Guarding on this
+ * lets mock-linked pages (homepage promos, carousels) resolve from mock data
+ * instead of throwing "invalid input syntax for type uuid" when the DB is on.
+ */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function mockById(id: string): MockListing | null {
+  const found =
+    demoStore().newListings.find((l) => l.id === id) ??
+    mockListings.find((l) => l.id === id) ??
+    null;
+  return found
+    ? { ...found, dealRating: dealRatingOf(found) ?? undefined }
+    : null;
+}
+
 export async function getListingById(id: string): Promise<MockListing | null> {
-  if (!isDbEnabled()) {
-    return (
-      demoStore().newListings.find((l) => l.id === id) ??
-      mockListings.find((l) => l.id === id) ??
-      null
-    );
-  }
+  if (!isDbEnabled() || !UUID_RE.test(id)) return mockById(id);
   return cachedGetById(id);
 }
 
@@ -541,6 +684,8 @@ async function runGetListingById(id: string): Promise<MockListing | null> {
       dealerVerified: dealers.isVerified,
       dealerRating: dealers.rating,
       dealerReviews: dealers.reviewCount,
+      dealerPhone: dealers.phone,
+      dealerWhatsapp: dealers.whatsapp,
       heroUrl: hero.url,
     })
     .from(listings)
@@ -577,7 +722,7 @@ const cachedMedia = unstable_cache(
 );
 
 export async function getListingMedia(id: string): Promise<string[]> {
-  if (!isDbEnabled()) {
+  if (!isDbEnabled() || !UUID_RE.test(id)) {
     const found = await getListingById(id);
     return found?.imageUrls ?? [];
   }
@@ -621,7 +766,7 @@ export async function getFeaturedListings(limit = 6): Promise<MockListing[]> {
 }
 
 export async function incrementViewCount(id: string): Promise<void> {
-  if (!isDbEnabled()) return;
+  if (!isDbEnabled() || !UUID_RE.test(id)) return;
   await db
     .update(listings)
     .set({ viewCount: sql`${listings.viewCount} + 1` })

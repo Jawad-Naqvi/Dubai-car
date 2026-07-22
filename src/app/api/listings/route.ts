@@ -6,6 +6,7 @@ import {
 import { parseFromURL } from "@/lib/data/search-params";
 import { createListing } from "@/lib/data/listing-write";
 import { getOrSyncUser } from "@/lib/data/users";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -21,8 +22,16 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   // Listing is open to guests (private sellers); we attach the user when signed
-  // in so dealers get ownership + quota tracking. Tighten this in production if
-  // you require accounts to list.
+  // in so dealers get ownership + quota tracking. Rate-limited per IP so the
+  // open endpoint can't be used to spam the marketplace with listings.
+  const rl = rateLimit(`listings:${clientIp(req)}`, 8, 60 * 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Listing limit reached, try again later." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
+  }
+
   const body = await req.json().catch(() => null);
   if (!body) return new NextResponse("Invalid JSON", { status: 400 });
 

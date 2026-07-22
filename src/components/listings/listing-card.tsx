@@ -1,11 +1,13 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatAED, monthlyEMI } from "@/lib/utils";
-import { MapPin, Gauge, Calendar, Fuel, Lock, BadgeCheck } from "lucide-react";
+import { MapPin, Gauge, Calendar, Fuel, Lock, BadgeCheck, TrendingDown } from "lucide-react";
 import type { MockListing } from "@/lib/mock-data";
 import { SaveButton } from "./save-button";
 import { CompareButton } from "./compare-button";
+import { DealBadge, HighDemandBadge } from "./deal-badge";
+import { isHighDemand } from "@/lib/vehicle-derive";
 
 export function ListingCard({
   listing,
@@ -38,6 +40,7 @@ export function ListingCard({
             </Badge>
           )}
           {listing.status === "reserved" && <Badge tone="reserved">Reserved</Badge>}
+          <HighDemandBadge show={isHighDemand(listing)} />
         </div>
 
         <div className="absolute top-2 right-2 flex flex-col gap-1.5">
@@ -63,12 +66,27 @@ export function ListingCard({
 
         <div className="mt-2.5 flex items-end justify-between gap-2">
           <div>
-            <div className="text-lg font-bold text-[#141414] leading-none">
-              {formatAED(listing.priceAED, locale)}
+            <div className="flex items-center gap-1.5">
+              <div className="text-lg font-bold text-[#141414] leading-none">
+                {formatAED(listing.priceAED, locale)}
+              </div>
+              <DealBadge rating={listing.dealRating} showIcon={false} />
             </div>
-            <div className="mt-0.5 text-[10px] text-muted">
-              From {formatAED(monthlyEMI(listing.priceAED), locale)}/mo
-            </div>
+            {listing.previousPrice ? (
+              <div className="mt-0.5 flex items-center gap-1.5">
+                <span className="text-[10px] text-muted line-through">
+                  {formatAED(listing.previousPrice, locale)}
+                </span>
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#137A43] text-white px-1.5 py-0.5 text-[9px] font-semibold leading-none">
+                  <TrendingDown className="h-2 w-2" />
+                  {formatAED(listing.previousPrice - listing.priceAED, locale)} off
+                </span>
+              </div>
+            ) : (
+              <div className="mt-0.5 text-[10px] text-muted">
+                From {formatAED(monthlyEMI(listing.priceAED), locale)}/mo
+              </div>
+            )}
           </div>
           <div className="text-[10px] text-secondary text-right">
             <div>{listing.regionalSpec}</div>

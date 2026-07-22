@@ -8,6 +8,7 @@ import { emirates } from "@/lib/brand";
 
 const SORT_LABELS: Record<string, string> = {
   newest: "Newest first",
+  deal_desc: "Best deal",
   price_asc: "Price: low to high",
   price_desc: "Price: high to low",
   year_desc: "Year: newest",

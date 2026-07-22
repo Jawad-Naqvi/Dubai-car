@@ -1,10 +1,50 @@
 import "server-only";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/lib/db";
-import { leads, listings, type Lead } from "@/lib/db/schema";
+import { leads, listings, dealers, users, leadReplies, type Lead } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId, type DemoLead } from "./demo-store";
-import { sendLeadNotification } from "@/lib/notify";
+import { sendLeadNotification, sendEmail } from "@/lib/notify";
+
+const LEAD_TYPE_LABEL: Record<string, string> = {
+  inquiry: "enquiry",
+  test_drive: "test-drive request",
+  contact_unlock: "contact unlock",
+  export_inquiry: "export enquiry",
+  finance_preapproval: "finance pre-approval request",
+};
+
+/** Build the seller/dealer notification for a new lead. */
+function buildLeadEmail(opts: {
+  to?: string;
+  type: string;
+  buyerName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
+  message?: string;
+  listingTitle?: string;
+}) {
+  const label = LEAD_TYPE_LABEL[opts.type] ?? "enquiry";
+  const car = opts.listingTitle ? ` on ${opts.listingTitle}` : "";
+  const lines = [
+    `You have a new ${label}${car}.`,
+    "",
+    `Buyer:  ${opts.buyerName ?? "—"}`,
+    `Phone:  ${opts.buyerPhone ?? "—"}`,
+    `Email:  ${opts.buyerEmail ?? "—"}`,
+    opts.message ? `\nMessage:\n${opts.message}` : "",
+    "",
+    "Reply to this email to reach the buyer directly, or open your dashboard:",
+    "https://dxbmotors.ae/dashboard/leads",
+  ];
+  return {
+    to: opts.to,
+    replyTo: opts.buyerEmail,
+    subject: `New ${label}${car} — ${opts.buyerName ?? "a buyer"}`,
+    body: lines.filter((l) => l !== undefined).join("\n"),
+  };
+}
 
 export interface CreateLeadInput {
   listingId?: string;
@@ -53,25 +93,49 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
       createdAt: new Date().toISOString(),
     };
     store.leads.unshift(lead);
-    void sendLeadNotification({
-      subject: `New ${type} lead from ${input.buyerName ?? "a buyer"}`,
-      body: `${input.message ?? ""}\nContact: ${input.buyerPhone ?? input.buyerEmail ?? "—"}`,
-    });
+    void sendLeadNotification(
+      buildLeadEmail({
+        type,
+        buyerName: input.buyerName,
+        buyerEmail: input.buyerEmail,
+        buyerPhone: input.buyerPhone,
+        message: input.message,
+      }),
+    );
     return { id: lead.id };
   }
 
-  // Look up the listing's dealer + price for routing and fee calc.
+  // Look up the listing's dealer/seller + price for routing, fee calc, and to
+  // notify the RIGHT recipient (dealer's account email, or the private
+  // seller's email — falling back to LEADS_NOTIFY_EMAIL so leads never vanish).
   let dealerId = input.dealerId;
   let price: number | undefined;
+  let recipientEmail: string | undefined;
+  let listingTitle: string | undefined;
   if (input.listingId) {
+    const dealerUser = alias(users, "dealer_user");
+    const sellerUser = alias(users, "seller_user");
     const l = await db
-      .select({ dealerId: listings.dealerId, price: listings.priceAED })
+      .select({
+        dealerId: listings.dealerId,
+        price: listings.priceAED,
+        make: listings.make,
+        model: listings.model,
+        year: listings.year,
+        dealerEmail: dealerUser.email,
+        sellerEmail: sellerUser.email,
+      })
       .from(listings)
+      .leftJoin(dealers, eq(listings.dealerId, dealers.id))
+      .leftJoin(dealerUser, eq(dealers.userId, dealerUser.id))
+      .leftJoin(sellerUser, eq(listings.sellerId, sellerUser.id))
       .where(eq(listings.id, input.listingId))
       .limit(1);
     if (l[0]) {
       dealerId = dealerId ?? l[0].dealerId ?? undefined;
       price = l[0].price;
+      recipientEmail = l[0].dealerEmail ?? l[0].sellerEmail ?? undefined;
+      listingTitle = `${l[0].year} ${l[0].make} ${l[0].model}`;
     }
     await db
       .update(listings)
@@ -98,10 +162,17 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
     })
     .returning({ id: leads.id });
 
-  void sendLeadNotification({
-    subject: `New ${type} lead from ${input.buyerName ?? "a buyer"}`,
-    body: `${input.message ?? ""}\nContact: ${input.buyerPhone ?? input.buyerEmail ?? "—"}`,
-  });
+  void sendLeadNotification(
+    buildLeadEmail({
+      to: recipientEmail,
+      type,
+      buyerName: input.buyerName,
+      buyerEmail: input.buyerEmail,
+      buyerPhone: input.buyerPhone,
+      message: input.message,
+      listingTitle,
+    }),
+  );
 
   return { id: row.id };
 }
@@ -119,6 +190,113 @@ export async function updateLeadStatus(
   return true;
 }
 
+export interface LeadReplyView {
+  senderRole: "buyer" | "dealer";
+  body: string;
+  createdAt: string;
+}
+
+/** Who can see/reply to a lead, and where to email the *other* party. */
+export interface LeadOwnership {
+  buyerId?: string;
+  dealerId?: string;
+  buyerEmail?: string;
+  dealerEmail?: string;
+  listingTitle?: string;
+}
+
+export async function getLeadOwnership(id: string): Promise<LeadOwnership | null> {
+  if (!isDbEnabled()) {
+    const lead = demoStore().leads.find((l) => l.id === id);
+    if (!lead) return null;
+    return { buyerEmail: lead.buyerEmail };
+  }
+  const dealerUser = alias(users, "dealer_user_lookup");
+  const [row] = await db
+    .select({
+      buyerId: leads.buyerId,
+      dealerId: leads.dealerId,
+      buyerEmail: leads.buyerEmail,
+      dealerEmail: dealerUser.email,
+      make: listings.make,
+      model: listings.model,
+      year: listings.year,
+    })
+    .from(leads)
+    .leftJoin(dealers, eq(leads.dealerId, dealers.id))
+    .leftJoin(dealerUser, eq(dealers.userId, dealerUser.id))
+    .leftJoin(listings, eq(leads.listingId, listings.id))
+    .where(eq(leads.id, id))
+    .limit(1);
+  if (!row) return null;
+  return {
+    buyerId: row.buyerId ?? undefined,
+    dealerId: row.dealerId ?? undefined,
+    buyerEmail: row.buyerEmail ?? undefined,
+    dealerEmail: row.dealerEmail ?? undefined,
+    listingTitle: row.make ? `${row.year} ${row.make} ${row.model}` : undefined,
+  };
+}
+
+/** Post a reply on a lead thread and notify the other party by email. */
+export async function addLeadReply(
+  leadId: string,
+  senderRole: "buyer" | "dealer",
+  body: string,
+): Promise<void> {
+  if (!isDbEnabled()) {
+    demoStore().leadReplies.push({
+      id: demoId("REPLY"),
+      leadId,
+      senderRole,
+      body,
+      createdAt: new Date().toISOString(),
+    });
+  } else {
+    await db.insert(leadReplies).values({ leadId, senderRole, body });
+  }
+
+  const ownership = await getLeadOwnership(leadId);
+  if (!ownership) return;
+  const to = senderRole === "dealer" ? ownership.buyerEmail : ownership.dealerEmail;
+  if (!to) return;
+  await sendEmail({
+    to,
+    subject: `New reply on your ${ownership.listingTitle ?? "listing"} enquiry`,
+    body: `${body}\n\n— sent via DXB Motors, reply to this thread from your dashboard.`,
+    label: "lead reply",
+  });
+}
+
+async function getRepliesFor(leadIds: string[]): Promise<Map<string, LeadReplyView[]>> {
+  const map = new Map<string, LeadReplyView[]>();
+  if (leadIds.length === 0) return map;
+  if (!isDbEnabled()) {
+    for (const r of demoStore().leadReplies) {
+      if (!leadIds.includes(r.leadId)) continue;
+      const arr = map.get(r.leadId) ?? [];
+      arr.push({ senderRole: r.senderRole, body: r.body, createdAt: r.createdAt });
+      map.set(r.leadId, arr);
+    }
+    return map;
+  }
+  const rows = await db
+    .select()
+    .from(leadReplies)
+    .where(inArray(leadReplies.leadId, leadIds))
+    .orderBy(leadReplies.createdAt);
+  for (const r of rows) {
+    const arr = map.get(r.leadId) ?? [];
+    arr.push({
+      senderRole: r.senderRole as "buyer" | "dealer",
+      body: r.body,
+      createdAt: r.createdAt.toISOString(),
+    });
+    map.set(r.leadId, arr);
+  }
+  return map;
+}
+
 export interface LeadView {
   id: string;
   type: string;
@@ -131,10 +309,12 @@ export interface LeadView {
   status: string;
   createdAt: string;
   listingId?: string;
+  replies: LeadReplyView[];
 }
 
 export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> {
   if (!isDbEnabled()) {
+    const replyMap = await getRepliesFor(demoStore().leads.map((l) => l.id));
     return demoStore().leads.map((l) => ({
       id: l.id,
       type: l.type,
@@ -147,6 +327,7 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
       status: l.status,
       createdAt: l.createdAt,
       listingId: l.listingId,
+      replies: replyMap.get(l.id) ?? [],
     }));
   }
     const baseQuery = db.select().from(leads);
@@ -156,6 +337,7 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
   )
     .orderBy(desc(leads.createdAt))
     .limit(200);
+  const replyMap = await getRepliesFor(rows.map((l) => l.id));
   return rows.map((l) => ({
     id: l.id,
     type: l.type,
@@ -168,5 +350,95 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
     status: l.status,
     createdAt: l.createdAt.toISOString(),
     listingId: l.listingId ?? undefined,
+    replies: replyMap.get(l.id) ?? [],
   }));
+}
+
+/** A buyer-facing message thread (one row per lead the buyer opened). */
+export interface MessageThread {
+  id: string;
+  type: string;
+  status: string;
+  message: string;
+  createdAt: string;
+  listingTitle?: string;
+  dealerName?: string;
+  replies: LeadReplyView[];
+}
+
+/**
+ * Message threads for a signed-in buyer: their own leads, newest first, with
+ * listing (make/model/year) and dealer name joined for context. Read-only —
+ * new messages are created via the lead form on listing pages. Falls back to a
+ * few sample threads in demo mode so the page always renders.
+ */
+export async function getMessagesForUser(userId: string): Promise<MessageThread[]> {
+  if (!isDbEnabled()) {
+    const now = Date.now();
+    return [
+      {
+        id: "MSG-1",
+        type: "inquiry",
+        status: "new",
+        message: "Hi, is this still available? Can I come see it this weekend?",
+        createdAt: new Date(now - 2 * 3600_000).toISOString(),
+        listingTitle: "2022 BMW X5 xDrive40i",
+        dealerName: "Al Habtoor Motors",
+        replies: [],
+      },
+      {
+        id: "MSG-2",
+        type: "test_drive",
+        status: "contacted",
+        message: "Requested a test drive for Saturday afternoon.",
+        createdAt: new Date(now - 26 * 3600_000).toISOString(),
+        listingTitle: "2021 Mercedes-Benz C 300",
+        dealerName: "Deals on Wheels",
+        replies: [],
+      },
+      {
+        id: "MSG-3",
+        type: "contact_unlock",
+        status: "closed",
+        message: "Unlocked seller contact details.",
+        createdAt: new Date(now - 5 * 24 * 3600_000).toISOString(),
+        listingTitle: "2020 Toyota Land Cruiser GXR",
+        dealerName: "Gargash Motors",
+        replies: [],
+      },
+    ];
+  }
+  try {
+    const rows = await db
+      .select({
+        id: leads.id,
+        type: leads.type,
+        status: leads.status,
+        message: leads.message,
+        createdAt: leads.createdAt,
+        make: listings.make,
+        model: listings.model,
+        year: listings.year,
+        dealerName: dealers.businessName,
+      })
+      .from(leads)
+      .leftJoin(listings, eq(leads.listingId, listings.id))
+      .leftJoin(dealers, eq(leads.dealerId, dealers.id))
+      .where(eq(leads.buyerId, userId))
+      .orderBy(desc(leads.createdAt))
+      .limit(100);
+    const replyMap = await getRepliesFor(rows.map((r) => r.id));
+    return rows.map((r) => ({
+      id: r.id,
+      type: r.type,
+      status: r.status,
+      message: r.message ?? "",
+      createdAt: r.createdAt.toISOString(),
+      listingTitle: r.make ? `${r.year} ${r.make} ${r.model}` : undefined,
+      dealerName: r.dealerName ?? undefined,
+      replies: replyMap.get(r.id) ?? [],
+    }));
+  } catch {
+    return [];
+  }
 }

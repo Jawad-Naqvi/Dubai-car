@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import { formatAED, monthlyEMI } from "@/lib/utils";
+import { FinancePreapprovalButton } from "@/components/finance/preapproval-button";
 import { Calculator, Wallet, Building2, Percent } from "lucide-react";
 
 const banks = [
@@ -129,9 +130,12 @@ export default function FinancePage() {
                   ))}
                 </div>
 
-                <Button asChild variant="gold" size="lg" className="mt-6 w-full">
-                  <Link href="/contact">Get pre-approved</Link>
-                </Button>
+                <FinancePreapprovalButton
+                  amount={principal}
+                  termYears={years}
+                  aprFrom={apr}
+                  className="mt-6"
+                />
               </div>
             </div>
           </div>
@@ -158,9 +162,16 @@ export default function FinancePage() {
                     </span>
                     <span className="text-xs text-muted">APR from</span>
                   </div>
-                  <Button asChild variant="ghost" size="sm" className="mt-4 w-full">
-                    <Link href="/contact">Apply →</Link>
-                  </Button>
+                  <FinancePreapprovalButton
+                    amount={principal}
+                    termYears={years}
+                    aprFrom={b.aprFrom}
+                    bank={b.name}
+                    variant="ghost"
+                    size="sm"
+                    label="Apply →"
+                    className="mt-4"
+                  />
                 </div>
               ))}
             </div>

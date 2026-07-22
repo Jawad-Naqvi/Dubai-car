@@ -47,7 +47,7 @@ export function ListingGallery({
 
   return (
     <div>
-      <div className="relative rounded-3xl overflow-hidden bg-[#F3F1E9] border border-[#E7E4DA] shadow-card aspect-[16/10] group">
+      <div className="relative rounded-2xl overflow-hidden bg-[#F3F1E9] border border-[#E7E4DA] shadow-card h-[240px] sm:h-[320px] lg:h-[400px] group">
         {current ? (
           <Image
             src={current}

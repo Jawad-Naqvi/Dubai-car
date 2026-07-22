@@ -3,7 +3,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Button } from "@/components/ui/button";
 import { BentoCard, BentoTitle, BentoDesc } from "@/components/marketing/bento-card";
 import { RadialGlow, StarField } from "@/components/marketing/radial-glow";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import {
   Building2,
   Globe,

@@ -4,6 +4,7 @@ type RawParams = Record<string, string | string[] | undefined>;
 
 const SORTS: SortKey[] = [
   "newest",
+  "deal_desc",
   "price_asc",
   "price_desc",
   "year_desc",
@@ -47,9 +48,13 @@ export function parseListingParams(raw: RawParams): ListingSearchParams {
   return {
     q: str(raw.q),
     make: multi(raw.make),
+    model: multi(raw.model),
+    trim: multi(raw.trim),
     bodyType: multi(raw.bodyType),
     fuel: multi(raw.fuel),
     transmission: multi(raw.transmission),
+    drivetrain: multi(raw.drivetrain),
+    dealRating: multi(raw.dealRating),
     regionalSpec: multi(raw.regionalSpec),
     emirate: multi(raw.emirate),
     condition: multi(raw.condition),

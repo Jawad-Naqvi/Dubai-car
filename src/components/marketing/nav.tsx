@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
-import { usePathname, useRouter } from "@/i18n/routing";
 import { Menu, X, Globe, Heart, GitCompare, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { brand } from "@/lib/brand";
@@ -174,6 +173,24 @@ export function Nav() {
                 {t(item.key)}
               </Link>
             ))}
+            <SignedOut>
+              <Link
+                href="/sign-in"
+                onClick={() => setOpen(false)}
+                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E7E4DA]"
+              >
+                {t("signIn")}
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E7E4DA]"
+              >
+                Dashboard
+              </Link>
+            </SignedIn>
             <button
               onClick={() => {
                 switchLocale();

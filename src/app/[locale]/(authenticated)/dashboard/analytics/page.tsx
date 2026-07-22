@@ -1,137 +1,113 @@
+import { Link } from "@/i18n/routing";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { Eye, MessageCircle, TrendingUp, Clock } from "lucide-react";
+import { getDealerAnalytics, type Distribution } from "@/lib/data/dashboard";
+import { Eye, MessageCircle, TrendingUp, Car } from "lucide-react";
 
-export default function AnalyticsPage() {
+function DistributionCard({
+  title,
+  items,
+}: {
+  title: string;
+  items: Distribution[];
+}) {
+  return (
+    <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+      <h3 className="font-semibold">{title}</h3>
+      {items.length === 0 ? (
+        <p className="mt-4 text-xs text-muted">No data yet.</p>
+      ) : (
+        <div className="mt-5 space-y-3">
+          {items.map((item) => (
+            <div key={item.label}>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="text-secondary">{item.label}</span>
+                <span className="text-[#141414] font-semibold">{item.pct}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-[#F3F1E9] overflow-hidden">
+                <div
+                  className="h-full bg-[#F0941F]"
+                  style={{ width: `${item.pct}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default async function AnalyticsPage() {
+  const a = await getDealerAnalytics();
+  const maxViews = Math.max(1, ...a.topListings.map((l) => l.views));
+
+  const kpis = [
+    { icon: Eye, label: "Total views", value: a.totalViews.toLocaleString() },
+    { icon: MessageCircle, label: "Leads generated", value: a.totalLeads.toLocaleString() },
+    { icon: TrendingUp, label: "Conversion rate", value: `${a.conversionRate}%` },
+    { icon: Car, label: "Active listings", value: a.activeListings.toLocaleString() },
+  ];
+
   return (
     <>
-      <DashboardHeader title="Analytics" subtitle="Last 30 days · Across all listings" />
+      <DashboardHeader
+        title="Analytics"
+        subtitle="Live · across your listings"
+      />
 
       <main className="p-5 space-y-4">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { icon: Eye, label: "Total views", value: "58,420", delta: "+22%" },
-            { icon: MessageCircle, label: "Leads generated", value: "412", delta: "+15%" },
-            { icon: TrendingUp, label: "Conversion rate", value: "7.1%", delta: "+0.4pp" },
-            { icon: Clock, label: "Avg response time", value: "3m 42s", delta: "-18%" },
-          ].map((k) => (
+          {kpis.map((k) => (
             <div
               key={k.label}
               className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
             >
               <k.icon className="h-5 w-5 text-[#F0941F]" />
               <div className="mt-4 text-base font-bold">{k.value}</div>
-              <div className="flex items-center justify-between mt-1">
-                <div className="text-xs text-muted">{k.label}</div>
-                <div className="text-xs text-[#F0941F]">{k.delta}</div>
-              </div>
+              <div className="text-xs text-muted mt-1">{k.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Chart placeholder */}
+        {/* Top listings by views — real, data-bound bars (replaces the old
+            hand-drawn fake trend chart). */}
         <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
-          <Eyebrow tone="gold">VIEWS & LEADS TREND</Eyebrow>
-          <h3 className="mt-3 text-xs font-semibold">Last 30 days</h3>
-          <div className="mt-6 h-64 relative">
-            <svg viewBox="0 0 600 200" className="w-full h-full">
-              <defs>
-                <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F0941F" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#F0941F" stopOpacity="0" />
-                </linearGradient>
-                <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#141414" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#141414" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M0,130 C50,120 80,95 130,105 C190,118 250,80 300,72 C360,65 410,90 470,75 C530,62 580,55 600,42 L600,200 L0,200 Z"
-                fill="url(#vg)"
-              />
-              <path
-                d="M0,130 C50,120 80,95 130,105 C190,118 250,80 300,72 C360,65 410,90 470,75 C530,62 580,55 600,42"
-                stroke="#F0941F"
-                strokeWidth="2"
-                fill="none"
-              />
-              <path
-                d="M0,170 C50,165 90,160 140,155 C200,150 260,145 320,140 C380,135 430,135 480,130 C530,125 570,123 600,120 L600,200 L0,200 Z"
-                fill="url(#lg)"
-              />
-              <path
-                d="M0,170 C50,165 90,160 140,155 C200,150 260,145 320,140 C380,135 430,135 480,130 C530,125 570,123 600,120"
-                stroke="#141414"
-                strokeWidth="2"
-                fill="none"
-              />
-            </svg>
-            <div className="absolute top-2 left-2 flex gap-4 text-xs">
-              <span className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-[#F0941F]" />
-                Views
-              </span>
-              <span className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-[#141414]" />
-                Leads
-              </span>
+          <Eyebrow tone="gold">TOP LISTINGS BY VIEWS</Eyebrow>
+          {a.topListings.length === 0 ? (
+            <p className="mt-4 text-sm text-muted">
+              No listings yet — add inventory to see performance here.
+            </p>
+          ) : (
+            <div className="mt-5 space-y-3">
+              {a.topListings.map((l) => (
+                <div key={l.id} className="flex items-center gap-3">
+                  <Link
+                    href={`/listings/${l.id}/${l.slug}`}
+                    className="w-40 shrink-0 text-xs font-medium text-[#141414] truncate hover:underline"
+                    title={l.title}
+                  >
+                    {l.title}
+                  </Link>
+                  <div className="flex-1 h-4 rounded-full bg-[#F3F1E9] overflow-hidden">
+                    <div
+                      className="h-full bg-[#F0941F] rounded-full"
+                      style={{ width: `${Math.round((l.views / maxViews) * 100)}%` }}
+                    />
+                  </div>
+                  <div className="w-24 shrink-0 text-right text-[10px] text-muted">
+                    {l.views.toLocaleString()} views · {l.inquiries} enq.
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {[
-            {
-              title: "By emirate",
-              items: [
-                { label: "Dubai", value: 62 },
-                { label: "Abu Dhabi", value: 22 },
-                { label: "Sharjah", value: 11 },
-                { label: "Other", value: 5 },
-              ],
-            },
-            {
-              title: "By channel",
-              items: [
-                { label: "WhatsApp", value: 58 },
-                { label: "Call", value: 27 },
-                { label: "Message", value: 15 },
-              ],
-            },
-            {
-              title: "By body type",
-              items: [
-                { label: "SUV", value: 71 },
-                { label: "Sedan", value: 12 },
-                { label: "Coupe", value: 9 },
-                { label: "Other", value: 8 },
-              ],
-            },
-          ].map((card) => (
-            <div
-              key={card.title}
-              className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4"
-            >
-              <h3 className="font-semibold">{card.title}</h3>
-              <div className="mt-5 space-y-3">
-                {card.items.map((item) => (
-                  <div key={item.label}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-secondary">{item.label}</span>
-                      <span className="text-[#141414] font-semibold">{item.value}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-[#F3F1E9] overflow-hidden">
-                      <div
-                        className="h-full bg-[#F0941F]"
-                        style={{ width: `${item.value}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          <DistributionCard title="Views by emirate" items={a.byEmirate} />
+          <DistributionCard title="Leads by type" items={a.byLeadType} />
+          <DistributionCard title="Views by body type" items={a.byBodyType} />
         </div>
       </main>
     </>
