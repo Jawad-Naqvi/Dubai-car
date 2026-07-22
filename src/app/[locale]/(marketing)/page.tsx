@@ -6,8 +6,7 @@ import { mockListings } from "@/lib/mock-data";
 import { formatAED } from "@/lib/utils";
 import { carImageUrl } from "@/lib/car-images";
 import { Reveal } from "@/components/marketing/home/reveal";
-import { HomeSearch } from "@/components/marketing/home-search";
-import { HomeSearchBy } from "@/components/marketing/home-search-by";
+import { HomeSearchTabs } from "@/components/marketing/home-search-tabs";
 import { PromoCard } from "@/components/marketing/home/promo-card";
 import { WhyAccordion } from "@/components/marketing/home/why-accordion";
 import { TopCarousel, type TopCar } from "@/components/marketing/home/top-carousel";
@@ -127,17 +126,9 @@ export default async function LandingPage({
             </Reveal>
           </div>
 
-          {/* Structured search — keyword, or drill down by make/model/emirate */}
+          {/* Shop / Sell switcher — buyers search, sellers get a valuation */}
           <Reveal delay={0.25} className="mt-8 max-w-2xl">
-            <HomeSearch />
-            <div className="my-3 flex items-center gap-3">
-              <div className="h-px flex-1 bg-[#141414]/10" />
-              <span className="text-[11px] font-medium text-muted">
-                {t("hero.orSearchBy")}
-              </span>
-              <div className="h-px flex-1 bg-[#141414]/10" />
-            </div>
-            <HomeSearchBy />
+            <HomeSearchTabs />
           </Reveal>
 
           {/* Promo cards */}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,12 +12,21 @@ import { popularMakes, conditions } from "@/lib/brand";
 import { estimateValue } from "@/lib/valuation";
 import { Sparkles, AlertCircle, Loader2, BadgeCheck } from "lucide-react";
 
-export default function ValuationPage() {
-  const [make, setMake] = useState("Toyota");
-  const [model, setModel] = useState("Land Cruiser");
-  const [year, setYear] = useState(2022);
-  const [kms, setKms] = useState(40000);
-  const [condition, setCondition] = useState<string>("Used");
+function ValuationForm() {
+  // Prefill from the home "Sell your car" tab (or any deep link), else defaults.
+  const params = useSearchParams();
+  const numParam = (key: string, fallback: number) => {
+    const n = Number(params.get(key));
+    return Number.isFinite(n) && n > 0 ? n : fallback;
+  };
+
+  const [make, setMake] = useState(() => params.get("make") || "Toyota");
+  const [model, setModel] = useState(() => params.get("model") || "Land Cruiser");
+  const [year, setYear] = useState(() => numParam("year", 2022));
+  const [kms, setKms] = useState(() => numParam("kms", 40000));
+  const [condition, setCondition] = useState<string>(
+    () => params.get("condition") || "Used",
+  );
   const [loading, setLoading] = useState(false);
   const [comps, setComps] = useState<number | null>(null);
 
@@ -202,5 +212,14 @@ export default function ValuationPage() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function ValuationPage() {
+  // useSearchParams needs a Suspense boundary during prerender.
+  return (
+    <Suspense>
+      <ValuationForm />
+    </Suspense>
   );
 }

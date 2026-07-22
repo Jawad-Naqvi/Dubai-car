@@ -265,7 +265,24 @@
           "href": "/export"
         }
       ],
-      "orSearchBy": "or search by"
+      "orSearchBy": "or search by",
+      "shopTab": "Shop cars for sale",
+      "sellTab": "Sell your car",
+      "sell": {
+        "heading": "What's your car worth?",
+        "make": "Make",
+        "makePlaceholder": "Select make",
+        "model": "Model",
+        "modelPlaceholder": "e.g. Land Cruiser",
+        "year": "Year",
+        "kms": "Kilometers",
+        "intentLabel": "I want to:",
+        "intentEstimate": "Get an instant estimate",
+        "intentList": "List my car for sale",
+        "cta": "Get estimate",
+        "ctaList": "Start listing",
+        "hint": "Free · No obligation · Blended with live market data"
+      }
     },
     "featuredWork": "Featured Inventory",
     "topSelling": {
