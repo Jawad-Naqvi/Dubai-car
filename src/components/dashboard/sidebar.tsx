@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { brand } from "@/lib/brand";
@@ -25,6 +26,8 @@ import {
   Database,
   RefreshCw,
   Lock,
+  Menu,
+  X,
 } from "lucide-react";
 
 const dealerNav = [
@@ -72,6 +75,7 @@ export function DashboardSidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const items =
     role === "admin" ? adminNav : role === "buyer" ? buyerNav : role === "b2b" ? b2bNav : dealerNav;
   const isAdmin = role === "admin";
@@ -82,12 +86,31 @@ export function DashboardSidebar({
     router.refresh();
   };
 
-  return (
-    <aside className="hidden lg:flex w-64 flex-col bg-[#0B0B10] min-h-screen sticky top-0 text-white">
+  // While the mobile drawer is open: lock body scroll and close on Escape.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  // Shared inner content — used by both the desktop rail and the mobile drawer.
+  // `onNavigate` closes the drawer after a tap on mobile (no-op on desktop).
+  const panel = (onNavigate: () => void) => (
+    <>
       {/* Brand header — carries the auth-page gradient signature */}
       <div className="relative overflow-hidden border-b border-white/10">
         <GradientArt className="opacity-90" />
-        <Link href="/" className="relative flex items-center gap-2.5 p-5">
+        <Link
+          href="/"
+          onClick={onNavigate}
+          className="relative flex items-center gap-2.5 p-5"
+        >
           <div className="h-9 w-9 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center text-white font-black text-xs ring-1 ring-white/25">
             DXB
           </div>
@@ -106,6 +129,7 @@ export function DashboardSidebar({
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onNavigate}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-colors",
                   isActive
@@ -127,6 +151,7 @@ export function DashboardSidebar({
         {role === "buyer" && (
           <Link
             href="/dashboard/sell/new"
+            onClick={onNavigate}
             className="flex items-center justify-center gap-2 h-9 rounded-xl bg-[#F0941F] text-[#141414] text-xs font-bold hover:bg-[#e0891a] transition-colors"
           >
             <Tag className="h-4 w-4" />
@@ -135,7 +160,10 @@ export function DashboardSidebar({
         )}
         {isAdmin ? (
           <button
-            onClick={lockAdmin}
+            onClick={() => {
+              onNavigate();
+              lockAdmin();
+            }}
             className="flex w-full items-center gap-3 px-3 py-2 rounded-xl text-xs text-white/55 hover:bg-white/5 hover:text-white"
           >
             <Lock className="h-4 w-4" />
@@ -144,6 +172,7 @@ export function DashboardSidebar({
         ) : (
           <Link
             href="/dashboard/settings"
+            onClick={onNavigate}
             className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-white/55 hover:bg-white/5 hover:text-white"
           >
             <Settings className="h-4 w-4" />
@@ -151,6 +180,55 @@ export function DashboardSidebar({
           </Link>
         )}
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop rail */}
+      <aside className="hidden lg:flex w-64 flex-col bg-[#0B0B10] min-h-screen sticky top-0 text-white">
+        {panel(() => {})}
+      </aside>
+
+      {/* Mobile top bar with hamburger */}
+      <div className="lg:hidden sticky top-0 z-30 flex items-center gap-3 bg-[#0B0B10] text-white px-4 h-14 border-b border-white/10">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open menu"
+          className="-ms-1 p-1.5 rounded-lg hover:bg-white/10"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <div className="h-8 w-8 rounded-lg bg-white/15 flex items-center justify-center text-white font-black text-[10px] ring-1 ring-white/25">
+          DXB
+        </div>
+        <span className="font-bold">{brand.name}</span>
+        <span className="ms-auto text-[10px] uppercase tracking-widest text-white/40">
+          {isAdmin ? "ADMIN" : role.toUpperCase()}
+        </span>
+      </div>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setOpen(false)}
+          />
+          <aside className="absolute inset-y-0 start-0 flex w-72 max-w-[82%] flex-col overflow-y-auto bg-[#0B0B10] text-white shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+              className="absolute top-4 end-3 z-10 p-1.5 rounded-lg text-white/70 hover:bg-white/10 hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            {panel(() => setOpen(false))}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }
