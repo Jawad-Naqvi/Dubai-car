@@ -39,7 +39,7 @@ export function FinanceCalculator({
 
   return (
     <CollapsibleSection
-      icon={<Calculator className="h-4 w-4 text-[#F0941F] flex-shrink-0" />}
+      icon={<Calculator className="h-4 w-4 text-[#8136B2] flex-shrink-0" />}
       title="Estimate monthly payment"
       summary={`${formatAED(emi, locale)}/mo`}
       className={className}
@@ -79,18 +79,18 @@ export function FinanceCalculator({
             />
           </div>
 
-          <div className="mt-4 pt-4 border-t border-[#E7E4DA] flex items-center justify-between">
+          <div className="mt-4 pt-4 border-t border-[#E5E5EA] flex items-center justify-between">
             <div className="text-xs text-secondary">Estimated monthly</div>
             <div className="text-lg font-bold text-[#141414]">
               {formatAED(emi, locale)}/mo
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2 text-[10px] text-muted">
-            <div className="flex justify-between rounded-lg bg-[#F3F1E9] px-2 py-1.5">
+            <div className="flex justify-between rounded-lg bg-[#F4F4F6] px-2 py-1.5">
               <span>Total interest</span>
               <span className="text-secondary">{formatAED(totalInterest, locale)}</span>
             </div>
-            <div className="flex justify-between rounded-lg bg-[#F3F1E9] px-2 py-1.5">
+            <div className="flex justify-between rounded-lg bg-[#F4F4F6] px-2 py-1.5">
               <span>Total payable</span>
               <span className="text-secondary">{formatAED(totalPayable, locale)}</span>
             </div>

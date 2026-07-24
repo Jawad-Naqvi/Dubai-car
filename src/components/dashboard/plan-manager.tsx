@@ -54,7 +54,7 @@ export function PlanManager({
 
   return (
     <>
-      <div className="lg:col-span-2 rounded-2xl bg-bento-dark border border-[#F0941F]/25 shadow-card p-5 relative overflow-hidden grain">
+      <div className="lg:col-span-2 rounded-2xl bg-bento-dark border border-[#8136B2]/25 shadow-card p-5 relative overflow-hidden grain">
         <Eyebrow tone="gold">CURRENT PLAN</Eyebrow>
         <div className="mt-4 flex items-baseline gap-3 flex-wrap">
           <span className="text-base font-bold">{active?.name ?? "Free"}</span>
@@ -88,7 +88,7 @@ export function PlanManager({
               <div
                 key={t.id}
                 className={`rounded-xl border p-4 ${
-                  isCurrent ? "border-[#F0941F]/50 bg-[#F0941F]/10" : "border-[#E7E4DA]"
+                  isCurrent ? "border-[#8136B2]/50 bg-[#8136B2]/10" : "border-[#E5E5EA]"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ export function PlanManager({
                 <ul className="mt-3 space-y-1">
                   {t.features.slice(0, 3).map((f) => (
                     <li key={f} className="flex items-start gap-1.5 text-[11px] text-secondary">
-                      <Check className="h-3 w-3 text-[#F0941F] mt-0.5 flex-shrink-0" />
+                      <Check className="h-3 w-3 text-[#8136B2] mt-0.5 flex-shrink-0" />
                       {f}
                     </li>
                   ))}

@@ -265,7 +265,24 @@
           "href": "/export"
         }
       ],
-      "orSearchBy": "أو ابحث حسب"
+      "orSearchBy": "أو ابحث حسب",
+      "shopTab": "تسوّق سيارات للبيع",
+      "sellTab": "بِع سيارتك",
+      "sell": {
+        "heading": "كم تساوي سيارتك؟",
+        "make": "الماركة",
+        "makePlaceholder": "اختر الماركة",
+        "model": "الموديل",
+        "modelPlaceholder": "مثال: لاند كروزر",
+        "year": "السنة",
+        "kms": "الكيلومترات",
+        "intentLabel": "أريد أن:",
+        "intentEstimate": "احصل على تقدير فوري",
+        "intentList": "أدرج سيارتي للبيع",
+        "cta": "احصل على التقدير",
+        "ctaList": "ابدأ الإدراج",
+        "hint": "مجاني · بدون التزام · مدمج مع بيانات السوق الحية"
+      }
     },
     "featuredWork": "مخزون مميز",
     "topSelling": {

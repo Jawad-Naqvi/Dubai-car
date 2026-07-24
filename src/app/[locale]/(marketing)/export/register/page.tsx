@@ -28,7 +28,7 @@ const COUNTRIES = [
 ];
 
 const field =
-  "w-full h-11 rounded-xl bg-white border border-[#E7E4DA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
+  "w-full h-11 rounded-xl bg-white border border-[#E5E5EA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
 const labelCls = "text-[11px] uppercase tracking-wider text-muted mb-1.5 block";
 
 export default function B2BRegisterPage() {
@@ -70,8 +70,8 @@ export default function B2BRegisterPage() {
   if (done) {
     return (
       <div className="mx-auto max-w-xl px-6 py-24 text-center">
-        <div className="h-14 w-14 rounded-full bg-[#F0941F]/10 border border-[#F0941F]/30 grid place-items-center mx-auto">
-          <CheckCircle2 className="h-7 w-7 text-[#F0941F]" />
+        <div className="h-14 w-14 rounded-full bg-[#8136B2]/10 border border-[#8136B2]/30 grid place-items-center mx-auto">
+          <CheckCircle2 className="h-7 w-7 text-[#8136B2]" />
         </div>
         <h1 className="mt-5 text-xl font-bold tracking-tight">
           Application received
@@ -112,7 +112,7 @@ export default function B2BRegisterPage() {
                 { icon: Clock, t: "24-hour approval", d: "Most applications are reviewed within a business day." },
               ].map((x) => (
                 <div key={x.t} className="flex gap-3">
-                  <x.icon className="h-5 w-5 text-[#F0941F] flex-shrink-0 mt-0.5" />
+                  <x.icon className="h-5 w-5 text-[#8136B2] flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="text-sm font-semibold">{x.t}</div>
                     <div className="text-xs text-muted">{x.d}</div>
@@ -125,10 +125,10 @@ export default function B2BRegisterPage() {
           {/* Right: form */}
           <form
             onSubmit={submit}
-            className="rounded-3xl bg-white border border-[#E7E4DA] shadow-card p-6"
+            className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-6"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Building2 className="h-4 w-4 text-[#F0941F]" />
+              <Building2 className="h-4 w-4 text-[#8136B2]" />
               <span className="text-sm font-semibold">Company details</span>
             </div>
             <div className="space-y-4">
@@ -188,7 +188,7 @@ export default function B2BRegisterPage() {
               </div>
               <div>
                 <label className={labelCls}>Trade licence</label>
-                <div className="rounded-xl border border-dashed border-[#D8D4C6] bg-[#F3F1E9] p-4 text-center text-xs text-muted">
+                <div className="rounded-xl border border-dashed border-[#D8D4C6] bg-[#F4F4F6] p-4 text-center text-xs text-muted">
                   Upload available after verification call. Submit the form to
                   start.
                 </div>

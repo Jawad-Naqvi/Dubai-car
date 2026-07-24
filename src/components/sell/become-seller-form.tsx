@@ -8,7 +8,7 @@ import { emirates } from "@/lib/brand";
 import { Building2, Loader2, Upload, FileCheck2, ShieldCheck } from "lucide-react";
 
 const inputCls =
-  "w-full h-11 rounded-xl bg-white border border-[#E7E4DA] px-3.5 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/30 focus:ring-2 focus:ring-[#141414]/10";
+  "w-full h-11 rounded-xl bg-white border border-[#E5E5EA] px-3.5 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/30 focus:ring-2 focus:ring-[#141414]/10";
 
 function DocUpload({
   label,
@@ -50,7 +50,7 @@ function DocUpload({
         className={`flex w-full items-center gap-2 h-11 rounded-xl border px-3.5 text-sm transition-colors ${
           value
             ? "border-[#137A43]/30 bg-[#137A43]/5 text-[#137A43]"
-            : "border-dashed border-[#D8D4C6] bg-[#F3F1E9] text-secondary hover:border-[#141414]/30"
+            : "border-dashed border-[#D8D4C6] bg-[#F4F4F6] text-secondary hover:border-[#141414]/30"
         }`}
       >
         <input
@@ -138,7 +138,7 @@ export function BecomeSellerForm() {
   };
 
   return (
-    <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8">
+    <div className="rounded-2xl bg-white shadow-card p-6 lg:p-8">
       <div className="flex items-center gap-2.5 mb-5">
         <span className="h-9 w-9 rounded-full bg-[#141414] text-white flex items-center justify-center">
           <Building2 className="h-4 w-4" />
@@ -217,9 +217,9 @@ export function BecomeSellerForm() {
         </div>
       </div>
 
-      <div className="mt-6 pt-5 border-t border-[#E7E4DA]">
+      <div className="mt-6 pt-5 border-t border-[#E5E5EA]">
         <div className="flex items-center gap-2 mb-3">
-          <ShieldCheck className="h-3.5 w-3.5 text-[#F0941F]" />
+          <ShieldCheck className="h-3.5 w-3.5 text-[#8136B2]" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-[#141414]">
             Identity & license verification
           </h3>

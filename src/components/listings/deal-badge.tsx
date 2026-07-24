@@ -6,7 +6,7 @@ type Rating = "Great" | "Good" | "Fair";
 const STYLES: Record<Rating, string> = {
   Great: "bg-[#137A43] text-white border-transparent",
   Good: "bg-[#E7F1EA] text-[#137A43] border-[#B7D8C3]",
-  Fair: "bg-[#F3F1E9] text-[#6B6B6B] border-[#E0DCCF]",
+  Fair: "bg-[#F4F4F6] text-[#6B6B6B] border-[#E0DCCF]",
 };
 
 /**
@@ -54,7 +54,7 @@ export function HighDemandBadge({
     <span
       title="Many buyers are viewing or inquiring about this car"
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none bg-[#FBEAD3] text-[#C97612] border-[#F0941F]/30",
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none bg-[#F3EDF9] text-[#6B21A8] border-[#8136B2]/30",
         className,
       )}
     >

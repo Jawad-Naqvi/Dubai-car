@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Search, ArrowUpDown, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LabeledSelect } from "@/components/ui/labeled-select";
 import { useQueryState } from "@/lib/use-query-state";
 import { emirates } from "@/lib/brand";
 
@@ -21,8 +22,8 @@ export function ListingSearchBar({ className }: { className?: string }) {
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-1.5 bg-white border border-[#E7E4DA] rounded-full shadow-card p-1 pl-3">
-        <Search className="h-3.5 w-3.5 text-[#F0941F]" />
+      <div className="flex items-center gap-1.5 bg-white border border-[#E5E5EA] rounded-full shadow-card p-1 pl-3">
+        <Search className="h-3.5 w-3.5 text-[#8136B2]" />
         <input
           type="text"
           value={value}
@@ -40,6 +41,24 @@ export function ListingSearchBar({ className }: { className?: string }) {
   );
 }
 
+/** cars.com-style "Sort by" labelled box for the SRP header row. */
+export function ListingSortSelect({ className }: { className?: string }) {
+  const { get, push } = useQueryState();
+  const sort = get("sort") ?? "newest";
+  return (
+    <LabeledSelect
+      className={className}
+      label="Sort by"
+      value={sort}
+      onChange={(v) => push({ sort: v === "newest" ? null : v })}
+      options={Object.entries(SORT_LABELS).map(([value, label]) => ({
+        value,
+        label,
+      }))}
+    />
+  );
+}
+
 export function ListingSortBar() {
   const { get, push } = useQueryState();
   const sort = get("sort") ?? "newest";
@@ -52,7 +71,7 @@ export function ListingSortBar() {
           value={emirate}
           onChange={(e) => push({ emirate: e.target.value || null })}
           suppressHydrationWarning
-          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E7E4DA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer"
+          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E5E5EA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer"
         >
           <option value="">All emirates</option>
           {emirates.map((e) => (
@@ -68,7 +87,7 @@ export function ListingSortBar() {
           value={sort}
           onChange={(e) => push({ sort: e.target.value })}
           suppressHydrationWarning
-          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E7E4DA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer"
+          className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E5E5EA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer"
         >
           {Object.entries(SORT_LABELS).map(([k, label]) => (
             <option key={k} value={k}>

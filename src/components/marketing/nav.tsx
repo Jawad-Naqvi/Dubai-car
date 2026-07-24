@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
-import { Menu, X, Globe, Heart, GitCompare, Search } from "lucide-react";
+import { Menu, X, Globe, Heart, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { brand } from "@/lib/brand";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { AccountMenu } from "./account-menu";
+import { NavSearch } from "./nav-search";
 import { useSavedListings } from "@/lib/saved-listings";
 import { useCompare } from "@/lib/compare";
 
@@ -32,7 +34,7 @@ function CountIcon({
     >
       {children}
       {count > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] px-1 rounded-full bg-[#F0941F] text-white text-[9px] font-bold flex items-center justify-center">
+        <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] px-1 rounded-full bg-[#8136B2] text-white text-[9px] font-bold flex items-center justify-center">
           {count}
         </span>
       )}
@@ -58,19 +60,22 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const { count: savedCount } = useSavedListings();
   const { count: compareCount } = useCompare();
+  const { user } = useUser();
+  const role = (user?.publicMetadata?.role as string | undefined) ?? "buyer";
+  const isSeller = role === "dealer" || role === "admin" || role === "b2b_importer";
 
   const switchLocale = () => {
     router.replace(pathname, { locale: locale === "en" ? "ar" : "en" });
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#F1EFE9]/90 backdrop-blur-md border-b border-[#E7E4DA]">
+    <header className="sticky top-0 z-50 bg-[#FFFFFF]/90 backdrop-blur-md border-b border-[#E5E5EA]">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Wordmark */}
         <Link href="/" className="flex-shrink-0 group">
           <span className="text-[#141414] font-extrabold text-xl tracking-tight">
             {brand.name}
-            <span className="text-[#F0941F]">.</span>
+            <span className="text-[#8136B2]">.</span>
           </span>
         </Link>
 
@@ -92,13 +97,7 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-1.5">
-          <Link
-            href="/buy"
-            aria-label="Search cars"
-            className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#141414]/15 text-[#141414] hover:bg-[#141414] hover:text-white transition-colors"
-          >
-            <Search className="h-3.5 w-3.5" />
-          </Link>
+          <NavSearch />
 
           <button
             onClick={switchLocale}
@@ -134,19 +133,17 @@ export function Nav() {
           </SignedOut>
 
           <SignedIn>
-            <Link
-              href="/dashboard"
-              className="hidden md:inline-flex text-[13px] font-medium text-secondary hover:text-[#141414] px-2 py-1.5 transition-colors"
-            >
-              Dashboard
-            </Link>
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "h-8 w-8 ring-1 ring-[#141414]/20",
-                },
-              }}
-            />
+            {/* Sellers still get a dashboard link; buyers use the profile menu. */}
+            {isSeller && (
+              <Link
+                href="/dashboard"
+                className="hidden md:inline-flex text-[13px] font-medium text-secondary hover:text-[#141414] px-2 py-1.5 transition-colors"
+              >
+                Dashboard
+              </Link>
+            )}
+            {/* cars.com/Shopify-style account dropdown off the profile icon */}
+            <AccountMenu />
           </SignedIn>
 
           <button
@@ -161,14 +158,14 @@ export function Nav() {
       </div>
 
       {open && (
-        <div className="lg:hidden border-t border-[#E7E4DA] bg-[#F1EFE9] animate-reveal-up">
+        <div className="lg:hidden border-t border-[#E5E5EA] bg-[#FFFFFF] animate-reveal-up">
           <div className="max-w-7xl mx-auto px-4 py-2 flex flex-col">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="px-2 py-3 text-sm font-medium text-secondary hover:text-[#141414] border-b border-[#E7E4DA]"
+                className="px-2 py-3 text-sm font-medium text-secondary hover:text-[#141414] border-b border-[#E5E5EA]"
               >
                 {t(item.key)}
               </Link>
@@ -177,19 +174,33 @@ export function Nav() {
               <Link
                 href="/sign-in"
                 onClick={() => setOpen(false)}
-                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E7E4DA]"
+                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]"
               >
                 {t("signIn")}
               </Link>
             </SignedOut>
             <SignedIn>
-              <Link
-                href="/dashboard"
-                onClick={() => setOpen(false)}
-                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E7E4DA]"
-              >
-                Dashboard
-              </Link>
+              {isSeller ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]"
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link href="/dashboard/saved" onClick={() => setOpen(false)} className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]">
+                    Saved cars
+                  </Link>
+                  <Link href="/dashboard/alerts" onClick={() => setOpen(false)} className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]">
+                    Alerts
+                  </Link>
+                  <Link href="/dashboard/messages" onClick={() => setOpen(false)} className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]">
+                    Messages
+                  </Link>
+                </>
+              )}
             </SignedIn>
             <button
               onClick={() => {

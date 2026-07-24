@@ -37,8 +37,8 @@ export default async function BillingPage() {
         </div>
 
         {/* Invoices */}
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-[#E7E4DA]">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-[#E5E5EA]">
             <div>
               <Eyebrow tone="gold">INVOICES</Eyebrow>
               <h2 className="mt-2 text-xs font-semibold">Billing history</h2>
@@ -50,7 +50,7 @@ export default async function BillingPage() {
           ) : (
             <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-[#F3F1E9] text-[10px] uppercase tracking-widest text-muted">
+              <thead className="bg-[#F4F4F6] text-[10px] uppercase tracking-widest text-muted">
                 <tr>
                   <th className="text-start p-4 font-medium">Invoice</th>
                   <th className="text-start p-4 font-medium">Description</th>
@@ -61,7 +61,7 @@ export default async function BillingPage() {
               </thead>
               <tbody>
                 {invoices.map((inv) => (
-                  <tr key={inv.id} className="border-t border-[#E7E4DA] hover:bg-[#F1EFE9]">
+                  <tr key={inv.id} className="border-t border-[#E5E5EA] hover:bg-[#FFFFFF]">
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <Receipt className="h-4 w-4 text-muted" />

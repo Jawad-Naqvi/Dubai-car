@@ -20,8 +20,8 @@ function timeAgo(iso: string) {
 
 const STATUS_CHIP: Record<string, string> = {
   new: "bg-[#1B4FA0]/10 text-[#1B4FA0]",
-  quoted: "bg-[#F0941F]/10 text-[#C97612]",
-  closed: "bg-[#F3F1E9] text-secondary",
+  quoted: "bg-[#8136B2]/10 text-[#6B21A8]",
+  closed: "bg-[#F4F4F6] text-secondary",
 };
 
 export default async function InquiriesPage({
@@ -45,7 +45,7 @@ export default async function InquiriesPage({
       />
       <main className="p-5 lg:p-8">
         {inquiries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
+          <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white border border-[#E5E5EA] shadow-card">
             <Ship className="h-8 w-8 text-muted mb-3" />
             <h3 className="text-sm font-semibold">No export inquiries yet</h3>
             <p className="mt-1 text-xs text-muted max-w-xs">
@@ -64,18 +64,18 @@ export default async function InquiriesPage({
             {inquiries.map((i) => (
               <div
                 key={i.id}
-                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
+                className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0">
-                    <MapPin className="h-4 w-4 text-[#F0941F] flex-shrink-0" />
+                    <MapPin className="h-4 w-4 text-[#8136B2] flex-shrink-0" />
                     <h3 className="font-semibold text-sm truncate">
                       {i.destinationCountry}
                     </h3>
                   </div>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] font-semibold flex-shrink-0 ${
-                      STATUS_CHIP[i.status] ?? "bg-[#F3F1E9] text-secondary"
+                      STATUS_CHIP[i.status] ?? "bg-[#F4F4F6] text-secondary"
                     }`}
                   >
                     {i.status}
@@ -106,7 +106,7 @@ export default async function InquiriesPage({
                       {i.docRequests.map((d) => (
                         <span
                           key={d}
-                          className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-[#F3F1E9] text-secondary"
+                          className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-[#F4F4F6] text-secondary"
                         >
                           {d}
                         </span>
@@ -116,7 +116,7 @@ export default async function InquiriesPage({
                 )}
 
                 {i.notes && (
-                  <p className="mt-4 text-xs text-secondary border-t border-[#E7E4DA] pt-3">
+                  <p className="mt-4 text-xs text-secondary border-t border-[#E5E5EA] pt-3">
                     {i.notes}
                   </p>
                 )}

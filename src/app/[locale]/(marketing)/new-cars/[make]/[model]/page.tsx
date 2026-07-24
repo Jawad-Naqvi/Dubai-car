@@ -69,7 +69,7 @@ export default async function CatalogModelPage({
             {detail.name}
           </h1>
           {detail.bodyType && (
-            <span className="mt-3 inline-flex items-center rounded-full bg-[#FBE7D4] px-3 py-1 text-[11px] font-semibold text-[#C97612] capitalize">
+            <span className="mt-3 inline-flex items-center rounded-full bg-[#F3EDF9] px-3 py-1 text-[11px] font-semibold text-[#6B21A8] capitalize">
               {detail.bodyType}
             </span>
           )}
@@ -97,7 +97,7 @@ export default async function CatalogModelPage({
               <div className="text-[11px] uppercase tracking-wider text-muted font-semibold mb-2">
                 {t("specifications")}
               </div>
-              <dl className="divide-y divide-[#E7E4DA]">
+              <dl className="divide-y divide-[#E5E5EA]">
                 {specEntries.map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between py-2.5">
                     <dt className="text-xs text-secondary">{SPEC_LABELS[k]}</dt>

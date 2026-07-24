@@ -143,7 +143,7 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
     <main className="p-5 space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2 h-9 w-72 rounded-xl bg-white border border-[#E7E4DA] px-4 text-xs text-muted focus-within:ring-2 focus-within:ring-[#141414]/20">
+        <div className="flex items-center gap-2 h-9 w-72 rounded-xl bg-white border border-[#E5E5EA] px-4 text-xs text-muted focus-within:ring-2 focus-within:ring-[#141414]/20">
           <Search className="h-4 w-4" />
           <input
             value={q}
@@ -165,14 +165,14 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-[#E7E4DA] overflow-x-auto">
+      <div className="flex items-center gap-1 border-b border-[#E5E5EA] overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={
               t === tab
-                ? "px-4 py-3 text-xs font-semibold border-b-2 border-[#F0941F] text-[#C97612] whitespace-nowrap"
+                ? "px-4 py-3 text-xs font-semibold border-b-2 border-[#8136B2] text-[#6B21A8] whitespace-nowrap"
                 : "px-4 py-3 text-xs text-secondary hover:text-[#141414] border-b-2 border-transparent whitespace-nowrap"
             }
           >
@@ -183,9 +183,9 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card overflow-hidden overflow-x-auto">
+      <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[720px]">
-          <thead className="bg-[#F3F1E9] text-[10px] uppercase tracking-widest text-muted">
+          <thead className="bg-[#F4F4F6] text-[10px] uppercase tracking-widest text-muted">
             <tr>
               <th className="text-start p-4 font-medium">Vehicle</th>
               <th className="text-start p-4 font-medium">Price</th>
@@ -207,7 +207,7 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
             {filtered.map((l) => (
               <tr
                 key={l.id}
-                className={`border-t border-[#E7E4DA] hover:bg-[#F1EFE9] ${
+                className={`border-t border-[#E5E5EA] hover:bg-[#FFFFFF] ${
                   busy === l.id ? "opacity-50" : ""
                 }`}
               >
@@ -216,13 +216,13 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
                     href={`/listings/${l.id}/${l.slug}`}
                     className="flex items-center gap-3 group"
                   >
-                    <div className="relative h-12 w-16 rounded-lg overflow-hidden bg-[#F3F1E9] flex-shrink-0">
+                    <div className="relative h-12 w-16 rounded-lg overflow-hidden bg-[#F4F4F6] flex-shrink-0">
                       <Image src={l.imageUrl} alt="" fill sizes="64px" className="object-cover" />
                     </div>
                     <div className="min-w-0">
-                      <div className="font-semibold text-xs truncate group-hover:text-[#C97612] transition-colors flex items-center gap-1">
+                      <div className="font-semibold text-xs truncate group-hover:text-[#6B21A8] transition-colors flex items-center gap-1">
                         {l.title}
-                        {l.isFeatured && <Star className="h-3 w-3 text-[#F0941F] fill-[#F0941F]" />}
+                        {l.isFeatured && <Star className="h-3 w-3 text-[#8136B2] fill-[#8136B2]" />}
                       </div>
                       <div className="text-xs text-muted">DXB-{l.id}</div>
                     </div>
@@ -248,14 +248,14 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
                 <td className="p-4">
                   <Dropdown.Root>
                     <Dropdown.Trigger asChild>
-                      <button className="h-8 w-8 rounded-full hover:bg-[#F3F1E9] flex items-center justify-center">
+                      <button className="h-8 w-8 rounded-full hover:bg-[#F4F4F6] flex items-center justify-center">
                         <MoreHorizontal className="h-4 w-4" />
                       </button>
                     </Dropdown.Trigger>
                     <Dropdown.Portal>
                       <Dropdown.Content
                         align="end"
-                        className="z-50 min-w-[170px] rounded-xl bg-white border border-[#E7E4DA] p-1 shadow-card text-xs"
+                        className="z-50 min-w-[170px] rounded-xl bg-white border border-[#E5E5EA] p-1 shadow-card text-xs"
                       >
                         <Item onClick={() => act(l.id, { status: "active" }, "Marked active")}>
                           <CheckCircle2 className="h-3.5 w-3.5" /> Mark active
@@ -279,7 +279,7 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
                         <Item onClick={() => act(l.id, { status: "archived" }, "Archived")}>
                           <Archive className="h-3.5 w-3.5" /> Archive
                         </Item>
-                        <Dropdown.Separator className="my-1 h-px bg-[#E7E4DA]" />
+                        <Dropdown.Separator className="my-1 h-px bg-[#E5E5EA]" />
                         <Item danger onClick={() => remove(l.id)}>
                           <Trash2 className="h-3.5 w-3.5" /> Delete
                         </Item>
@@ -308,7 +308,7 @@ function Item({
   return (
     <Dropdown.Item
       onClick={onClick}
-      className={`flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer outline-none data-[highlighted]:bg-[#F1EFE9] ${
+      className={`flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer outline-none data-[highlighted]:bg-[#FFFFFF] ${
         danger ? "text-[#DC2626]" : "text-secondary"
       }`}
     >

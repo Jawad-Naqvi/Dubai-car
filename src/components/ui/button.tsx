@@ -8,27 +8,29 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        /* Primary CTA — solid ink pill (reference "Contact Us" / "Buy Now") */
-        gold: "bg-[#141414] text-white shadow-sm hover:bg-[#2E2C28] hover:shadow-card-hover",
+        /* Primary CTA — solid violet (cars.com), rounded-rectangle */
+        gold: "bg-[#8136B2] text-white shadow-sm hover:bg-[#370B55] hover:shadow-card-hover",
         gold_outline:
-          "border border-[#141414]/25 text-[#141414] bg-transparent hover:bg-[#141414] hover:text-white hover:border-[#141414]",
+          "border border-[#8136B2]/40 text-[#8136B2] bg-transparent hover:bg-[#8136B2] hover:text-white hover:border-[#8136B2]",
         ghost:
-          "border border-[#E7E4DA] bg-white text-[#141414] hover:bg-[#F3F1E9] hover:border-[#D8D4C6]",
-        dark: "bg-[#181C30] text-white border border-[#181C30] hover:bg-[#23283F]",
-        /* Amber accent pill for promos */
-        accent: "bg-[#F0941F] text-white shadow-sm hover:bg-[#D6821A]",
+          "border border-[#E5E5EA] bg-white text-[#141414] hover:bg-[#F4F4F6] hover:border-[#D8D4C6]",
+        dark: "bg-[#141414] text-white border border-[#141414] hover:bg-[#2E2C28]",
+        /* Violet accent (same family as primary) */
+        accent: "bg-[#8136B2] text-white shadow-sm hover:bg-[#370B55]",
+        /* Light button for use ON dark/violet surfaces */
+        onDark: "bg-white text-[#8136B2] shadow-sm hover:bg-[#F3EDF9]",
         emerald:
-          "bg-white text-[#141414] border border-[#E7E4DA] hover:bg-[#F3F1E9]",
-        link: "text-[#141414] underline-offset-4 hover:underline",
+          "bg-white text-[#141414] border border-[#E5E5EA] hover:bg-[#F4F4F6]",
+        link: "text-[#8136B2] underline-offset-4 hover:underline",
         danger: "bg-[#DC2626] text-white hover:bg-[#B91C1C]",
       },
       size: {
-        xs: "h-7 px-3 text-[11px] rounded-full",
-        sm: "h-8 px-3.5 text-xs rounded-full",
-        md: "h-9 px-4 text-xs rounded-full",
-        lg: "h-10 px-6 text-sm rounded-full",
-        xl: "h-12 px-7 text-sm rounded-full",
-        icon: "h-8 w-8 rounded-full",
+        xs: "h-7 px-3 text-[11px] rounded-md",
+        sm: "h-8 px-3.5 text-xs rounded-md",
+        md: "h-9 px-4 text-xs rounded-md",
+        lg: "h-10 px-6 text-sm rounded-md",
+        xl: "h-12 px-7 text-sm rounded-md",
+        icon: "h-8 w-8 rounded-md",
       },
     },
     defaultVariants: {

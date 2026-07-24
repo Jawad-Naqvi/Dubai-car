@@ -23,7 +23,7 @@ export function StarRating({
     >
       <span className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map((n) => (
-          <Star key={n} className={cn(size, "text-[#D8D4C6]")} />
+          <Star key={n} className={cn(size, "text-[#D9D9E0]")} />
         ))}
       </span>
       <span
@@ -34,7 +34,7 @@ export function StarRating({
         {[1, 2, 3, 4, 5].map((n) => (
           <Star
             key={n}
-            className={cn(size, "flex-shrink-0 fill-[#F0941F] text-[#F0941F]")}
+            className={cn(size, "flex-shrink-0 fill-[#8136B2] text-[#8136B2]")}
           />
         ))}
       </span>

@@ -86,8 +86,8 @@ export default async function AdminOverview() {
                   a.tone === "danger"
                     ? "rounded-2xl bg-[#DC2626]/10 border border-[#DC2626]/30 px-5 py-3 flex items-center gap-3"
                     : a.tone === "warn"
-                      ? "rounded-2xl bg-[#F0941F]/10 border border-[#F0941F]/25 px-5 py-3 flex items-center gap-3"
-                      : "rounded-2xl bg-white shadow-card border border-[#E7E4DA] px-5 py-3 flex items-center gap-3"
+                      ? "rounded-2xl bg-[#8136B2]/10 border border-[#8136B2]/25 px-5 py-3 flex items-center gap-3"
+                      : "rounded-2xl bg-white shadow-card border border-[#E5E5EA] px-5 py-3 flex items-center gap-3"
                 }
               >
                 <ShieldAlert
@@ -95,8 +95,8 @@ export default async function AdminOverview() {
                     a.tone === "danger"
                       ? "h-4 w-4 text-[#DC2626]"
                       : a.tone === "warn"
-                        ? "h-4 w-4 text-[#C97612]"
-                        : "h-4 w-4 text-[#F0941F]"
+                        ? "h-4 w-4 text-[#6B21A8]"
+                        : "h-4 w-4 text-[#8136B2]"
                   }
                 />
                 <span className="text-xs">{a.text}</span>
@@ -107,17 +107,17 @@ export default async function AdminOverview() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((k) => (
-            <div key={k.label} className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-5 hover:shadow-card-hover transition-shadow">
-              <k.icon className="h-5 w-5 text-[#F0941F]" />
+            <div key={k.label} className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] p-5 hover:shadow-card-hover transition-shadow">
+              <k.icon className="h-5 w-5 text-[#8136B2]" />
               <div className="mt-4 text-base font-bold text-[#141414]">{k.value}</div>
               <div className="text-xs text-muted mt-1">{k.label}</div>
-              <div className="text-[10px] text-[#F0941F] mt-1">{k.sub}</div>
+              <div className="text-[10px] text-[#8136B2] mt-1">{k.sub}</div>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-4">
+          <div className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] p-4">
             <Eyebrow tone="gold">REVENUE BY STREAM</Eyebrow>
             <h3 className="mt-3 text-xs font-semibold text-[#141414]">This period</h3>
             <div className="mt-5 space-y-3">
@@ -127,9 +127,9 @@ export default async function AdminOverview() {
                     <span className="text-secondary">{row.label}</span>
                     <span className="font-semibold text-[#141414]">{formatAED(row.amount)}</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-[#F3F1E9] overflow-hidden">
+                  <div className="h-1.5 rounded-full bg-[#F4F4F6] overflow-hidden">
                     <div
-                      className="h-full bg-[#F0941F]"
+                      className="h-full bg-[#8136B2]"
                       style={{ width: `${Math.round((row.amount / maxStream) * 100)}%` }}
                     />
                   </div>
@@ -138,7 +138,7 @@ export default async function AdminOverview() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-4">
+          <div className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] p-4">
             <Eyebrow tone="emerald">TOP EXPORT DESTINATIONS</Eyebrow>
             <h3 className="mt-3 text-xs font-semibold text-[#141414]">From export inquiries</h3>
             {destinations.length === 0 ? (
@@ -150,11 +150,11 @@ export default async function AdminOverview() {
                 {destinations.map((row, i) => (
                   <div
                     key={row.country}
-                    className="flex items-center justify-between py-2 border-b border-[#E7E4DA] last:border-0"
+                    className="flex items-center justify-between py-2 border-b border-[#E5E5EA] last:border-0"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-muted w-6">#{i + 1}</span>
-                      <Ship className="h-4 w-4 text-[#F0941F]" />
+                      <Ship className="h-4 w-4 text-[#8136B2]" />
                       <span className="text-xs text-[#141414]">
                         {row.country} {FLAGS[row.country] ?? ""}
                       </span>

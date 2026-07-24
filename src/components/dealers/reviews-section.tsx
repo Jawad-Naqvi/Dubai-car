@@ -40,7 +40,7 @@ function Stars({
             className={cn(
               size,
               n <= value
-                ? "fill-[#F0941F] text-[#F0941F]"
+                ? "fill-[#8136B2] text-[#8136B2]"
                 : "text-[#D8D4C6]",
             )}
           />
@@ -99,7 +99,7 @@ export function ReviewsSection({ slug }: { slug: string }) {
   };
 
   return (
-    <section className="py-8 border-t border-[#E7E4DA]">
+    <section className="py-8 border-t border-[#E5E5EA]">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">
           Reviews
@@ -123,7 +123,7 @@ export function ReviewsSection({ slug }: { slug: string }) {
               reviews.map((r) => (
                 <div
                   key={r.id}
-                  className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4"
+                  className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">{r.authorName}</span>
@@ -146,7 +146,7 @@ export function ReviewsSection({ slug }: { slug: string }) {
           </div>
 
           {/* Write form */}
-          <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4 h-fit lg:sticky lg:top-16">
+          <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4 h-fit lg:sticky lg:top-16">
             <h3 className="text-sm font-semibold">Write a review</h3>
             {isSignedIn ? (
               <form onSubmit={submit} className="mt-3 space-y-2.5">

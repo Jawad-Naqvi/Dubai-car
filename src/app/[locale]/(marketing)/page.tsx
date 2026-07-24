@@ -6,24 +6,21 @@ import { mockListings } from "@/lib/mock-data";
 import { formatAED } from "@/lib/utils";
 import { carImageUrl } from "@/lib/car-images";
 import { Reveal } from "@/components/marketing/home/reveal";
-import { HomeSearch } from "@/components/marketing/home-search";
-import { HomeSearchBy } from "@/components/marketing/home-search-by";
+import { HomeSearchTabs } from "@/components/marketing/home-search-tabs";
 import { PromoCard } from "@/components/marketing/home/promo-card";
 import { WhyAccordion } from "@/components/marketing/home/why-accordion";
 import { TopCarousel, type TopCar } from "@/components/marketing/home/top-carousel";
 import { Testimonials, type Testimonial } from "@/components/marketing/home/testimonials";
-import { ArrowRight, ArrowUpRight, BadgeCheck, Ship, ShieldCheck, Star } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, Ship, ShieldCheck, Star } from "lucide-react";
 
 const TINTS = [
-  "bg-[#FBE7D4]",
+  "bg-[#F3EDF9]",
   "bg-[#CFE3F3]",
   "bg-[#DFEDE0]",
   "bg-[#E6E1F2]",
-  "bg-[#F6DDD3]",
-  "bg-[#F3F1E9]",
+  "bg-[#F3EDF9]",
+  "bg-[#F4F4F6]",
 ];
-
-const AVATAR_SEEDS = ["Ahmed", "Priya", "Chidi", "Omar"];
 
 export default async function LandingPage({
   params,
@@ -76,72 +73,51 @@ export default async function LandingPage({
 
   return (
     <>
-      {/* ================ HERO ================ */}
-      <section className="relative pt-10 lg:pt-16 overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-start">
-            <Reveal>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl leading-[1.1] tracking-tight font-light text-[#141414] max-w-3xl">
-                {t("hero.titlePre")}{" "}
-                <span className="font-extrabold">{t("hero.titleHighlight")}</span>{" "}
-                <span>
+      {/* ================ HERO — grey band, search column left (cars.com) ================ */}
+      <section className="bg-[#F4F4F6] border-b border-[#E5E5EA]">
+        <div className="mx-auto max-w-7xl px-4 lg:px-6 py-10 lg:py-14">
+          <div className="grid grid-cols-1 lg:grid-cols-[430px_1fr] gap-10 lg:gap-16 items-start">
+            {/* Search column */}
+            <div>
+              <Reveal>
+                <h1 className="text-3xl sm:text-4xl lg:text-[40px] leading-[1.1] tracking-tight font-extrabold text-[#141414]">
+                  {t("hero.titlePre")} {t("hero.titleHighlight")}{" "}
                   {t("hero.titlePost")}
-                  <ArrowRight
-                    className="inline-block h-8 w-8 lg:h-12 lg:w-12 mx-3 rtl-flip align-middle"
-                    strokeWidth={1.25}
-                  />
-                  <Button asChild variant="gold" size="lg" className="align-middle">
-                    <Link href="/contact">{t("hero.contact")}</Link>
-                  </Button>
-                </span>
-              </h1>
-            </Reveal>
+                </h1>
+              </Reveal>
 
-            {/* Happy customers cluster */}
-            <Reveal delay={0.15} className="flex lg:flex-col items-center lg:items-end gap-3">
-              <div className="flex -space-x-2.5 rtl:space-x-reverse">
-                {AVATAR_SEEDS.map((seed, i) => (
-                  <div
-                    key={seed}
-                    className="relative h-10 w-10 rounded-full ring-2 ring-[#F1EFE9] overflow-hidden bg-[#FBE7D4]"
-                    style={{ zIndex: 10 - i }}
-                  >
-                    <Image
-                      src={`https://api.dicebear.com/9.x/notionists/png?seed=${seed}&backgroundColor=fbe7d4,cfe3f3,dfede0,e6e1f2`}
-                      alt=""
-                      fill
-                      sizes="40px"
-                    />
-                  </div>
-                ))}
-                <div className="relative z-0 h-10 w-10 rounded-full ring-2 ring-[#F1EFE9] bg-[#141414] text-white flex items-center justify-center text-sm font-bold">
-                  +
-                </div>
+              {/* Shop / Sell switcher — buyers search, sellers get a valuation */}
+              <Reveal delay={0.15} className="mt-6">
+                <HomeSearchTabs />
+              </Reveal>
+            </div>
+
+            {/* Hero art */}
+            <Reveal delay={0.2} className="relative hidden lg:block self-stretch min-h-[430px]">
+              <div className="absolute inset-0 rounded-lg overflow-hidden bg-[#E6E1F2]">
+                <Image
+                  src={promoImages[0]}
+                  alt={promos[0]?.label ?? "Featured car"}
+                  fill
+                  sizes="(max-width: 1024px) 0px, 60vw"
+                  className="object-cover"
+                  priority
+                />
               </div>
-              <div className="text-start lg:text-end">
-                <div className="text-lg font-extrabold text-[#141414] leading-none">
-                  {t("hero.customersCount")}
-                </div>
-                <div className="mt-1 text-[11px] text-secondary">{t("hero.customersLabel")}</div>
+              <div className="absolute bottom-4 right-4">
+                <Button asChild variant="dark" size="sm" className="rounded-full">
+                  <Link href="/buy">{t("hero.contact")}</Link>
+                </Button>
               </div>
             </Reveal>
           </div>
+        </div>
+      </section>
 
-          {/* Structured search — keyword, or drill down by make/model/emirate */}
-          <Reveal delay={0.25} className="mt-8 max-w-2xl">
-            <HomeSearch />
-            <div className="my-3 flex items-center gap-3">
-              <div className="h-px flex-1 bg-[#141414]/10" />
-              <span className="text-[11px] font-medium text-muted">
-                {t("hero.orSearchBy")}
-              </span>
-              <div className="h-px flex-1 bg-[#141414]/10" />
-            </div>
-            <HomeSearchBy />
-          </Reveal>
-
-          {/* Promo cards */}
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* ================ PROMO CARDS ================ */}
+      <section className="relative pt-10 lg:pt-12">
+        <div className="mx-auto max-w-7xl px-4 lg:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {promos.map((p, i) => (
               <PromoCard
                 key={p.href}
@@ -208,7 +184,7 @@ export default async function LandingPage({
       <section className="relative pt-12 lg:pt-16">
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Reveal className="relative min-h-[320px] lg:min-h-[460px] rounded-3xl overflow-hidden bg-[#CFE3F3]">
+            <Reveal className="relative min-h-[320px] lg:min-h-[460px] rounded-2xl overflow-hidden bg-[#CFE3F3]">
               <Image
                 src={whyImage}
                 alt="Verified inspection"
@@ -217,12 +193,12 @@ export default async function LandingPage({
                 className="object-cover"
               />
               <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur px-4 py-2 text-xs font-semibold text-[#141414] shadow-card">
-                <BadgeCheck className="h-4 w-4 text-[#F0941F]" />
+                <BadgeCheck className="h-4 w-4 text-[#8136B2]" />
                 200-point inspection
               </div>
             </Reveal>
 
-            <Reveal delay={0.12} className="rounded-3xl bg-white shadow-card p-6 lg:p-10">
+            <Reveal delay={0.12} className="rounded-2xl bg-white shadow-card p-6 lg:p-10">
               <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-[#141414]">
                 {t("why.title")}
               </h2>
@@ -245,8 +221,8 @@ export default async function LandingPage({
               <Reveal
                 key={v.title}
                 delay={i * 0.1}
-                className={`rounded-3xl p-6 flex flex-col ${
-                  i === 0 ? "bg-[#FBE7D4]" : "bg-white shadow-card"
+                className={`rounded-2xl p-6 flex flex-col ${
+                  i === 0 ? "bg-[#F3EDF9]" : "bg-white shadow-card"
                 }`}
               >
                 <div className="h-9 w-9 rounded-full bg-[#141414] text-white flex items-center justify-center mb-4">
@@ -269,7 +245,7 @@ export default async function LandingPage({
             {/* Offer tile with starburst */}
             <Reveal
               delay={0.3}
-              className="relative rounded-3xl overflow-hidden min-h-[220px] bg-[#C6CD87]"
+              className="relative rounded-2xl overflow-hidden min-h-[220px] bg-[#C6CD87]"
             >
               <Image
                 src={carImageUrl({
@@ -304,7 +280,7 @@ export default async function LandingPage({
       {/* ================ COLLECTION BANNER ================ */}
       <section className="relative pt-12 lg:pt-16">
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
-          <Reveal className="relative rounded-[2rem] bg-[#FBE7D4] overflow-hidden">
+          <Reveal className="relative rounded-[2rem] bg-[#F3EDF9] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
               <div className="p-8 lg:p-14">
                 <h2 className="text-3xl lg:text-[44px] leading-[1.1] font-bold tracking-tight text-[#141414] max-w-sm">
@@ -330,7 +306,7 @@ export default async function LandingPage({
                     alt={t("collection.title")}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover rounded-3xl shadow-card-hover"
+                    className="object-cover rounded-2xl shadow-card-hover"
                   />
                 </div>
               </div>
@@ -366,7 +342,7 @@ export default async function LandingPage({
               <Reveal key={l.id} delay={(i % 3) * 0.08}>
                 <Link href={`/listings/${l.id}/${l.slug}`} className="group block">
                   <div
-                    className={`relative aspect-[4/3] rounded-3xl overflow-hidden ${TINTS[(i + 1) % TINTS.length]}`}
+                    className={`relative aspect-[4/3] rounded-2xl overflow-hidden ${TINTS[(i + 1) % TINTS.length]}`}
                   >
                     <Image
                       src={carImageUrl({
@@ -392,8 +368,8 @@ export default async function LandingPage({
                             key={s}
                             className={`h-3 w-3 ${
                               s < 4
-                                ? "fill-[#F0941F] text-[#F0941F]"
-                                : "fill-[#E7E4DA] text-[#E7E4DA]"
+                                ? "fill-[#8136B2] text-[#8136B2]"
+                                : "fill-[#E5E5EA] text-[#E5E5EA]"
                             }`}
                           />
                         ))}
