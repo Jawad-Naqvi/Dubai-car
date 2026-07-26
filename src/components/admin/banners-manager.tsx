@@ -11,7 +11,7 @@ import type { BannerView } from "@/lib/data/banners";
 import { Plus, Trash2, ImageOff, Loader2 } from "lucide-react";
 
 const field =
-  "w-full h-10 rounded-xl bg-white border border-[#E7E4DA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[#141414]/20";
+  "w-full h-10 rounded-xl bg-white border border-[#E5E5EA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[#141414]/20";
 const labelCls = "text-[11px] uppercase tracking-wider text-muted mb-1.5 block";
 
 const PLACEMENTS = ["homepage_hero", "homepage_strip", "category_top", "sidebar"];
@@ -73,7 +73,7 @@ export function BannersManager({ banners }: { banners: BannerView[] }) {
       </div>
 
       {banners.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white shadow-card border border-[#E7E4DA]">
+        <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white shadow-card border border-[#E5E5EA]">
           <ImageOff className="h-8 w-8 text-muted mb-3" />
           <h3 className="text-sm font-semibold text-[#141414]">No banners yet</h3>
           <p className="mt-1 text-xs text-muted">
@@ -83,8 +83,8 @@ export function BannersManager({ banners }: { banners: BannerView[] }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {banners.map((b) => (
-            <div key={b.id} className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] overflow-hidden">
-              <div className="relative aspect-[16/6] bg-[#F3F1E9]">
+            <div key={b.id} className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] overflow-hidden">
+              <div className="relative aspect-[16/6] bg-[#F4F4F6]">
                 {b.imageUrl && (
                   <Image src={b.imageUrl} alt={b.title} fill sizes="400px" className="object-cover" />
                 )}

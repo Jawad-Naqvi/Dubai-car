@@ -36,7 +36,7 @@ export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
 
   if (items !== null && items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
+      <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white border border-[#E5E5EA] shadow-card">
         <GitCompare className="h-8 w-8 text-muted mb-3" />
         <h3 className="text-sm font-semibold">Nothing to compare yet</h3>
         <p className="mt-1 text-xs text-muted max-w-xs">
@@ -90,19 +90,19 @@ export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[#E7E4DA] bg-white shadow-card">
+      <div className="overflow-x-auto rounded-2xl border border-[#E5E5EA] bg-white shadow-card">
         <table className="w-full text-xs border-collapse min-w-[640px]">
           <thead>
             <tr>
               <th className="w-32 bg-white sticky left-0" />
               {items.map((l) => (
-                <th key={l.id} className="p-3 bg-white border-l border-[#E7E4DA] align-top text-left font-normal">
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F3F1E9] mb-2">
+                <th key={l.id} className="p-3 bg-white border-l border-[#E5E5EA] align-top text-left font-normal">
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F4F4F6] mb-2">
                     <Image src={l.imageUrl} alt={l.model} fill sizes="200px" className="object-cover" />
                     <button
                       onClick={() => toggle(l.id)}
                       aria-label="Remove"
-                      className="absolute top-1 right-1 h-6 w-6 rounded-full bg-white/90 border border-[#E7E4DA] text-[#141414] grid place-items-center hover:bg-white"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full bg-white/90 border border-[#E5E5EA] text-[#141414] grid place-items-center hover:bg-white"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -122,15 +122,15 @@ export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
             {rows.map((row) => {
               const winner = bestIndex(row);
               return (
-                <tr key={row.label} className="border-t border-[#E7E4DA]">
+                <tr key={row.label} className="border-t border-[#E5E5EA]">
                   <td className="p-3 bg-white sticky left-0 text-muted text-[10px] uppercase tracking-wider">
                     {row.label}
                   </td>
                   {items.map((l, i) => (
                     <td
                       key={l.id}
-                      className={`p-3 border-l border-[#E7E4DA] ${
-                        winner === i ? "text-[#C97612] font-semibold" : "text-secondary"
+                      className={`p-3 border-l border-[#E5E5EA] ${
+                        winner === i ? "text-[#6B21A8] font-semibold" : "text-secondary"
                       }`}
                     >
                       <span className="inline-flex items-center gap-1">

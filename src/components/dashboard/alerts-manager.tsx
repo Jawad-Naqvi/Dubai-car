@@ -101,9 +101,9 @@ export function AlertsManager() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-4">
       {/* Create form */}
-      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 h-fit">
+      <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 h-fit">
         <div className="flex items-center gap-2 mb-4">
-          <Bell className="h-4 w-4 text-[#F0941F]" />
+          <Bell className="h-4 w-4 text-[#8136B2]" />
           <h2 className="text-xs font-semibold">New alert</h2>
         </div>
         <form onSubmit={addAlert} className="space-y-3">
@@ -115,7 +115,7 @@ export function AlertsManager() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="BMW under 200k"
-              className="w-full h-9 rounded-full border border-[#E7E4DA] bg-white px-4 text-xs outline-none focus:border-[#F0941F]"
+              className="w-full h-9 rounded-full border border-[#E5E5EA] bg-white px-4 text-xs outline-none focus:border-[#8136B2]"
             />
           </div>
           <div>
@@ -126,7 +126,7 @@ export function AlertsManager() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="e.g. X5, Land Cruiser"
-              className="w-full h-9 rounded-full border border-[#E7E4DA] bg-white px-4 text-xs outline-none focus:border-[#F0941F]"
+              className="w-full h-9 rounded-full border border-[#E5E5EA] bg-white px-4 text-xs outline-none focus:border-[#8136B2]"
             />
           </div>
           <div>
@@ -136,7 +136,7 @@ export function AlertsManager() {
             <select
               value={frequency}
               onChange={(e) => setFrequency(e.target.value as Frequency)}
-              className="w-full h-9 rounded-full border border-[#E7E4DA] bg-white px-4 text-xs outline-none focus:border-[#F0941F]"
+              className="w-full h-9 rounded-full border border-[#E5E5EA] bg-white px-4 text-xs outline-none focus:border-[#8136B2]"
             >
               <option value="instant">Instant</option>
               <option value="daily">Daily digest</option>
@@ -155,7 +155,7 @@ export function AlertsManager() {
       </div>
 
       {/* Existing alerts */}
-      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
+      <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
         <h2 className="text-xs font-semibold mb-4">
           Your alerts{" "}
           <span className="text-muted font-normal">({alerts?.length ?? 0})</span>
@@ -177,12 +177,12 @@ export function AlertsManager() {
             {alerts.map((a) => (
               <div
                 key={a.id}
-                className="flex items-center gap-3 rounded-xl border border-[#E7E4DA] p-3 hover:bg-[#F1EFE9]"
+                className="flex items-center gap-3 rounded-xl border border-[#E5E5EA] p-3 hover:bg-[#FFFFFF]"
               >
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-xs truncate">{a.name}</div>
                   <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted">
-                    <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-[#F3F1E9] text-secondary">
+                    <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-[#F4F4F6] text-secondary">
                       {FREQUENCY_LABELS[a.frequency]}
                     </span>
                     <span className="truncate">{describe(a.query)}</span>

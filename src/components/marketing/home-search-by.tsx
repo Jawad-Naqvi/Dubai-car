@@ -2,57 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@/i18n/routing";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { emirates, makeModels } from "@/lib/brand";
+import { LabeledSelect } from "@/components/ui/labeled-select";
 
 interface Facet {
   value: string;
   count: number;
 }
 
-function Select({
-  label,
-  value,
-  onChange,
-  options,
-  disabled,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: { value: string; label: string }[];
-  disabled?: boolean;
-  placeholder: string;
-}) {
-  return (
-    <div className="relative flex-1 min-w-0">
-      <div className="rounded-xl border border-[#E7E4DA] bg-white px-3 pt-2 pb-1.5 focus-within:border-[#F0941F] transition-colors">
-        <label className="block text-[10px] font-medium text-muted">{label}</label>
-        <select
-          value={value}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          suppressHydrationWarning
-          className="w-full appearance-none bg-transparent pe-5 text-sm font-semibold text-[#141414] outline-none disabled:text-muted cursor-pointer truncate"
-        >
-          <option value="">{placeholder}</option>
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <ChevronDown className="pointer-events-none absolute end-3 bottom-2.5 h-4 w-4 text-muted" />
-    </div>
-  );
-}
-
 /**
- * cars.com-style structured search: pick condition / make / model / emirate and
- * the CTA shows the live match count before you commit to the results page.
- * Counts come from the same /api/search facets the listings page uses.
+ * cars.com-style structured search: a vertically joined stack of labelled
+ * selects (condition → make → model → emirate) with a full-width violet CTA
+ * that shows the live match count before you commit to the results page.
  */
 export function HomeSearchBy() {
   const router = useRouter();
@@ -122,64 +84,65 @@ export function HomeSearchBy() {
   const go = () => router.push(`/buy?${query.toString()}`);
 
   return (
-    <div className="rounded-2xl border border-[#E7E4DA] bg-white/80 backdrop-blur p-3 shadow-card">
-      <div className="flex flex-col gap-2">
-        <div className="flex gap-2">
-          <Select
-            label="Condition"
-            value={condition}
-            onChange={setCondition}
-            placeholder="New & used"
-            options={[
-              { value: "New", label: "New" },
-              { value: "Used", label: "Used" },
-              { value: "Certified Pre-Owned", label: "Certified Pre-Owned" },
-            ]}
-          />
-          <Select
-            label="Emirate"
-            value={emirate}
-            onChange={setEmirate}
-            placeholder="All emirates"
-            options={emirates.map((e) => ({ value: e.en, label: e.en }))}
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <Select
-            label="Make"
-            value={make}
-            onChange={(v) => {
-              setMake(v);
-              setModel("");
-            }}
-            placeholder="All makes"
-            options={makes.map((m) => ({
-              value: m.value,
-              label: `${m.value} (${m.count})`,
-            }))}
-          />
-          <Select
-            label="Model"
-            value={model}
-            onChange={setModel}
-            disabled={!make}
-            placeholder={make ? "All models" : "Select a make"}
-            options={modelOptions}
-          />
-        </div>
-
-        <button
-          onClick={go}
-          className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#141414] text-sm font-semibold text-white transition-opacity hover:opacity-90"
-        >
-          {loading && total === null ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <>Show {total?.toLocaleString() ?? 0} matches</>
-          )}
-        </button>
+    <div>
+      {/* Joined vertical stack — one grouped widget, cars.com style */}
+      <div className="rounded-md border border-[#D9D9E0] bg-white divide-y divide-[#D9D9E0] overflow-hidden [&>div>div]:border-0">
+        <LabeledSelect
+          joined
+          label="New/used"
+          value={condition}
+          onChange={setCondition}
+          placeholder="New & used"
+          options={[
+            { value: "New", label: "New" },
+            { value: "Used", label: "Used" },
+            { value: "Certified Pre-Owned", label: "Certified Pre-Owned" },
+          ]}
+        />
+        <LabeledSelect
+          joined
+          label="Make"
+          value={make}
+          onChange={(v) => {
+            setMake(v);
+            setModel("");
+          }}
+          placeholder="All makes"
+          options={makes.map((m) => ({
+            value: m.value,
+            label: `${m.value} (${m.count})`,
+          }))}
+        />
+        <LabeledSelect
+          joined
+          label="Model"
+          value={model}
+          onChange={setModel}
+          disabled={!make}
+          placeholder={make ? "All models" : "All models"}
+          options={modelOptions}
+        />
+        <LabeledSelect
+          joined
+          label="Emirate"
+          value={emirate}
+          onChange={setEmirate}
+          placeholder="All emirates"
+          options={emirates.map((e) => ({ value: e.en, label: e.en }))}
+        />
       </div>
+
+      <button
+        onClick={go}
+        suppressHydrationWarning
+        className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#8136B2] text-sm font-semibold text-white transition-colors hover:bg-[#6B21A8]"
+      >
+        {loading && total === null ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <>Show {total?.toLocaleString() ?? 0} matches</>
+        )}
+      </button>
     </div>
   );
 }

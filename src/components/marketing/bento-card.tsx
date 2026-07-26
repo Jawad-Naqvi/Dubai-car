@@ -12,9 +12,9 @@ export function BentoCard({
   children,
 }: BentoCardProps) {
   const variants = {
-    dark: "bg-white border border-[#E7E4DA] text-[#141414] shadow-card",
-    gold: "bg-bento-gold text-white border border-[#F0941F]/40 shadow-card",
-    emerald: "bg-white border border-[#E7E4DA] text-[#141414] shadow-card",
+    dark: "bg-white border border-[#E5E5EA] text-[#141414] shadow-card",
+    gold: "bg-bento-gold text-white border border-[#8136B2]/40 shadow-card",
+    emerald: "bg-white border border-[#E5E5EA] text-[#141414] shadow-card",
   };
 
   return (
@@ -27,7 +27,7 @@ export function BentoCard({
     >
       <div className="relative z-10 h-full">{children}</div>
       {variant === "dark" && (
-        <div className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#F0941F]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#8136B2]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       )}
     </div>
   );

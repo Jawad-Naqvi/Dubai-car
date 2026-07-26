@@ -39,7 +39,7 @@ export default async function SellPage({
       <section className="relative pt-12 pb-24 overflow-hidden">
         <RadialGlow color="gold" size="xl" className="-top-40 -left-40 opacity-30" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-6">
-          <div className="relative rounded-3xl bg-[#F3F1E9] border border-[#E7E4DA] px-5 py-8 lg:px-10 lg:py-12 overflow-hidden">
+          <div className="relative rounded-2xl bg-[#F4F4F6] border border-[#E5E5EA] px-5 py-8 lg:px-10 lg:py-12 overflow-hidden">
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 items-center">
               <div>
                 <Eyebrow tone="gold">LIST YOUR CAR</Eyebrow>
@@ -67,7 +67,7 @@ export default async function SellPage({
                   Run a yard or dealership?{" "}
                   <Link
                     href="/sell/become-seller"
-                    className="font-semibold text-[#141414] underline underline-offset-2 hover:text-[#C97612]"
+                    className="font-semibold text-[#141414] underline underline-offset-2 hover:text-[#6B21A8]"
                   >
                     Open a seller account
                   </Link>{" "}
@@ -109,12 +109,12 @@ export default async function SellPage({
             {steps.map((s, i) => (
               <div
                 key={s.title}
-                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 relative overflow-hidden hover:shadow-card-hover hover:border-[#D8D4C6] transition-all"
+                className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 relative overflow-hidden hover:shadow-card-hover hover:border-[#D8D4C6] transition-all"
               >
                 <div className="text-2xl font-extrabold text-[#141414]/10 absolute top-4 right-4">
                   0{i + 1}
                 </div>
-                <s.icon className="h-7 w-7 text-[#F0941F] mb-4" />
+                <s.icon className="h-7 w-7 text-[#8136B2] mb-4" />
                 <h3 className="font-semibold">{s.title}</h3>
                 <p className="mt-2 text-sm text-secondary leading-relaxed">
                   {s.desc}
@@ -140,7 +140,7 @@ export default async function SellPage({
               </p>
             </BentoCard>
             <BentoCard variant="dark" className="col-span-12 md:col-span-5">
-              <Users className="h-7 w-7 text-[#F0941F] mb-4" />
+              <Users className="h-7 w-7 text-[#8136B2] mb-4" />
               <BentoTitle className="text-sm">
                 Direct WhatsApp leads — no spam.
               </BentoTitle>
@@ -149,7 +149,7 @@ export default async function SellPage({
               </BentoDesc>
             </BentoCard>
             <BentoCard variant="emerald" className="col-span-12 md:col-span-5">
-              <Clock className="h-7 w-7 text-[#F0941F] mb-4" />
+              <Clock className="h-7 w-7 text-[#8136B2] mb-4" />
               <BentoTitle className="text-sm">
                 Most cars sell within 19 days.
               </BentoTitle>

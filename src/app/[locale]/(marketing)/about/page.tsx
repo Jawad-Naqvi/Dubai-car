@@ -55,10 +55,10 @@ export default async function AboutPage({
             {principles.map((p) => (
               <div
                 key={p.title}
-                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
+                className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
               >
-                <div className="h-12 w-12 rounded-full bg-[#FBE7D4] flex items-center justify-center mb-5">
-                  <p.icon className="h-5 w-5 text-[#F0941F]" />
+                <div className="h-12 w-12 rounded-full bg-[#F3EDF9] flex items-center justify-center mb-5">
+                  <p.icon className="h-5 w-5 text-[#8136B2]" />
                 </div>
                 <h3 className="font-semibold text-sm">{p.title}</h3>
                 <p className="mt-2 text-sm text-secondary leading-relaxed">

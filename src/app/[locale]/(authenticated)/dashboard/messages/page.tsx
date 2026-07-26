@@ -21,8 +21,8 @@ function timeAgo(iso: string) {
 
 const STATUS_CHIP: Record<string, string> = {
   new: "bg-[#1B4FA0]/10 text-[#1B4FA0]",
-  contacted: "bg-[#F0941F]/10 text-[#C97612]",
-  closed: "bg-[#F3F1E9] text-secondary",
+  contacted: "bg-[#8136B2]/10 text-[#6B21A8]",
+  closed: "bg-[#F4F4F6] text-secondary",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -53,7 +53,7 @@ export default async function MessagesPage({
       />
       <main className="p-5 lg:p-8">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
+          <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white border border-[#E5E5EA] shadow-card">
             <MessageSquare className="h-8 w-8 text-muted mb-3" />
             <h3 className="text-sm font-semibold">No messages yet</h3>
             <p className="mt-1 text-xs text-muted max-w-xs">
@@ -72,7 +72,7 @@ export default async function MessagesPage({
             {messages.map((m) => (
               <div
                 key={m.id}
-                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4 hover:shadow-card-hover transition-shadow"
+                className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4 hover:shadow-card-hover transition-shadow"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -88,7 +88,7 @@ export default async function MessagesPage({
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                        STATUS_CHIP[m.status] ?? "bg-[#F3F1E9] text-secondary"
+                        STATUS_CHIP[m.status] ?? "bg-[#F4F4F6] text-secondary"
                       }`}
                     >
                       {m.status}
@@ -102,11 +102,11 @@ export default async function MessagesPage({
                   {m.message || "—"}
                 </p>
                 <div className="mt-3 flex items-center gap-2">
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-[#F3F1E9] text-secondary">
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-[#F4F4F6] text-secondary">
                     {TYPE_LABELS[m.type] ?? m.type}
                   </span>
                 </div>
-                <div className="mt-3 pt-3 border-t border-[#F1EFE9]">
+                <div className="mt-3 pt-3 border-t border-[#E5E5EA]">
                   <ReplyThread leadId={m.id} replies={m.replies} senderRole="buyer" />
                 </div>
               </div>

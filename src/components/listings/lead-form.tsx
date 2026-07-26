@@ -29,7 +29,7 @@ const FieldLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 const inputCls =
-  "w-full h-9 rounded-xl bg-white border border-[#E7E4DA] text-xs text-[#141414] placeholder:text-muted px-2.5 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
+  "w-full h-9 rounded-xl bg-white border border-[#E5E5EA] text-xs text-[#141414] placeholder:text-muted px-2.5 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
 
 export function LeadForm({
   listingId,
@@ -166,7 +166,7 @@ export function LeadForm({
         <div>
           <FieldLabel>Message</FieldLabel>
           <textarea
-            className="w-full rounded-xl bg-white border border-[#E7E4DA] text-xs text-[#141414] placeholder:text-muted px-2.5 py-2 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10 min-h-[72px]"
+            className="w-full rounded-xl bg-white border border-[#E5E5EA] text-xs text-[#141414] placeholder:text-muted px-2.5 py-2 focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10 min-h-[72px]"
             value={form.message}
             onChange={(e) => set("message", e.target.value)}
             placeholder="Add any details…"

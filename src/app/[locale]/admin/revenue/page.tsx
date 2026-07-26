@@ -29,14 +29,14 @@ export default async function AdminRevenuePage() {
             { label: "Active subscriptions", value: String(activeSubs) },
             { label: "ARPU", value: formatAED(arpu) },
           ].map((k) => (
-            <div key={k.label} className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-5">
+            <div key={k.label} className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] p-5">
               <div className="text-base font-bold text-[#141414]">{k.value}</div>
               <div className="text-xs text-muted mt-2">{k.label}</div>
             </div>
           ))}
         </div>
 
-        <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-4">
+        <div className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] p-4">
           <Eyebrow tone="gold">MRR TREND</Eyebrow>
           <h3 className="mt-3 text-xs font-semibold text-[#141414]">Last 6 months (projected)</h3>
           <div className="mt-6 flex items-end justify-between gap-3 h-64 px-2">
@@ -46,7 +46,7 @@ export default async function AdminRevenuePage() {
                   {formatAED(m.value)}
                 </div>
                 <div
-                  className="w-full rounded-t-lg bg-[#F0941F]"
+                  className="w-full rounded-t-lg bg-[#8136B2]"
                   style={{ height: `${(m.value / max) * 80}%` }}
                 />
                 <div className="text-xs text-muted">{m.month}</div>
@@ -56,13 +56,13 @@ export default async function AdminRevenuePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-4">
+          <div className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] p-4">
             <Eyebrow tone="emerald">SUBSCRIPTION SPLIT</Eyebrow>
             <div className="mt-5 space-y-3">
               {revenue.subscriptionSplit.map((row) => (
                 <div
                   key={row.tier}
-                  className="flex items-center justify-between py-3 border-b border-[#E7E4DA] last:border-0"
+                  className="flex items-center justify-between py-3 border-b border-[#E5E5EA] last:border-0"
                 >
                   <div>
                     <div className="font-semibold text-xs text-[#141414]">{row.tier}</div>
@@ -76,7 +76,7 @@ export default async function AdminRevenuePage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] p-4">
+          <div className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] p-4">
             <Eyebrow tone="gold">REVENUE STREAMS</Eyebrow>
             <div className="mt-5 space-y-3">
               {revenue.streams.map((s) => {
@@ -85,11 +85,11 @@ export default async function AdminRevenuePage() {
                   <div key={s.label}>
                     <div className="flex justify-between text-xs mb-1.5">
                       <span className="font-semibold text-[#141414]">{s.label}</span>
-                      <span className="text-[#F0941F]">{formatAED(s.amount)}</span>
+                      <span className="text-[#8136B2]">{formatAED(s.amount)}</span>
                     </div>
-                    <div className="h-2 rounded-full bg-[#F3F1E9] overflow-hidden">
+                    <div className="h-2 rounded-full bg-[#F4F4F6] overflow-hidden">
                       <div
-                        className="h-full bg-[#F0941F]"
+                        className="h-full bg-[#8136B2]"
                         style={{ width: `${Math.round((s.amount / maxAmt) * 100)}%` }}
                       />
                     </div>

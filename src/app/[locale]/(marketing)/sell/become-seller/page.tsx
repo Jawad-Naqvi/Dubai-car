@@ -32,7 +32,7 @@ export default async function BecomeSellerPage({
   return (
     <div className="mx-auto max-w-5xl px-4 lg:px-6 pt-10 lg:pt-14">
       <div className="max-w-xl">
-        <span className="inline-flex items-center rounded-full bg-[#FBE7D4] px-3 py-1 text-[11px] font-semibold text-[#C97612]">
+        <span className="inline-flex items-center rounded-full bg-[#F3EDF9] px-3 py-1 text-[11px] font-semibold text-[#6B21A8]">
           For yards, dealers & vendors
         </span>
         <h1 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-[#141414] leading-[1.1]">
@@ -48,8 +48,8 @@ export default async function BecomeSellerPage({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {PERKS.map((p) => (
             <div key={p.title} className="rounded-2xl bg-white shadow-card p-4">
-              <span className="h-8 w-8 rounded-full bg-[#F3F1E9] flex items-center justify-center mb-2.5">
-                <p.icon className="h-4 w-4 text-[#F0941F]" />
+              <span className="h-8 w-8 rounded-full bg-[#F4F4F6] flex items-center justify-center mb-2.5">
+                <p.icon className="h-4 w-4 text-[#8136B2]" />
               </span>
               <h3 className="text-sm font-semibold text-[#141414]">{p.title}</h3>
               <p className="mt-1 text-xs text-secondary leading-relaxed">{p.desc}</p>
@@ -60,7 +60,7 @@ export default async function BecomeSellerPage({
         <div>
           <SignedIn>
             {dealer?.kycStatus === "approved" ? (
-              <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8 text-center">
+              <div className="rounded-2xl bg-white shadow-card p-6 lg:p-8 text-center">
                 <span className="mx-auto h-11 w-11 rounded-full bg-[#137A43]/10 flex items-center justify-center">
                   <CheckCircle2 className="h-5 w-5 text-[#137A43]" />
                 </span>
@@ -73,9 +73,9 @@ export default async function BecomeSellerPage({
                 </Button>
               </div>
             ) : dealer?.kycStatus === "pending" ? (
-              <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8 text-center">
-                <span className="mx-auto h-11 w-11 rounded-full bg-[#F0941F]/10 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-[#F0941F]" />
+              <div className="rounded-2xl bg-white shadow-card p-6 lg:p-8 text-center">
+                <span className="mx-auto h-11 w-11 rounded-full bg-[#8136B2]/10 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-[#8136B2]" />
                 </span>
                 <h2 className="mt-3 text-base font-bold text-[#141414]">Application under review</h2>
                 <p className="mt-2 text-xs text-secondary leading-relaxed">
@@ -85,7 +85,7 @@ export default async function BecomeSellerPage({
                 </p>
               </div>
             ) : dealer?.kycStatus === "rejected" ? (
-              <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8">
+              <div className="rounded-2xl bg-white shadow-card p-6 lg:p-8">
                 <div className="text-center">
                   <span className="mx-auto h-11 w-11 rounded-full bg-[#DC2626]/10 flex items-center justify-center">
                     <XCircle className="h-5 w-5 text-[#DC2626]" />
@@ -111,7 +111,7 @@ export default async function BecomeSellerPage({
             )}
           </SignedIn>
           <SignedOut>
-            <div className="rounded-3xl bg-white shadow-card p-6 lg:p-8 text-center">
+            <div className="rounded-2xl bg-white shadow-card p-6 lg:p-8 text-center">
               <h2 className="text-base font-bold text-[#141414]">Sign in to continue</h2>
               <p className="mt-2 text-xs text-secondary leading-relaxed">
                 Create a free account or sign in, then set up your yard in one step.

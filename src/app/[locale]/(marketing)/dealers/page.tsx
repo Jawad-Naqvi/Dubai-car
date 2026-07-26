@@ -84,7 +84,7 @@ export default async function DealersPage({
   return (
     <>
       {/* Hero strip */}
-      <div className="relative bg-[#F3F1E9] py-8 lg:py-10 border-b border-[#E7E4DA]">
+      <div className="relative bg-[#F4F4F6] py-8 lg:py-10 border-b border-[#E5E5EA]">
         <div className="relative mx-auto max-w-7xl px-4 lg:px-6">
           <Eyebrow tone="gold">VERIFIED DEALER DIRECTORY</Eyebrow>
           <h1 className="mt-2 text-2xl lg:text-3xl font-light tracking-tight">
@@ -130,7 +130,7 @@ export default async function DealersPage({
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
+          <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white border border-[#E5E5EA] shadow-card">
             <SearchX className="h-8 w-8 text-muted mb-3" />
             <h3 className="text-sm font-semibold text-[#141414]">
               No dealers match your filters
@@ -153,10 +153,10 @@ export default async function DealersPage({
         <Pagination page={page} totalPages={totalPages} />
 
         {/* Become-a-dealer CTA */}
-        <div className="mt-10 rounded-3xl bg-[#181C30] text-white p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mt-10 rounded-2xl bg-[#370B55] text-white p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="h-11 w-11 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
-              <Store className="h-5 w-5 text-[#F0941F]" />
+              <Store className="h-5 w-5 text-[#8136B2]" />
             </div>
             <div>
               <h2 className="text-base font-bold tracking-tight">
@@ -168,7 +168,7 @@ export default async function DealersPage({
               </p>
             </div>
           </div>
-          <Button asChild variant="accent" size="md" className="flex-shrink-0">
+          <Button asChild variant="onDark" size="md" className="flex-shrink-0">
             <Link href="/sell/become-seller">Become a dealer</Link>
           </Button>
         </div>

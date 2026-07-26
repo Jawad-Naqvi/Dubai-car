@@ -46,7 +46,7 @@ const COMMON_FEATURES = [
 ];
 
 const field =
-  "w-full h-10 rounded-xl bg-white border border-[#E7E4DA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
+  "w-full h-10 rounded-xl bg-white border border-[#E5E5EA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
 const labelCls = "text-[11px] uppercase tracking-wider text-muted mb-1.5 block";
 
 export function SellWizard() {
@@ -163,8 +163,8 @@ export function SellWizard() {
     const isLive = done.status === "active";
     return (
       <div className="mx-auto max-w-xl px-6 py-20 text-center">
-        <div className="h-14 w-14 rounded-full bg-[#F0941F]/10 border border-[#F0941F]/30 grid place-items-center mx-auto">
-          <CheckCircle2 className="h-7 w-7 text-[#F0941F]" />
+        <div className="h-14 w-14 rounded-full bg-[#8136B2]/10 border border-[#8136B2]/30 grid place-items-center mx-auto">
+          <CheckCircle2 className="h-7 w-7 text-[#8136B2]" />
         </div>
         <h1 className="mt-5 text-xl font-bold tracking-tight">
           {isLive ? "Your listing is live" : "Your listing is in review"}
@@ -201,16 +201,16 @@ export function SellWizard() {
           <div key={s} className="flex items-center gap-2 flex-1">
             <div
               className={`flex items-center gap-1.5 ${
-                i <= step ? "text-[#F0941F]" : "text-muted"
+                i <= step ? "text-[#8136B2]" : "text-muted"
               }`}
             >
               <div
                 className={`h-6 w-6 rounded-full grid place-items-center text-[10px] font-semibold border ${
                   i < step
-                    ? "bg-[#F0941F] text-white border-[#F0941F]"
+                    ? "bg-[#8136B2] text-white border-[#8136B2]"
                     : i === step
-                      ? "border-[#F0941F]"
-                      : "border-[#E7E4DA]"
+                      ? "border-[#8136B2]"
+                      : "border-[#E5E5EA]"
                 }`}
               >
                 {i < step ? <Check className="h-3 w-3" /> : i + 1}
@@ -219,17 +219,17 @@ export function SellWizard() {
             </div>
             {i < STEPS.length - 1 && (
               <div
-                className={`h-px flex-1 ${i < step ? "bg-[#F0941F]/40" : "bg-[#E7E4DA]"}`}
+                className={`h-px flex-1 ${i < step ? "bg-[#8136B2]/40" : "bg-[#E5E5EA]"}`}
               />
             )}
           </div>
         ))}
       </div>
 
-      <div className="mt-6 rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
+      <div className="mt-6 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
         {step === 0 && (
           <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2 rounded-xl bg-[#F3F1E9] border border-[#E7E4DA] p-3">
+            <div className="col-span-2 rounded-xl bg-[#F4F4F6] border border-[#E5E5EA] p-3">
               <label className={labelCls}>Have the VIN? Skip typing it all in</label>
               <div className="flex gap-2">
                 <input
@@ -371,10 +371,10 @@ export function SellWizard() {
         {step === 1 && (
           <div className="space-y-4">
             {suggested && (
-              <div className="rounded-xl bg-[#FBE7D4] border border-[#E7E4DA] p-3 flex items-start gap-2">
-                <Sparkles className="h-4 w-4 text-[#F0941F] mt-0.5" />
+              <div className="rounded-xl bg-[#F3EDF9] border border-[#E5E5EA] p-3 flex items-start gap-2">
+                <Sparkles className="h-4 w-4 text-[#8136B2] mt-0.5" />
                 <div>
-                  <div className="text-xs font-semibold text-[#C97612]">
+                  <div className="text-xs font-semibold text-[#6B21A8]">
                     Suggested price: {formatAED(suggested.estimate)}
                   </div>
                   <div className="text-[11px] text-muted mt-0.5">
@@ -382,7 +382,7 @@ export function SellWizard() {
                     {formatAED(suggested.high)}.{" "}
                     <button
                       type="button"
-                      className="text-[#C97612] hover:underline"
+                      className="text-[#6B21A8] hover:underline"
                       onClick={() => set("priceAED", suggested.estimate)}
                     >
                       Use this
@@ -455,7 +455,7 @@ export function SellWizard() {
             <div>
               <label className={labelCls}>Description</label>
               <textarea
-                className="w-full rounded-xl bg-white border border-[#E7E4DA] px-3 py-2 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10 min-h-[90px]"
+                className="w-full rounded-xl bg-white border border-[#E5E5EA] px-3 py-2 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10 min-h-[90px]"
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 placeholder="Service history, ownership, condition notes…"
@@ -538,7 +538,7 @@ export function SellWizard() {
             </div>
 
             {/* Review summary */}
-            <div className="rounded-2xl bg-[#F3F1E9] border border-[#E7E4DA] p-4">
+            <div className="rounded-2xl bg-[#F4F4F6] border border-[#E5E5EA] p-4">
               <div className="text-[11px] uppercase tracking-wider text-muted mb-2">
                 Review
               </div>

@@ -78,12 +78,12 @@ export function VehicleHistory({ report }: { report: VehicleHistoryReport }) {
 
   return (
     <CollapsibleSection
-      icon={<FileClock className="h-4 w-4 text-[#F0941F] flex-shrink-0" />}
+      icon={<FileClock className="h-4 w-4 text-[#8136B2] flex-shrink-0" />}
       title="Vehicle history"
       badge={badge}
       summary={summary}
     >
-      <div className="divide-y divide-[#F1EFE9]">
+      <div className="divide-y divide-[#E5E5EA]">
         <Row
           icon={report.titleStatus === "clean" ? ShieldCheck : ShieldAlert}
           label="Title status"

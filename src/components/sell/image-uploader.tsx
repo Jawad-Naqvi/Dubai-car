@@ -67,7 +67,7 @@ export function ImageUploader({
           handleFiles(e.dataTransfer.files);
         }}
         onClick={() => inputRef.current?.click()}
-        className="cursor-pointer rounded-2xl border border-dashed border-[#D8D4C6] bg-[#F3F1E9] hover:border-[#141414]/30 transition-colors p-8 text-center"
+        className="cursor-pointer rounded-2xl border border-dashed border-[#D8D4C6] bg-[#F4F4F6] hover:border-[#141414]/30 transition-colors p-8 text-center"
       >
         <input
           ref={inputRef}
@@ -78,9 +78,9 @@ export function ImageUploader({
           onChange={(e) => handleFiles(e.target.files)}
         />
         {uploading ? (
-          <Loader2 className="h-6 w-6 text-[#F0941F] mx-auto animate-spin" />
+          <Loader2 className="h-6 w-6 text-[#8136B2] mx-auto animate-spin" />
         ) : (
-          <Upload className="h-6 w-6 text-[#F0941F] mx-auto" />
+          <Upload className="h-6 w-6 text-[#8136B2] mx-auto" />
         )}
         <p className="mt-3 text-xs text-secondary">
           Drag &amp; drop photos, or <span className="font-semibold text-[#141414] underline underline-offset-2">browse</span>
@@ -95,11 +95,11 @@ export function ImageUploader({
           {value.map((src, i) => (
             <div
               key={i}
-              className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F3F1E9] border border-[#E7E4DA] group"
+              className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F4F4F6] border border-[#E5E5EA] group"
             >
               <Image src={src} alt="" fill sizes="160px" className="object-cover" />
               {i === 0 && (
-                <span className="absolute top-1 left-1 text-[9px] px-1.5 py-0.5 rounded-full bg-[#F0941F] text-white font-semibold">
+                <span className="absolute top-1 left-1 text-[9px] px-1.5 py-0.5 rounded-full bg-[#8136B2] text-white font-semibold">
                   Cover
                 </span>
               )}
@@ -111,7 +111,7 @@ export function ImageUploader({
                     title="Make cover"
                     className="h-6 w-6 rounded-full bg-black/70 grid place-items-center hover:bg-black"
                   >
-                    <Star className="h-3 w-3 text-[#F0941F]" />
+                    <Star className="h-3 w-3 text-[#8136B2]" />
                   </button>
                 )}
                 <button

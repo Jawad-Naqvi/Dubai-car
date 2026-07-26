@@ -35,7 +35,7 @@ export default async function SignUpPage({
           Already have an account?{" "}
           <Link
             href="/sign-in"
-            className="font-bold text-[#141414] hover:text-[#C97612] transition-colors"
+            className="font-bold text-[#141414] hover:text-[#6B21A8] transition-colors"
           >
             Sign In
           </Link>

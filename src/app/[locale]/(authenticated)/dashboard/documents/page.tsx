@@ -53,8 +53,8 @@ export default async function DocumentsPage({
       />
       <main className="p-5 lg:p-8 space-y-4">
         {/* How it works */}
-        <div className="rounded-2xl bg-[#F3F1E9] border border-[#E7E4DA] p-5 flex items-start gap-3">
-          <Info className="h-5 w-5 text-[#F0941F] flex-shrink-0" />
+        <div className="rounded-2xl bg-[#F4F4F6] border border-[#E5E5EA] p-5 flex items-start gap-3">
+          <Info className="h-5 w-5 text-[#8136B2] flex-shrink-0" />
           <div>
             <h2 className="text-xs font-semibold">How documents work</h2>
             <p className="mt-1 text-xs text-secondary max-w-2xl">
@@ -73,17 +73,17 @@ export default async function DocumentsPage({
             return (
               <div
                 key={doc.key}
-                className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 flex flex-col hover:shadow-card-hover transition-shadow"
+                className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 flex flex-col hover:shadow-card-hover transition-shadow"
               >
                 <div className="flex items-center justify-between">
-                  <div className="h-10 w-10 rounded-xl bg-[#F0941F]/10 flex items-center justify-center">
-                    <doc.icon className="h-5 w-5 text-[#F0941F]" />
+                  <div className="h-10 w-10 rounded-xl bg-[#8136B2]/10 flex items-center justify-center">
+                    <doc.icon className="h-5 w-5 text-[#8136B2]" />
                   </div>
                   <Eyebrow tone="gold">EXPORT DOC</Eyebrow>
                 </div>
                 <h3 className="mt-4 font-semibold text-sm">{doc.key}</h3>
                 <p className="mt-1 text-xs text-muted flex-1">{doc.description}</p>
-                <div className="mt-4 pt-4 border-t border-[#E7E4DA] flex items-center justify-between">
+                <div className="mt-4 pt-4 border-t border-[#E5E5EA] flex items-center justify-between">
                   <span className="text-[11px] text-muted">
                     Provided by the yard
                   </span>

@@ -31,9 +31,9 @@ export function BuyerStats({ messagesCount }: { messagesCount: number }) {
       {tiles.map((t) => (
         <div
           key={t.label}
-          className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
+          className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
         >
-          <t.icon className="h-5 w-5 text-[#F0941F]" />
+          <t.icon className="h-5 w-5 text-[#8136B2]" />
           <div className="mt-4 text-base font-bold tracking-tight">{t.value}</div>
           <div className="text-xs text-muted mt-1">{t.label}</div>
         </div>

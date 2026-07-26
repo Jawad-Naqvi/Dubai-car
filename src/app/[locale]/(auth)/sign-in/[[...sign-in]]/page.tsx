@@ -17,7 +17,7 @@ export default async function SignInPage() {
             New to DXB Motors?{" "}
             <Link
               href="/sign-up"
-              className="font-bold text-[#141414] hover:text-[#C97612] transition-colors"
+              className="font-bold text-[#141414] hover:text-[#6B21A8] transition-colors"
             >
               Create an account
             </Link>

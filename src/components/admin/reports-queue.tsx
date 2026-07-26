@@ -18,10 +18,10 @@ interface Report {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  open: "bg-[#FBE7D4] text-[#C97612]",
+  open: "bg-[#F3EDF9] text-[#6B21A8]",
   reviewing: "bg-[#E7EEF6] text-[#2456C7]",
   resolved: "bg-[#E7F1EA] text-[#137A43]",
-  dismissed: "bg-[#F3F1E9] text-[#6B6B6B]",
+  dismissed: "bg-[#F4F4F6] text-[#6B6B6B]",
 };
 
 export function ReportsQueue({ initial }: { initial: Report[] }) {
@@ -49,7 +49,7 @@ export function ReportsQueue({ initial }: { initial: Report[] }) {
 
   if (reports.length === 0) {
     return (
-      <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-6 text-center text-muted text-sm">
+      <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-6 text-center text-muted text-sm">
         <Flag className="h-5 w-5 mx-auto mb-2 text-[#B8B2A0]" />
         No reports. The queue is clear.
       </div>
@@ -61,7 +61,7 @@ export function ReportsQueue({ initial }: { initial: Report[] }) {
       {reports.map((r) => (
         <div
           key={r.id}
-          className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4"
+          className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -99,7 +99,7 @@ export function ReportsQueue({ initial }: { initial: Report[] }) {
                   key={s}
                   disabled={busy === r.id || r.status === s}
                   onClick={() => act(r.id, s)}
-                  className="text-[10px] px-2 py-1 rounded-md border border-[#E5E5E5] capitalize hover:bg-[#F3F1E9] disabled:opacity-40"
+                  className="text-[10px] px-2 py-1 rounded-md border border-[#E5E5E5] capitalize hover:bg-[#F4F4F6] disabled:opacity-40"
                 >
                   {s}
                 </button>

@@ -30,7 +30,7 @@ export function PaymentMethodCard({ gatewayEnabled }: { gatewayEnabled: boolean 
   };
 
   return (
-    <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
+    <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
       <Eyebrow tone="emerald">PAYMENT METHOD</Eyebrow>
       <div className="mt-4 flex items-center gap-4">
         <div className="h-12 w-16 rounded-lg bg-[#141414] flex items-center justify-center">
