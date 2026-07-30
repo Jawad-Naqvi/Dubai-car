@@ -31,10 +31,10 @@ export default async function ContactPage({
             <div className="mt-10 space-y-4">
               <a
                 href={`mailto:${brand.email}`}
-                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
+                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
               >
-                <div className="h-11 w-11 rounded-full bg-[#FBE7D4] flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-[#F0941F]" />
+                <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
+                  <Mail className="h-5 w-5 text-[#8136B2]" />
                 </div>
                 <div>
                   <div className="text-xs text-muted">Email</div>
@@ -43,10 +43,10 @@ export default async function ContactPage({
               </a>
               <a
                 href={`tel:${brand.whatsapp}`}
-                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
+                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
               >
-                <div className="h-11 w-11 rounded-full bg-[#FBE7D4] flex items-center justify-center">
-                  <Phone className="h-5 w-5 text-[#F0941F]" />
+                <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
+                  <Phone className="h-5 w-5 text-[#8136B2]" />
                 </div>
                 <div>
                   <div className="text-xs text-muted">Phone</div>
@@ -57,19 +57,19 @@ export default async function ContactPage({
                 href={brand.whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
+                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
               >
-                <div className="h-11 w-11 rounded-full bg-[#FBE7D4] flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-[#F0941F]" />
+                <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-[#8136B2]" />
                 </div>
                 <div>
                   <div className="text-xs text-muted">WhatsApp</div>
                   <div className="font-semibold">Chat with sales</div>
                 </div>
               </a>
-              <div className="flex items-center gap-4 rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
-                <div className="h-11 w-11 rounded-full bg-[#FBE7D4] flex items-center justify-center">
-                  <MapPin className="h-5 w-5 text-[#F0941F]" />
+              <div className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
+                <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
+                  <MapPin className="h-5 w-5 text-[#8136B2]" />
                 </div>
                 <div>
                   <div className="text-xs text-muted">Office</div>

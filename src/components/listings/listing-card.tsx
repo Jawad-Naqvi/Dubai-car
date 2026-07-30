@@ -2,7 +2,7 @@ import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatAED, monthlyEMI } from "@/lib/utils";
-import { MapPin, Gauge, Calendar, Fuel, Lock, BadgeCheck, TrendingDown } from "lucide-react";
+import { MapPin, Gauge, Calendar, Fuel, BadgeCheck, TrendingDown } from "lucide-react";
 import type { MockListing } from "@/lib/mock-data";
 import { SaveButton } from "./save-button";
 import { CompareButton } from "./compare-button";
@@ -17,10 +17,10 @@ export function ListingCard({
   locale?: "en" | "ar";
 }) {
   return (
-    <div className="group relative rounded-2xl bg-white border border-[#E7E4DA] overflow-hidden shadow-card hover:shadow-card-hover hover:border-[#D8D4C6] transition-all duration-200 flex flex-col">
+    <div className="group relative rounded-lg bg-white border border-[#E5E5EA] overflow-hidden hover:border-[#B9B9C4] transition-colors duration-200 flex flex-col">
       <Link
         href={`/listings/${listing.id}/${listing.slug}`}
-        className="block relative aspect-[4/3] overflow-hidden bg-[#F3F1E9]"
+        className="block relative aspect-[4/3] overflow-hidden bg-[#F4F4F6]"
       >
         <Image
           src={listing.imageUrl}
@@ -94,7 +94,7 @@ export function ListingCard({
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-3 gap-1.5 text-[10px] text-secondary border-t border-[#E7E4DA] pt-3">
+        <div className="mt-3 grid grid-cols-3 gap-1.5 text-[10px] text-secondary border-t border-[#E5E5EA] pt-3">
           <div className="flex items-center gap-1">
             <Calendar className="h-2.5 w-2.5 text-muted" />
             {listing.year}
@@ -109,19 +109,18 @@ export function ListingCard({
           </div>
         </div>
 
-        <div className="mt-3 flex items-center justify-between pt-2.5 border-t border-[#E7E4DA]">
-          <div className="flex items-center gap-1 text-[10px] text-secondary min-w-0">
-            <MapPin className="h-2.5 w-2.5 text-muted flex-shrink-0" />
-            <span className="truncate">{listing.emirate}</span>
-          </div>
-          <Link
-            href={`/listings/${listing.id}/${listing.slug}`}
-            className="flex items-center gap-1 text-[10px] text-[#141414] font-semibold hover:underline"
-          >
-            <Lock className="h-2.5 w-2.5" />
-            View seller
-          </Link>
+        <div className="mt-3 flex items-center gap-1 text-[10px] text-secondary min-w-0 pt-2.5 border-t border-[#E5E5EA]">
+          <MapPin className="h-2.5 w-2.5 text-muted flex-shrink-0" />
+          <span className="truncate">{listing.emirate}</span>
         </div>
+
+        {/* Primary CTA — cars.com cards lead with "Check availability" */}
+        <Link
+          href={`/listings/${listing.id}/${listing.slug}`}
+          className="mt-2.5 flex items-center justify-center h-8 w-full rounded-md bg-[#8136B2] text-white text-[11px] font-semibold hover:bg-[#370B55] transition-colors"
+        >
+          Check availability
+        </Link>
       </div>
     </div>
   );
@@ -129,8 +128,8 @@ export function ListingCard({
 
 export function ListingCardSkeleton() {
   return (
-    <div className="rounded-2xl bg-white border border-[#E7E4DA] overflow-hidden shadow-card">
-      <div className="aspect-[4/3] bg-[#F3F1E9] animate-pulse" />
+    <div className="rounded-2xl bg-white border border-[#E5E5EA] overflow-hidden shadow-card">
+      <div className="aspect-[4/3] bg-[#F4F4F6] animate-pulse" />
       <div className="p-3.5 space-y-2">
         <div className="h-3 w-3/4 bg-[#EDEBE2] rounded animate-pulse" />
         <div className="h-5 w-1/2 bg-[#EDEBE2] rounded animate-pulse" />

@@ -42,7 +42,7 @@ export default function FinancePage() {
           </div>
 
           <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="rounded-3xl bg-white border border-[#E7E4DA] shadow-card p-5">
+            <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -105,9 +105,9 @@ export default function FinancePage() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-[#FBE7D4] border border-[#E7E4DA] shadow-card p-5 relative overflow-hidden">
+            <div className="rounded-2xl bg-[#F3EDF9] border border-[#E5E5EA] shadow-card p-5 relative overflow-hidden">
               <div className="relative">
-                <Calculator className="h-6 w-6 text-[#F0941F]" />
+                <Calculator className="h-6 w-6 text-[#8136B2]" />
                 <div className="mt-4 text-sm text-secondary">Monthly payment</div>
                 <div className="mt-2 text-2xl lg:text-3xl font-extrabold tracking-tight text-[#141414] leading-none">
                   {formatAED(emi)}
@@ -150,9 +150,9 @@ export default function FinancePage() {
               {banks.map((b) => (
                 <div
                   key={b.name}
-                  className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-6 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
+                  className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-6 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
                 >
-                  <div className="h-12 w-12 rounded-full bg-[#181C30] text-white flex items-center justify-center text-xs font-bold mb-4">
+                  <div className="h-12 w-12 rounded-full bg-[#370B55] text-white flex items-center justify-center text-xs font-bold mb-4">
                     {b.logo}
                   </div>
                   <h3 className="font-semibold">{b.name}</h3>

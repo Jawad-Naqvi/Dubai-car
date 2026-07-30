@@ -62,7 +62,7 @@ export function ReportListingButton({ listingId }: { listingId: string }) {
           />
           <form
             onSubmit={submit}
-            className="relative w-full max-w-sm rounded-2xl bg-white shadow-xl border border-[#E7E4DA] p-5 space-y-3"
+            className="relative w-full max-w-sm rounded-2xl bg-white shadow-xl border border-[#E5E5EA] p-5 space-y-3"
           >
             <h3 className="text-base font-bold">Report listing</h3>
             <div>
@@ -96,7 +96,7 @@ export function ReportListingButton({ listingId }: { listingId: string }) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="flex-1 h-9 rounded-lg border border-[#E5E5E5] text-xs font-semibold hover:bg-[#F3F1E9]"
+                className="flex-1 h-9 rounded-lg border border-[#E5E5E5] text-xs font-semibold hover:bg-[#F4F4F6]"
               >
                 Cancel
               </button>

@@ -18,7 +18,7 @@ function Field({
 }) {
   return (
     <div className="relative flex-1 min-w-0">
-      <div className="rounded-xl border border-[#E7E4DA] bg-white px-3 pt-2 pb-1.5 focus-within:border-[#F0941F] transition-colors">
+      <div className="rounded-xl border border-[#E5E5EA] bg-white px-3 pt-2 pb-1.5 focus-within:border-[#8136B2] transition-colors">
         <label className="block text-[10px] font-medium text-muted">{label}</label>
         {children}
       </div>
@@ -59,7 +59,7 @@ export function HomeSell() {
   };
 
   return (
-    <div className="rounded-2xl border border-[#E7E4DA] bg-white/80 backdrop-blur p-3 shadow-card">
+    <div className="rounded-2xl border border-[#E5E5EA] bg-white/80 backdrop-blur p-3 shadow-card">
       <div className="flex flex-col gap-2">
         <p className="px-1 text-sm font-semibold text-[#141414]">{t("heading")}</p>
 
@@ -146,7 +146,7 @@ export function HomeSell() {
                   "h-9 rounded-lg text-xs font-semibold transition-colors " +
                   (intent === key
                     ? "bg-[#141414] text-white"
-                    : "bg-white border border-[#E7E4DA] text-[#141414] hover:border-[#141414]/40")
+                    : "bg-white border border-[#E5E5EA] text-[#141414] hover:border-[#141414]/40")
                 }
               >
                 {key === "estimate" ? t("intentEstimate") : t("intentList")}
@@ -157,7 +157,7 @@ export function HomeSell() {
 
         <button
           onClick={go}
-          className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#F0941F] text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#8136B2] text-sm font-semibold text-white transition-opacity hover:opacity-90"
         >
           {intent === "list" ? t("ctaList") : t("cta")}
           <ArrowRight className="h-4 w-4" />

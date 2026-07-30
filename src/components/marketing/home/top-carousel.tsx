@@ -18,7 +18,7 @@ export interface TopCar {
 function Stars({ rating }: { rating: number }) {
   return (
     <span className="inline-flex items-center gap-0.5 text-[10px] text-secondary">
-      <Star className="h-3 w-3 fill-[#F0941F] text-[#F0941F]" />
+      <Star className="h-3 w-3 fill-[#8136B2] text-[#8136B2]" />
       ({rating.toFixed(1)})
     </span>
   );
@@ -62,7 +62,7 @@ export function TopCarousel({ cars }: { cars: TopCar[] }) {
             className="group snap-start flex-shrink-0 w-56 sm:w-64"
           >
             <div
-              className={`relative aspect-square rounded-3xl overflow-hidden ${car.tint} ${
+              className={`relative aspect-square rounded-2xl overflow-hidden ${car.tint} ${
                 i % 2 === 1 ? "sm:-translate-y-0 sm:scale-[1.02]" : ""
               }`}
             >

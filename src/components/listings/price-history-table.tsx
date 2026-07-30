@@ -17,12 +17,12 @@ export function PriceHistoryTable({
   if (points.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5">
+    <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
       <div className="flex items-center gap-2 mb-3">
-        <History className="h-4 w-4 text-[#F0941F]" />
+        <History className="h-4 w-4 text-[#8136B2]" />
         <h2 className="text-sm font-bold">Price history</h2>
       </div>
-      <div className="divide-y divide-[#F1EFE9]">
+      <div className="divide-y divide-[#E5E5EA]">
         {points.map((p, i) => {
           const dropped = p.newPrice < p.oldPrice;
           return (

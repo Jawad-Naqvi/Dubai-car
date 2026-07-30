@@ -24,8 +24,8 @@ export function CompareButton({
         className={cn(
           "flex items-center justify-center gap-1.5 h-9 rounded-full border text-xs font-semibold transition-colors",
           active
-            ? "border-[#F0941F]/50 bg-[#F0941F]/10 text-[#C97612]"
-            : "border-[#141414]/20 text-[#141414] hover:bg-[#F3F1E9]",
+            ? "border-[#8136B2]/50 bg-[#8136B2]/10 text-[#6B21A8]"
+            : "border-[#141414]/20 text-[#141414] hover:bg-[#F4F4F6]",
           className,
         )}
       >
@@ -48,8 +48,8 @@ export function CompareButton({
       className={cn(
         "h-7 w-7 rounded-full bg-white/90 backdrop-blur border flex items-center justify-center transition-colors",
         active
-          ? "border-[#F0941F]/50 text-[#F0941F]"
-          : "border-[#E7E4DA] text-[#141414] hover:bg-white",
+          ? "border-[#8136B2]/50 text-[#8136B2]"
+          : "border-[#E5E5EA] text-[#141414] hover:bg-white",
         className,
       )}
     >

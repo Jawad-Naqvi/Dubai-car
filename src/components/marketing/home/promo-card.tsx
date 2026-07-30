@@ -34,7 +34,7 @@ export function PromoCard({
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative h-64 sm:h-72 lg:h-80 rounded-3xl overflow-hidden bg-[#F3F1E9]"
+      className="group relative h-64 sm:h-72 lg:h-80 rounded-2xl overflow-hidden bg-[#F4F4F6]"
     >
       <Image
         src={image}
@@ -63,7 +63,7 @@ export function PromoCard({
       {/* CTA pill */}
       <Link
         href={href}
-        className="absolute top-3 right-3 inline-flex items-center gap-1 h-9 px-4 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#F0941F] transition-colors"
+        className="absolute top-3 right-3 inline-flex items-center gap-1 h-9 px-4 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#8136B2] transition-colors"
       >
         {cta}
       </Link>

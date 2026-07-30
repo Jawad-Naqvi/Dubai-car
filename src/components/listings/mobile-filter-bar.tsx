@@ -49,7 +49,7 @@ export function MobileFilterBar({
         <SlidersHorizontal className="h-3.5 w-3.5" />
         {t("title")}
         {count > 0 && (
-          <span className="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-[#F0941F] text-[10px] font-bold text-white">
+          <span className="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-[#8136B2] text-[10px] font-bold text-white">
             {count}
           </span>
         )}
@@ -69,7 +69,7 @@ export function MobileFilterBar({
             aria-label={t("title")}
             className="relative ms-auto flex h-full w-full max-w-sm flex-col bg-[#F7F5EF] shadow-xl animate-in slide-in-from-right duration-200"
           >
-            <div className="flex items-center justify-between px-4 h-14 border-b border-[#E7E4DA] bg-white">
+            <div className="flex items-center justify-between px-4 h-14 border-b border-[#E5E5EA] bg-white">
               <span className="text-sm font-semibold text-[#141414]">
                 {t("title")}
                 {total !== undefined && (
@@ -81,7 +81,7 @@ export function MobileFilterBar({
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close filters"
-                className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-[#F3F1E9]"
+                className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-[#F4F4F6]"
               >
                 <X className="h-4 w-4 text-[#141414]" />
               </button>

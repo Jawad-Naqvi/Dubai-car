@@ -15,12 +15,12 @@ export const metadata: Metadata = {
 };
 
 const TINTS = [
-  "bg-[#FBE7D4]",
+  "bg-[#F3EDF9]",
   "bg-[#CFE3F3]",
   "bg-[#DFEDE0]",
   "bg-[#E6E1F2]",
-  "bg-[#F6DDD3]",
-  "bg-[#F3F1E9]",
+  "bg-[#F3EDF9]",
+  "bg-[#F4F4F6]",
 ];
 
 export default async function NewCarsPage({
@@ -44,7 +44,7 @@ export default async function NewCarsPage({
     <div className="mx-auto max-w-7xl px-4 lg:px-6 pt-10 lg:pt-14">
       <Reveal>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-[#141414]/20 px-4 py-1.5 text-xs font-semibold text-[#141414]">
-          <RefreshCw className="h-3 w-3 text-[#F0941F]" />
+          <RefreshCw className="h-3 w-3 text-[#8136B2]" />
           {t("chip")}
         </span>
         <h1 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-[#141414] max-w-2xl leading-[1.1]">
@@ -88,7 +88,7 @@ export default async function NewCarsPage({
           <Reveal key={`${m.makeSlug}-${m.slug}`} delay={(i % 4) * 0.06}>
             <Link href={`/new-cars/${m.makeSlug}/${m.slug}`} className="group block">
               <div
-                className={`relative aspect-[4/3] rounded-3xl overflow-hidden ${TINTS[i % TINTS.length]}`}
+                className={`relative aspect-[4/3] rounded-2xl overflow-hidden ${TINTS[i % TINTS.length]}`}
               >
                 <Image
                   src={m.imageUrl}
@@ -118,7 +118,7 @@ export default async function NewCarsPage({
       </div>
 
       {models.length === 0 && (
-        <div className="mt-10 rounded-3xl bg-white shadow-card p-10 text-center text-sm text-secondary">
+        <div className="mt-10 rounded-2xl bg-white shadow-card p-10 text-center text-sm text-secondary">
           {t("empty")}
         </div>
       )}

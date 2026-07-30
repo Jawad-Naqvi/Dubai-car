@@ -35,8 +35,8 @@ export function DealerSearchBar({ className }: { className?: string }) {
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-1.5 bg-white border border-[#E7E4DA] rounded-full shadow-card p-1 pl-3">
-        <Search className="h-3.5 w-3.5 text-[#F0941F]" />
+      <div className="flex items-center gap-1.5 bg-white border border-[#E5E5EA] rounded-full shadow-card p-1 pl-3">
+        <Search className="h-3.5 w-3.5 text-[#8136B2]" />
         <input
           type="text"
           value={value}
@@ -55,7 +55,7 @@ export function DealerSearchBar({ className }: { className?: string }) {
 }
 
 const selectClass =
-  "appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E7E4DA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer";
+  "appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E5E5EA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer";
 
 export function DealerFilterSortBar() {
   const { get, push } = useQueryState();
@@ -106,7 +106,7 @@ export function DealerFilterSortBar() {
           "inline-flex items-center gap-1 h-7 px-3 rounded-full border text-[10px] font-medium transition-colors",
           verified
             ? "bg-[#141414] text-white border-[#141414]"
-            : "bg-white text-secondary border-[#E7E4DA] hover:border-[#141414]/30",
+            : "bg-white text-secondary border-[#E5E5EA] hover:border-[#141414]/30",
         )}
       >
         <BadgeCheck className="h-3 w-3" />
@@ -157,7 +157,7 @@ export function DealerActiveFilters() {
         <button
           key={c.key}
           onClick={() => push({ [c.key]: null })}
-          className="inline-flex items-center gap-1 h-6 pl-2.5 pr-1.5 rounded-full bg-[#F3F1E9] border border-[#E7E4DA] text-[10px] text-[#141414] font-medium hover:border-[#141414]/30 transition-colors"
+          className="inline-flex items-center gap-1 h-6 pl-2.5 pr-1.5 rounded-full bg-[#F4F4F6] border border-[#E5E5EA] text-[10px] text-[#141414] font-medium hover:border-[#141414]/30 transition-colors"
         >
           {c.label}
           <X className="h-2.5 w-2.5 text-muted" />

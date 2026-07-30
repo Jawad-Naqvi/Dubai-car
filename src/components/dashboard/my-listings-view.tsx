@@ -42,7 +42,7 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
   if (rows.length === 0) {
     return (
       <main className="p-5">
-        <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
+        <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white border border-[#E5E5EA] shadow-card">
           <Tag className="h-8 w-8 text-muted mb-3" />
           <h3 className="text-sm font-semibold">You haven&apos;t listed a car yet</h3>
           <p className="mt-1 text-xs text-muted max-w-xs">
@@ -74,10 +74,10 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
         {rows.map((l) => (
           <div
             key={l.id}
-            className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4 hover:shadow-card-hover transition-shadow"
+            className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4 hover:shadow-card-hover transition-shadow"
           >
             <div className="flex gap-3">
-              <div className="relative h-16 w-24 rounded-lg overflow-hidden bg-[#F3F1E9] flex-shrink-0">
+              <div className="relative h-16 w-24 rounded-lg overflow-hidden bg-[#F4F4F6] flex-shrink-0">
                 <Image src={l.imageUrl} alt="" fill sizes="96px" className="object-cover" />
               </div>
               <div className="flex-1 min-w-0">
@@ -94,7 +94,7 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between pt-3 border-t border-[#E7E4DA]">
+            <div className="mt-3 flex items-center justify-between pt-3 border-t border-[#E5E5EA]">
               <p className="text-[11px] text-muted flex-1 pe-3">
                 {STATUS_HINT[l.status] ?? ""}
               </p>

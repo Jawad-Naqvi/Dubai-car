@@ -12,7 +12,7 @@ function DistributionCard({
   items: Distribution[];
 }) {
   return (
-    <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+    <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
       <h3 className="font-semibold">{title}</h3>
       {items.length === 0 ? (
         <p className="mt-4 text-xs text-muted">No data yet.</p>
@@ -24,9 +24,9 @@ function DistributionCard({
                 <span className="text-secondary">{item.label}</span>
                 <span className="text-[#141414] font-semibold">{item.pct}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-[#F3F1E9] overflow-hidden">
+              <div className="h-1.5 rounded-full bg-[#F4F4F6] overflow-hidden">
                 <div
-                  className="h-full bg-[#F0941F]"
+                  className="h-full bg-[#8136B2]"
                   style={{ width: `${item.pct}%` }}
                 />
               </div>
@@ -61,9 +61,9 @@ export default async function AnalyticsPage() {
           {kpis.map((k) => (
             <div
               key={k.label}
-              className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
+              className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:shadow-card-hover transition-shadow"
             >
-              <k.icon className="h-5 w-5 text-[#F0941F]" />
+              <k.icon className="h-5 w-5 text-[#8136B2]" />
               <div className="mt-4 text-base font-bold">{k.value}</div>
               <div className="text-xs text-muted mt-1">{k.label}</div>
             </div>
@@ -72,7 +72,7 @@ export default async function AnalyticsPage() {
 
         {/* Top listings by views — real, data-bound bars (replaces the old
             hand-drawn fake trend chart). */}
-        <div className="rounded-2xl bg-white border border-[#E7E4DA] shadow-card p-4">
+        <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
           <Eyebrow tone="gold">TOP LISTINGS BY VIEWS</Eyebrow>
           {a.topListings.length === 0 ? (
             <p className="mt-4 text-sm text-muted">
@@ -89,9 +89,9 @@ export default async function AnalyticsPage() {
                   >
                     {l.title}
                   </Link>
-                  <div className="flex-1 h-4 rounded-full bg-[#F3F1E9] overflow-hidden">
+                  <div className="flex-1 h-4 rounded-full bg-[#F4F4F6] overflow-hidden">
                     <div
-                      className="h-full bg-[#F0941F] rounded-full"
+                      className="h-full bg-[#8136B2] rounded-full"
                       style={{ width: `${Math.round((l.views / maxViews) * 100)}%` }}
                     />
                   </div>

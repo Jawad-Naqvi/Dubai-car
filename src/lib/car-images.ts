@@ -56,7 +56,7 @@ export function imaginUrl(p: CarImageParams): string | undefined {
 
 /** Inline SVG placeholder (data URI) so cards never render broken. */
 export function placeholderCarImage(label = "DXB Motors"): string {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="#F3F1E9"/><g fill="none" stroke="#D8D4C6" stroke-width="14" stroke-linecap="round"><path d="M170 380h460"/><path d="M210 380c10-60 50-110 120-120l140-6c70 6 110 46 140 126"/><circle cx="280" cy="392" r="36"/><circle cx="540" cy="392" r="36"/></g><text x="400" y="500" font-family="sans-serif" font-size="28" fill="#98958B" text-anchor="middle">${label}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="#F4F4F6"/><g fill="none" stroke="#D8D4C6" stroke-width="14" stroke-linecap="round"><path d="M170 380h460"/><path d="M210 380c10-60 50-110 120-120l140-6c70 6 110 46 140 126"/><circle cx="280" cy="392" r="36"/><circle cx="540" cy="392" r="36"/></g><text x="400" y="500" font-family="sans-serif" font-size="28" fill="#98958B" text-anchor="middle">${label}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 

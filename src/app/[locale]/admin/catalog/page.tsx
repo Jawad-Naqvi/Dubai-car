@@ -38,7 +38,7 @@ export default async function AdminCatalogPage({
       </div>
 
       {!dbOn && (
-        <div className="mt-4 rounded-xl bg-[#FBEAD3] border border-[#F0941F]/30 px-4 py-3 text-xs text-[#8A5A12]">
+        <div className="mt-4 rounded-xl bg-[#F3EDF9] border border-[#8136B2]/30 px-4 py-3 text-xs text-[#8A5A12]">
           Demo mode: serving the bundled catalog snapshot (generated from the same live
           APIs). Configure DATABASE_URL to enable persistent syncs and the daily cron.
         </div>
@@ -52,7 +52,7 @@ export default async function AdminCatalogPage({
           { icon: RefreshCw, label: "Sync runs", value: runs.length },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="rounded-2xl bg-white shadow-card p-4">
-            <Icon className="h-4 w-4 text-[#F0941F] mb-2" />
+            <Icon className="h-4 w-4 text-[#8136B2] mb-2" />
             <div className="text-base font-bold text-[#141414]">{value}</div>
             <div className="mt-0.5 text-[10px] text-secondary uppercase tracking-wider">{label}</div>
           </div>
@@ -60,7 +60,7 @@ export default async function AdminCatalogPage({
       </div>
 
       <div className="mt-5 rounded-2xl bg-white shadow-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#E7E4DA] text-sm font-semibold">
+        <div className="px-5 py-4 border-b border-[#E5E5EA] text-sm font-semibold">
           Recent sync runs
         </div>
         {runs.length === 0 ? (
@@ -70,7 +70,7 @@ export default async function AdminCatalogPage({
         ) : (
           <table className="w-full text-xs">
             <thead>
-              <tr className="text-left text-muted border-b border-[#E7E4DA]">
+              <tr className="text-left text-muted border-b border-[#E5E5EA]">
                 <th className="px-5 py-2.5 font-medium">Started</th>
                 <th className="px-5 py-2.5 font-medium">Trigger</th>
                 <th className="px-5 py-2.5 font-medium">Status</th>
@@ -83,7 +83,7 @@ export default async function AdminCatalogPage({
               {runs.map((r) => {
                 const s = (r.stats ?? {}) as Record<string, number>;
                 return (
-                  <tr key={r.id} className="border-b border-[#E7E4DA] last:border-0">
+                  <tr key={r.id} className="border-b border-[#E5E5EA] last:border-0">
                     <td className="px-5 py-2.5">{r.startedAt.toLocaleString()}</td>
                     <td className="px-5 py-2.5 capitalize">{r.trigger}</td>
                     <td className="px-5 py-2.5">
@@ -92,7 +92,7 @@ export default async function AdminCatalogPage({
                           r.status === "success"
                             ? "bg-[#1A7A4A]/10 text-[#1A7A4A]"
                             : r.status === "running"
-                              ? "bg-[#F0941F]/10 text-[#C97612]"
+                              ? "bg-[#8136B2]/10 text-[#6B21A8]"
                               : "bg-[#DC2626]/10 text-[#DC2626]"
                         }`}
                       >

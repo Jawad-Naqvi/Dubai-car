@@ -72,7 +72,7 @@ export function AuthShell({
           <Link href="/" className="flex items-center justify-center gap-2">
             <span className="text-[#141414] font-extrabold text-lg tracking-tight">
               {brand.name}
-              <span className="text-[#F0941F]">.</span>
+              <span className="text-[#8136B2]">.</span>
             </span>
           </Link>
 
@@ -118,10 +118,10 @@ export const clerkAuthAppearance = {
     formButtonPrimary:
       "h-11 rounded-full bg-[#141414] hover:bg-[#2E2C28] text-white text-sm font-semibold shadow-none normal-case tracking-normal after:hidden",
     socialButtonsBlockButton:
-      "h-11 rounded-full border border-[#E7E4DA] bg-white hover:bg-[#F3F1E9] text-sm font-medium text-[#141414] shadow-none",
-    dividerLine: "bg-[#E7E4DA]",
+      "h-11 rounded-full border border-[#E5E5EA] bg-white hover:bg-[#F4F4F6] text-sm font-medium text-[#141414] shadow-none",
+    dividerLine: "bg-[#E5E5EA]",
     dividerText: "text-[11px] text-muted",
-    formFieldAction: "text-xs font-semibold text-[#141414] hover:text-[#C97612]",
+    formFieldAction: "text-xs font-semibold text-[#141414] hover:text-[#6B21A8]",
     identityPreview: "rounded-xl bg-[#F4F3F1] border-0",
     footer: "!hidden",
     footerAction: "!hidden",

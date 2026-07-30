@@ -43,7 +43,7 @@ export function DocRequestButton({
 
   if (done) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-[10px] font-semibold bg-[#F0941F]/10 text-[#C97612]">
+      <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-[10px] font-semibold bg-[#8136B2]/10 text-[#6B21A8]">
         <Check className="h-3 w-3" />
         Requested
       </span>

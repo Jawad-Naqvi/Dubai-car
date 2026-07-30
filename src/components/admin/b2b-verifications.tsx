@@ -37,19 +37,19 @@ export function B2BVerifications({ buyers }: { buyers: B2BBuyerView[] }) {
   if (pending.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] overflow-hidden">
-      <div className="p-4 border-b border-[#E7E4DA]">
+    <div className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] overflow-hidden">
+      <div className="p-4 border-b border-[#E5E5EA]">
         <Eyebrow tone="emerald">B2B BUYER VERIFICATIONS</Eyebrow>
         <h2 className="mt-2 text-xs font-semibold text-[#141414]">{pending.length} awaiting approval</h2>
       </div>
-      <div className="divide-y divide-[#E7E4DA]">
+      <div className="divide-y divide-[#E5E5EA]">
         {pending.map((b) => (
           <div
             key={b.id}
             className={`flex items-center gap-4 p-4 ${busy === b.id ? "opacity-50" : ""}`}
           >
-            <div className="h-9 w-9 rounded-full bg-[#F0941F]/10 grid place-items-center flex-shrink-0">
-              <Building2 className="h-4 w-4 text-[#F0941F]" />
+            <div className="h-9 w-9 rounded-full bg-[#8136B2]/10 grid place-items-center flex-shrink-0">
+              <Building2 className="h-4 w-4 text-[#8136B2]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-xs truncate text-[#141414]">{b.companyName}</div>

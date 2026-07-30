@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
       footer={
         <Link
           href="/sign-in"
-          className="inline-flex items-center gap-1.5 font-semibold text-[#141414] hover:text-[#C97612] transition-colors"
+          className="inline-flex items-center gap-1.5 font-semibold text-[#141414] hover:text-[#6B21A8] transition-colors"
         >
           <ArrowLeft className="h-3 w-3" />
           Back to sign in

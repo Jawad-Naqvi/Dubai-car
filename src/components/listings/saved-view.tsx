@@ -41,7 +41,7 @@ export function SavedView({ locale = "en" }: { locale?: "en" | "ar" }) {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-24 rounded-3xl bg-white border border-[#E7E4DA] shadow-card">
+      <div className="flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-white border border-[#E5E5EA] shadow-card">
         <Heart className="h-8 w-8 text-muted mb-3" />
         <h3 className="text-sm font-semibold">No saved cars yet</h3>
         <p className="mt-1 text-xs text-muted max-w-xs">

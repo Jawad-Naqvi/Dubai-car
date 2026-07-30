@@ -51,7 +51,7 @@ export function UsersTable({ users }: { users: AdminUser[] }) {
   return (
     <main className="p-5 space-y-4">
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 h-9 w-80 rounded-xl bg-white border border-[#E7E4DA] px-4 text-xs focus-within:ring-2 focus-within:ring-[#141414]/20">
+        <div className="flex items-center gap-2 h-9 w-80 rounded-xl bg-white border border-[#E5E5EA] px-4 text-xs focus-within:ring-2 focus-within:ring-[#141414]/20">
           <Search className="h-4 w-4 text-muted" />
           <input
             value={q}
@@ -62,9 +62,9 @@ export function UsersTable({ users }: { users: AdminUser[] }) {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white shadow-card border border-[#E7E4DA] overflow-hidden overflow-x-auto">
+      <div className="rounded-2xl bg-white shadow-card border border-[#E5E5EA] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[640px]">
-          <thead className="bg-[#F3F1E9] text-[10px] uppercase tracking-widest text-muted">
+          <thead className="bg-[#F4F4F6] text-[10px] uppercase tracking-widest text-muted">
             <tr>
               <th className="text-start p-4 font-medium">User</th>
               <th className="text-start p-4 font-medium hidden md:table-cell">Email</th>
@@ -76,10 +76,10 @@ export function UsersTable({ users }: { users: AdminUser[] }) {
             {filtered.map((u) => {
               const role = roles[u.id] ?? u.role;
               return (
-                <tr key={u.id} className={`border-t border-[#E7E4DA] hover:bg-[#F1EFE9] ${busy === u.id ? "opacity-50" : ""}`}>
+                <tr key={u.id} className={`border-t border-[#E5E5EA] hover:bg-[#FFFFFF] ${busy === u.id ? "opacity-50" : ""}`}>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-[#F0941F]/10 flex items-center justify-center text-xs font-bold text-[#C97612]">
+                      <div className="h-9 w-9 rounded-full bg-[#8136B2]/10 flex items-center justify-center text-xs font-bold text-[#6B21A8]">
                         {u.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -95,23 +95,23 @@ export function UsersTable({ users }: { users: AdminUser[] }) {
                   <td className="p-4">
                     <Dropdown.Root>
                       <Dropdown.Trigger asChild>
-                        <button className="inline-flex items-center gap-1 text-xs text-secondary hover:text-[#C97612]">
+                        <button className="inline-flex items-center gap-1 text-xs text-secondary hover:text-[#6B21A8]">
                           Edit role <ChevronDown className="h-3 w-3" />
                         </button>
                       </Dropdown.Trigger>
                       <Dropdown.Portal>
                         <Dropdown.Content
                           align="end"
-                          className="z-50 min-w-[150px] rounded-xl bg-white border border-[#E7E4DA] p-1 shadow-card text-xs"
+                          className="z-50 min-w-[150px] rounded-xl bg-white border border-[#E5E5EA] p-1 shadow-card text-xs"
                         >
                           {ROLES.map((r) => (
                             <Dropdown.Item
                               key={r}
                               onClick={() => changeRole(u.id, r)}
-                              className="flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer outline-none text-secondary data-[highlighted]:bg-[#F3F1E9] capitalize"
+                              className="flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer outline-none text-secondary data-[highlighted]:bg-[#F4F4F6] capitalize"
                             >
                               {r.replace("_", " ")}
-                              {role === r && <Check className="h-3 w-3 text-[#F0941F]" />}
+                              {role === r && <Check className="h-3 w-3 text-[#8136B2]" />}
                             </Dropdown.Item>
                           ))}
                         </Dropdown.Content>
