@@ -17,7 +17,10 @@ import {
   regionalSpecs,
   conditions,
   emirates,
+  exteriorColors,
+  interiorColors,
 } from "@/lib/brand";
+import { modelsForMake } from "@/lib/car-models";
 import {
   Check,
   ChevronLeft,
@@ -148,6 +151,22 @@ export function SellWizard() {
         throw new Error(err.error ?? "Failed");
       }
       const data = await res.json();
+      // Individual listing fee due (only when the fee feature is enabled) —
+      // send them to secure Stripe checkout; the webhook queues it for review.
+      if (data.feeRequired) {
+        toast.success(`Listing saved — a fee of AED ${data.feeAED} is due to publish.`);
+        const fr = await fetch("/api/payments/listing-fee", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listingId: data.id }),
+        });
+        const fd = await fr.json().catch(() => ({}));
+        if (fr.ok && fd.url) {
+          window.location.href = fd.url;
+          return;
+        }
+        throw new Error(fd.error ?? "Could not start payment.");
+      }
       setDone({ id: data.id, slug: data.slug, status: data.status });
       toast.success(
         data.status === "active" ? "Listing published!" : "Listing submitted for review!",
@@ -260,7 +279,11 @@ export function SellWizard() {
               <select
                 className={field}
                 value={form.make}
-                onChange={(e) => set("make", e.target.value)}
+                onChange={(e) =>
+                  // Changing make resets the dependent model so stale
+                  // make/model pairs can't be submitted.
+                  setForm((f) => ({ ...f, make: e.target.value, model: "" }))
+                }
               >
                 {popularMakes.map((m) => (
                   <option key={m}>{m}</option>
@@ -269,12 +292,47 @@ export function SellWizard() {
             </div>
             <div>
               <label className={labelCls}>Model *</label>
-              <input
-                className={field}
-                value={form.model}
-                onChange={(e) => set("model", e.target.value)}
-                placeholder="e.g. Land Cruiser"
-              />
+              {(() => {
+                const models = modelsForMake(form.make);
+                const isOther = form.model !== "" && !models.includes(form.model);
+                if (models.length === 0) {
+                  // Make not in the catalog → free text fallback.
+                  return (
+                    <input
+                      className={field}
+                      value={form.model}
+                      onChange={(e) => set("model", e.target.value)}
+                      placeholder="e.g. Land Cruiser"
+                    />
+                  );
+                }
+                return (
+                  <>
+                    <select
+                      className={field}
+                      value={isOther ? "__other__" : form.model}
+                      onChange={(e) =>
+                        set("model", e.target.value === "__other__" ? " " : e.target.value)
+                      }
+                    >
+                      <option value="">Select model</option>
+                      {models.map((m) => (
+                        <option key={m}>{m}</option>
+                      ))}
+                      <option value="__other__">Other…</option>
+                    </select>
+                    {isOther && (
+                      <input
+                        className={`${field} mt-2`}
+                        value={form.model.trim()}
+                        onChange={(e) => set("model", e.target.value)}
+                        placeholder="Enter model name"
+                        autoFocus
+                      />
+                    )}
+                  </>
+                );
+              })()}
             </div>
             <div>
               <label className={labelCls}>Trim</label>
@@ -418,19 +476,31 @@ export function SellWizard() {
                 <label className={labelCls}>Exterior colour</label>
                 <input
                   className={field}
+                  list="ext-colors"
                   value={form.colorExterior}
                   onChange={(e) => set("colorExterior", e.target.value)}
-                  placeholder="e.g. Pearl White"
+                  placeholder="Select or type…"
                 />
+                <datalist id="ext-colors">
+                  {exteriorColors.map((c) => (
+                    <option key={c.name} value={c.name} />
+                  ))}
+                </datalist>
               </div>
               <div>
                 <label className={labelCls}>Interior colour</label>
                 <input
                   className={field}
+                  list="int-colors"
                   value={form.colorInterior}
                   onChange={(e) => set("colorInterior", e.target.value)}
-                  placeholder="e.g. Black"
+                  placeholder="Select or type…"
                 />
+                <datalist id="int-colors">
+                  {interiorColors.map((c) => (
+                    <option key={c.name} value={c.name} />
+                  ))}
+                </datalist>
               </div>
               <div>
                 <label className={labelCls}>Cylinders</label>

@@ -229,7 +229,7 @@ export const bodyTypes = [
 
 export const fuelTypes = ["Petrol", "Diesel", "Hybrid", "Electric"] as const;
 export const transmissions = ["Automatic", "Manual"] as const;
-export const regionalSpecs = ["GCC", "American", "European", "Japanese", "Canadian", "Other"] as const;
+export const regionalSpecs = ["GCC", "American", "European", "Japanese", "Canadian", "Chinese", "Other"] as const;
 export const conditions = ["New", "Used", "Certified Pre-Owned"] as const;
 
 /** Drivetrain options — mirrors the cars.com facet (AWD / 4WD / FWD / RWD). */

@@ -36,11 +36,12 @@ const dealerNav = [
   { href: "/dashboard/profile", label: "Profile", icon: Building2 },
 ];
 
-// A buyer's workspace is purely for shopping. "Sell your car" is a gateway
-// (it converts them into a seller) — it is NOT a buyer feature, so it's
-// rendered separately as a CTA, not a peer nav item.
+// An Individual can BUY and SELL from one account, so their workspace has both
+// shopping (saved, alerts, messages) and selling (my listings). "Sell your car"
+// also stays as a prominent CTA at the bottom.
 const buyerNav = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard/my-listings", label: "My listings", icon: Car },
   { href: "/dashboard/saved", label: "Saved cars", icon: Heart },
   { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
   { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
