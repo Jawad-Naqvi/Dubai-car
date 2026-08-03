@@ -8,6 +8,7 @@ import { slugify } from "@/lib/utils";
 import { deriveDrivetrain, computeDealRating } from "@/lib/vehicle-derive";
 import { demoStore, demoId, type DemoListing } from "./demo-store";
 import { bust } from "./revalidate";
+import { isListingFeeEnabled, computeListingFee } from "./listing-fee";
 import type { CurrentUser } from "./users";
 
 export const listingInputSchema = z.object({
@@ -42,6 +43,9 @@ export interface CreateListingResult {
   id: string;
   slug: string;
   status: string;
+  /** Set when an individual must pay a per-listing fee before it's reviewed. */
+  feeRequired?: boolean;
+  feeAED?: number;
 }
 
 export async function createListing(
@@ -117,9 +121,27 @@ export async function createListing(
     dealerId = d[0]?.id;
     dealerVerified = d[0]?.isVerified ?? false;
   }
+  // Identity gate: every seller must have an Emirates ID on file (individuals
+  // via /verify-identity, dealers via onboarding). Verified dealers are always
+  // allowed. This enforces the "Emirates ID required to sell" rule server-side.
+  const idOnFile = !!user?.emiratesIdNumber;
+  if (!dealerVerified && !idOnFile) {
+    throw new Error(
+      "Please verify your Emirates ID before listing a car.",
+    );
+  }
+
   // KYC-approved dealers publish instantly — moderation is for unvetted
   // sellers (private listings, or dealers still pending approval).
   const initialStatus = dealerVerified ? "active" : "pending_review";
+
+  // Individual per-listing fee (default OFF during the free launch). When on,
+  // a private-seller listing is held as an unpaid "draft" and the caller is
+  // told a fee is due; the Stripe webhook flips it to pending_review on payment.
+  // Dealers (any dealerId) are exempt — their listings are covered by their tier.
+  const feeApplies = isListingFeeEnabled() && !dealerId;
+  const feeAED = feeApplies ? computeListingFee(input.priceAED) : 0;
+  const finalStatus = feeApplies ? "draft" : initialStatus;
 
   // Denormalise the cars.com-style facets so search stays a plain column read.
   const drivetrain = deriveDrivetrain({
@@ -163,8 +185,8 @@ export async function createListing(
       description: input.description,
       features: input.features ?? [],
       isExportReady: !!input.isExportReady,
-      status: initialStatus,
-      ...(initialStatus === "active" ? { publishedAt: new Date() } : {}),
+      status: finalStatus,
+      ...(finalStatus === "active" ? { publishedAt: new Date() } : {}),
     })
     .returning({ id: listings.id, slug: listings.slug });
 
@@ -188,5 +210,10 @@ export async function createListing(
   }
 
   bust("listings");
-  return { id: row.id, slug: row.slug, status: initialStatus };
+  return {
+    id: row.id,
+    slug: row.slug,
+    status: finalStatus,
+    ...(feeApplies ? { feeRequired: true, feeAED } : {}),
+  };
 }

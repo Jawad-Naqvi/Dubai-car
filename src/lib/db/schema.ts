@@ -87,12 +87,27 @@ export const users = pgTable(
     imageUrl: text("image_url"),
     role: roleEnum("role").notNull().default("buyer"),
     preferredLocale: varchar("preferred_locale", { length: 8 }).default("en"),
+    /**
+     * Emirates ID identity verification — required for EVERY account (both
+     * "individual" and "dealer" signups) before they can sell. The number is
+     * globally unique so one Emirates ID maps to exactly one account (blocks
+     * duplicate accounts). Dealers additionally provide a trade license on the
+     * dealers table. Stored here (not only on dealers) so the uniqueness rule
+     * and the "verified" gate apply to individuals too.
+     */
+    emiratesIdNumber: varchar("emirates_id_number", { length: 32 }),
+    emiratesIdFrontUrl: text("emirates_id_front_url"),
+    emiratesIdBackUrl: text("emirates_id_back_url"),
+    idSubmittedAt: timestamp("id_submitted_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (t) => ({
     clerkIdx: uniqueIndex("users_clerk_idx").on(t.clerkId),
     emailIdx: index("users_email_idx").on(t.email),
+    // One Emirates ID = one account. NULLs are allowed (multiple), so
+    // unverified accounts don't collide; only real ID numbers are unique.
+    emiratesIdIdx: uniqueIndex("users_emirates_id_idx").on(t.emiratesIdNumber),
   }),
 );
 
@@ -231,6 +246,28 @@ export const listings = pgTable(
     exportIdx: index("listings_export_idx").on(t.isExportReady),
   }),
 );
+
+/**
+ * Timestamped listing-view events — one row per detail-page view. Powers
+ * time-range analytics (today / last 7 / last 30 days) which the denormalised
+ * listings.viewCount counter can't answer. Kept lean (listing + timestamp);
+ * dealer/seller scoping is derived by joining to listings.
+ */
+export const listingViewEvents = pgTable(
+  "listing_view_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    listingId: uuid("listing_id")
+      .notNull()
+      .references(() => listings.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    listingIdx: index("view_events_listing_idx").on(t.listingId),
+    createdIdx: index("view_events_created_idx").on(t.createdAt),
+  }),
+);
+export type ListingViewEvent = typeof listingViewEvents.$inferSelect;
 
 export const listingMedia = pgTable("listing_media", {
   id: uuid("id").defaultRandom().primaryKey(),

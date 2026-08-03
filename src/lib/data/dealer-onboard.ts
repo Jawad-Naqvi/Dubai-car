@@ -5,7 +5,13 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { dealers, users } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
-import { getOrSyncUser, getCurrentDealer, type CurrentUser } from "./users";
+import {
+  getOrSyncUser,
+  getCurrentDealer,
+  emiratesIdInUse,
+  normalizeEmiratesId,
+  type CurrentUser,
+} from "./users";
 import { bust } from "./revalidate";
 import { sendEmail } from "@/lib/notify";
 
@@ -61,6 +67,15 @@ export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
     };
   }
 
+  // One Emirates ID = one account (globally, across individuals and dealers).
+  const normalizedEid = normalizeEmiratesId(input.emiratesIdNumber);
+  if (await emiratesIdInUse(normalizedEid, user.id)) {
+    return {
+      ok: false,
+      error: "This Emirates ID is already registered to another account.",
+    };
+  }
+
   const existing = await getCurrentDealer();
   if (existing) {
     if (existing.kycStatus === "approved") {
@@ -87,6 +102,7 @@ export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
       })
       .where(eq(dealers.id, existing.id));
     await promoteToDealer(user);
+    await syncUserIdentity(user.id, normalizedEid, input);
     await notifyApplicationReceived(user.email, input.businessName);
     return { ok: true, dealerSlug: existing.slug };
   }
@@ -122,9 +138,32 @@ export async function becomeDealer(raw: unknown): Promise<BecomeDealerResult> {
     .returning({ slug: dealers.slug });
 
   await promoteToDealer(user);
+  await syncUserIdentity(user.id, normalizedEid, input);
   bust("listings");
   await notifyApplicationReceived(user.email, input.businessName);
   return { ok: true, dealerSlug: dealer?.slug ?? slug };
+}
+
+/**
+ * Mirror the dealer's Emirates ID onto their users row so the global
+ * "one Emirates ID = one account" unique index (users.emiratesIdNumber) also
+ * covers dealers, and the identity-verified gate treats them as verified.
+ */
+async function syncUserIdentity(
+  userId: string,
+  normalizedEid: string,
+  input: BecomeDealerInput,
+) {
+  await db
+    .update(users)
+    .set({
+      emiratesIdNumber: normalizedEid,
+      emiratesIdFrontUrl: input.emiratesIdFrontUrl,
+      emiratesIdBackUrl: input.emiratesIdBackUrl,
+      idSubmittedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, userId));
 }
 
 /** Promote a user to the "dealer" role in both the DB and Clerk (RBAC source

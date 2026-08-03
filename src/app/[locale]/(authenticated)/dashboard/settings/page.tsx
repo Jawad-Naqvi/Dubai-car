@@ -3,15 +3,24 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getOrSyncUser, getCurrentRole } from "@/lib/data/users";
+import { getMyIdentity } from "@/lib/data/identity";
 import { NotificationPrefs } from "@/components/dashboard/notification-prefs";
+import { IdentityDocuments } from "@/components/account/identity-documents";
 import { Link } from "@/i18n/routing";
 import { User, Globe, ShieldCheck } from "lucide-react";
 
 export default async function SettingsPage() {
-  const [user, role] = await Promise.all([
+  const [user, role, identity] = await Promise.all([
     getOrSyncUser().catch(() => null),
     getCurrentRole().catch(() => "buyer" as const),
+    getMyIdentity().catch(() => ({
+      emiratesIdNumber: "",
+      emiratesIdFrontUrl: "",
+      emiratesIdBackUrl: "",
+    })),
   ]);
+  // Dealers manage identity on their Profile page; individuals do it here.
+  const showIdentity = role !== "dealer";
 
   return (
     <>
@@ -41,6 +50,9 @@ export default async function SettingsPage() {
             Manage your password and security from the account menu (avatar, top-right).
           </p>
         </div>
+
+        {/* Identity & documents (individuals) */}
+        {showIdentity && <IdentityDocuments mode="individual" initial={identity} />}
 
         {/* Preferences */}
         <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">

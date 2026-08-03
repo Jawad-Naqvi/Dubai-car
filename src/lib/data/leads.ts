@@ -6,6 +6,7 @@ import { leads, listings, dealers, users, leadReplies, type Lead } from "@/lib/d
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore, demoId, type DemoLead } from "./demo-store";
 import { sendLeadNotification, sendEmail } from "@/lib/notify";
+import { sendWhatsApp } from "@/lib/whatsapp";
 
 const LEAD_TYPE_LABEL: Record<string, string> = {
   inquiry: "enquiry",
@@ -111,6 +112,7 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
   let dealerId = input.dealerId;
   let price: number | undefined;
   let recipientEmail: string | undefined;
+  let recipientWhatsapp: string | undefined;
   let listingTitle: string | undefined;
   if (input.listingId) {
     const dealerUser = alias(users, "dealer_user");
@@ -124,6 +126,9 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
         year: listings.year,
         dealerEmail: dealerUser.email,
         sellerEmail: sellerUser.email,
+        dealerWhatsapp: dealers.whatsapp,
+        dealerPhone: dealers.phone,
+        sellerPhone: sellerUser.phone,
       })
       .from(listings)
       .leftJoin(dealers, eq(listings.dealerId, dealers.id))
@@ -135,6 +140,8 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
       dealerId = dealerId ?? l[0].dealerId ?? undefined;
       price = l[0].price;
       recipientEmail = l[0].dealerEmail ?? l[0].sellerEmail ?? undefined;
+      recipientWhatsapp =
+        l[0].dealerWhatsapp ?? l[0].dealerPhone ?? l[0].sellerPhone ?? undefined;
       listingTitle = `${l[0].year} ${l[0].make} ${l[0].model}`;
     }
     await db
@@ -174,7 +181,41 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
     }),
   );
 
+  // Same alert over WhatsApp (fires only when the seller has a number and the
+  // WhatsApp Cloud API is configured; otherwise it logs and no-ops).
+  void sendWhatsApp({
+    to: recipientWhatsapp,
+    body: buildLeadWhatsApp({
+      type,
+      buyerName: input.buyerName,
+      buyerPhone: input.buyerPhone,
+      buyerEmail: input.buyerEmail,
+      message: input.message,
+      listingTitle,
+    }),
+    label: "new lead",
+  });
+
   return { id: row.id };
+}
+
+/** Short WhatsApp text for a new lead. */
+function buildLeadWhatsApp(opts: {
+  type: string;
+  buyerName?: string;
+  buyerPhone?: string;
+  buyerEmail?: string;
+  message?: string;
+  listingTitle?: string;
+}): string {
+  const label = LEAD_TYPE_LABEL[opts.type] ?? "enquiry";
+  const lines = [
+    `🚗 New ${label} on DXB Motors${opts.listingTitle ? ` — ${opts.listingTitle}` : ""}`,
+    `From: ${opts.buyerName ?? "A buyer"}${opts.buyerPhone ? ` · ${opts.buyerPhone}` : ""}${opts.buyerEmail ? ` · ${opts.buyerEmail}` : ""}`,
+  ];
+  if (opts.message) lines.push(`"${opts.message}"`);
+  lines.push("Open your dashboard → Leads to reply.");
+  return lines.join("\n");
 }
 
 export async function updateLeadStatus(

@@ -1,8 +1,49 @@
 import { Link } from "@/i18n/routing";
+import type { LucideIcon } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { getDealerAnalytics, type Distribution } from "@/lib/data/dashboard";
+import {
+  getDealerAnalytics,
+  type Distribution,
+  type TimeRange,
+} from "@/lib/data/dashboard";
 import { Eye, MessageCircle, TrendingUp, Car } from "lucide-react";
+
+function TimeRangeCard({
+  title,
+  icon: Icon,
+  range,
+}: {
+  title: string;
+  icon: LucideIcon;
+  range: TimeRange;
+}) {
+  const cells = [
+    { label: "Today", value: range.today },
+    { label: "Last 7 days", value: range.last7 },
+    { label: "Last 30 days", value: range.last30 },
+  ];
+  return (
+    <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-[#8136B2]" />
+        <h3 className="font-semibold text-sm">{title}</h3>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        {cells.map((c) => (
+          <div key={c.label} className="rounded-xl bg-[#F9F8FC] p-3 text-center">
+            <div className="text-lg font-bold text-[#141414]">
+              {c.value.toLocaleString()}
+            </div>
+            <div className="text-[10px] uppercase tracking-wider text-muted mt-0.5">
+              {c.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function DistributionCard({
   title,
@@ -68,6 +109,20 @@ export default async function AnalyticsPage() {
               <div className="text-xs text-muted mt-1">{k.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Rolling-window breakdowns (real, from the view-event timeline). */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TimeRangeCard
+            title="Views"
+            icon={Eye}
+            range={a.timeRanges.views}
+          />
+          <TimeRangeCard
+            title="Leads"
+            icon={MessageCircle}
+            range={a.timeRanges.leads}
+          />
         </div>
 
         {/* Top listings by views — real, data-bound bars (replaces the old

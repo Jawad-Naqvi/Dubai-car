@@ -1,7 +1,13 @@
 import "server-only";
 import { desc, eq, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { listings, listingMedia, leads, type Listing } from "@/lib/db/schema";
+import {
+  listings,
+  listingMedia,
+  leads,
+  listingViewEvents,
+  type Listing,
+} from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { mockListings } from "@/lib/mock-data";
 import { demoStore } from "./demo-store";
@@ -302,6 +308,12 @@ export interface Distribution {
   count: number;
   pct: number;
 }
+/** Counts over rolling windows (last 24h / 7 days / 30 days). */
+export interface TimeRange {
+  today: number;
+  last7: number;
+  last30: number;
+}
 export interface DealerAnalytics {
   totalViews: number;
   totalInquiries: number;
@@ -312,6 +324,8 @@ export interface DealerAnalytics {
   byBodyType: Distribution[];
   byLeadType: Distribution[];
   topListings: { id: string; slug: string; title: string; views: number; inquiries: number }[];
+  /** Rolling-window breakdowns the all-time counters can't provide. */
+  timeRanges: { views: TimeRange; leads: TimeRange };
 }
 
 const LEAD_TYPE_LABEL: Record<string, string> = {
@@ -351,13 +365,23 @@ export async function getDealerAnalytics(): Promise<DealerAnalytics> {
   const totalInquiries = inventory.reduce((s, l) => s + l.inquiryCount, 0);
   const activeListings = inventory.filter((l) => l.status === "active").length;
 
-  // Lead type distribution + total.
+  // Lead type distribution + total, plus rolling-window (today/7d/30d) counts.
   let leadTypeCounts: { type: string; count: number }[] = [];
+  let timeRanges: DealerAnalytics["timeRanges"] = {
+    views: { today: 0, last7: 0, last30: 0 },
+    leads: { today: 0, last7: 0, last30: 0 },
+  };
   if (!isDbEnabled()) {
     const map = new Map<string, number>();
     for (const l of demoStore().leads)
       map.set(l.type, (map.get(l.type) ?? 0) + 1);
     leadTypeCounts = Array.from(map, ([type, count]) => ({ type, count }));
+    const totalDemoLeads = demoStore().leads.length;
+    // Demo has no event timeline; show plausible splits of the totals.
+    timeRanges = {
+      views: split(totalViews),
+      leads: split(totalDemoLeads),
+    };
   } else {
     const dealer = await getEffectiveDealer();
     leadTypeCounts = dealer
@@ -370,6 +394,7 @@ export async function getDealerAnalytics(): Promise<DealerAnalytics> {
           .where(eq(leads.dealerId, dealer.id))
           .groupBy(leads.type)) as { type: string; count: number }[])
       : [];
+    if (dealer) timeRanges = await computeTimeRanges(dealer.id);
   }
   const totalLeads = leadTypeCounts.reduce((s, r) => s + r.count, 0);
 
@@ -399,6 +424,55 @@ export async function getDealerAnalytics(): Promise<DealerAnalytics> {
       (r) => r.count,
     ),
     topListings,
+    timeRanges,
+  };
+}
+
+/** Demo-only: derive plausible today/7d/30d splits from an all-time total. */
+function split(total: number): TimeRange {
+  return {
+    today: Math.round(total * 0.06),
+    last7: Math.round(total * 0.3),
+    last30: Math.round(total * 0.75),
+  };
+}
+
+/**
+ * Real rolling-window view + lead counts for a dealer, from the timestamped
+ * listing_view_events table and leads.createdAt. Windows are rolling (last 24h
+ * / 7 days / 30 days) so they're timezone-safe.
+ */
+async function computeTimeRanges(
+  dealerId: string,
+): Promise<DealerAnalytics["timeRanges"]> {
+  const now = Date.now();
+  const since = (days: number) => new Date(now - days * 86_400_000);
+  const d1 = since(1);
+  const d7 = since(7);
+  const d30 = since(30);
+
+  const [v] = await db
+    .select({
+      today: sql<number>`count(*) filter (where ${listingViewEvents.createdAt} >= ${d1})::int`,
+      last7: sql<number>`count(*) filter (where ${listingViewEvents.createdAt} >= ${d7})::int`,
+      last30: sql<number>`count(*) filter (where ${listingViewEvents.createdAt} >= ${d30})::int`,
+    })
+    .from(listingViewEvents)
+    .innerJoin(listings, eq(listingViewEvents.listingId, listings.id))
+    .where(eq(listings.dealerId, dealerId));
+
+  const [l] = await db
+    .select({
+      today: sql<number>`count(*) filter (where ${leads.createdAt} >= ${d1})::int`,
+      last7: sql<number>`count(*) filter (where ${leads.createdAt} >= ${d7})::int`,
+      last30: sql<number>`count(*) filter (where ${leads.createdAt} >= ${d30})::int`,
+    })
+    .from(leads)
+    .where(eq(leads.dealerId, dealerId));
+
+  return {
+    views: { today: v?.today ?? 0, last7: v?.last7 ?? 0, last30: v?.last30 ?? 0 },
+    leads: { today: l?.today ?? 0, last7: l?.last7 ?? 0, last30: l?.last30 ?? 0 },
   };
 }
 

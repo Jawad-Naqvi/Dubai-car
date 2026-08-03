@@ -60,8 +60,30 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
     );
   }
 
+  const totalViews = rows.reduce((s, l) => s + l.viewCount, 0);
+  const totalInquiries = rows.reduce((s, l) => s + l.inquiryCount, 0);
+  const liveCount = rows.filter((l) => l.status === "active").length;
+  const stats = [
+    { icon: Eye, label: "Total views", value: totalViews.toLocaleString() },
+    { icon: MessageCircle, label: "Total inquiries", value: totalInquiries.toLocaleString() },
+    { icon: Tag, label: "Live listings", value: liveCount.toLocaleString() },
+  ];
+
   return (
     <main className="p-5 space-y-4">
+      <div className="grid grid-cols-3 gap-3">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4"
+          >
+            <s.icon className="h-4 w-4 text-[#8136B2]" />
+            <div className="mt-2 text-lg font-bold text-[#141414]">{s.value}</div>
+            <div className="text-[11px] text-muted">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
       <div className="flex items-center justify-end">
         <Button variant="gold" size="md" asChild>
           <Link href="/sell/new">

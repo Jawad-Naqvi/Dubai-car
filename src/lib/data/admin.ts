@@ -1,5 +1,5 @@
 import "server-only";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { listings, dealers, users, listingMedia, leads, payments, b2bBuyers } from "@/lib/db/schema";
@@ -20,6 +20,8 @@ export interface ModerationItem {
   emirate: string;
   regionalSpec: string;
   imageUrl: string;
+  /** All uploaded photos, so admins can review the full set inline. */
+  images: string[];
   createdAt?: string;
 }
 
@@ -37,6 +39,7 @@ export async function getModerationQueue(): Promise<ModerationItem[]> {
         emirate: l.emirate,
         regionalSpec: l.regionalSpec,
         imageUrl: l.imageUrl,
+        images: l.imageUrls?.length ? l.imageUrls : [l.imageUrl],
         createdAt: l.createdAt,
       }));
   }
@@ -58,20 +61,42 @@ export async function getModerationQueue(): Promise<ModerationItem[]> {
     .where(eq(listings.status, "pending_review"))
     .orderBy(desc(listings.createdAt))
     .limit(100);
-  return rows.map(({ listing: l, dealerName, heroUrl }) => ({
-    id: l.id,
-    slug: l.slug,
-    title: `${l.year} ${l.make} ${l.model}`,
-    dealerName: dealerName ?? "Private seller",
-    priceAED: l.priceAED,
-    kms: l.kms,
-    emirate: l.emirate,
-    regionalSpec: l.regionalSpec ?? "—",
-    imageUrl:
-      heroUrl ||
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80",
-    createdAt: l.createdAt.toISOString(),
-  }));
+
+  // Fetch every photo for the pending listings so admins can review the full
+  // set inline (not just one hero thumbnail).
+  const ids = rows.map((r) => r.listing.id);
+  const mediaByListing = new Map<string, string[]>();
+  if (ids.length) {
+    const media = await db
+      .select({ listingId: listingMedia.listingId, url: listingMedia.url })
+      .from(listingMedia)
+      .where(inArray(listingMedia.listingId, ids))
+      .orderBy(listingMedia.sortOrder);
+    for (const m of media) {
+      const arr = mediaByListing.get(m.listingId) ?? [];
+      arr.push(m.url);
+      mediaByListing.set(m.listingId, arr);
+    }
+  }
+
+  const FALLBACK =
+    "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80";
+  return rows.map(({ listing: l, dealerName, heroUrl }) => {
+    const images = mediaByListing.get(l.id) ?? [];
+    return {
+      id: l.id,
+      slug: l.slug,
+      title: `${l.year} ${l.make} ${l.model}`,
+      dealerName: dealerName ?? "Private seller",
+      priceAED: l.priceAED,
+      kms: l.kms,
+      emirate: l.emirate,
+      regionalSpec: l.regionalSpec ?? "—",
+      imageUrl: heroUrl || images[0] || FALLBACK,
+      images: images.length ? images : [heroUrl || FALLBACK],
+      createdAt: l.createdAt.toISOString(),
+    };
+  });
 }
 
 export async function moderateListing(
@@ -143,10 +168,23 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
 
 export async function setUserRole(id: string, role: string): Promise<boolean> {
   if (!isDbEnabled()) return true; // demo: accept (no Clerk write here)
-  await db
+  const [row] = await db
     .update(users)
     .set({ role: role as "buyer" | "dealer" | "b2b_importer" | "admin" })
-    .where(eq(users.id, id));
+    .where(eq(users.id, id))
+    .returning({ clerkId: users.clerkId });
+  // Keep Clerk publicMetadata (the RBAC source of truth) in sync, like
+  // approveDealer does — otherwise a DB-only role change wouldn't take effect.
+  if (row?.clerkId) {
+    try {
+      const client = await clerkClient();
+      await client.users.updateUserMetadata(row.clerkId, {
+        publicMetadata: { role },
+      });
+    } catch {
+      // DB role updated; Clerk reconciles on next sync.
+    }
+  }
   return true;
 }
 

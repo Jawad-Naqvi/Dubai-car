@@ -2,12 +2,13 @@ import "server-only";
 import Stripe from "stripe";
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { payments, dealers, subscriptions } from "@/lib/db/schema";
+import { payments, dealers, subscriptions, listings } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore } from "./demo-store";
 import { getEffectiveDealer, getOrSyncUser } from "./users";
 import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
+import { computeListingFee } from "./listing-fee";
 
 export interface InvoiceView {
   id: string;
@@ -125,6 +126,65 @@ export async function startCheckout(
 
   if (!session.url) throw new Error("Could not start checkout session.");
   return { ok: true, tier: tierId, url: session.url };
+}
+
+/**
+ * One-time Stripe Checkout for an individual's per-listing fee. The listing was
+ * created as an unpaid "draft"; on successful payment the Stripe webhook flips
+ * it to "pending_review" (see /api/webhooks/stripe). Only the listing's owner
+ * can pay, and only while the fee feature is enabled + gateway configured.
+ */
+export async function startListingFeeCheckout(
+  listingId: string,
+): Promise<{ ok: boolean; url?: string }> {
+  if (!isDbEnabled()) return { ok: false };
+  if (!isGatewayEnabled()) {
+    throw new Error("Payments aren't configured yet.");
+  }
+  const user = await getOrSyncUser();
+  if (!user) throw new Error("Sign in required.");
+
+  const rows = await db
+    .select({
+      id: listings.id,
+      slug: listings.slug,
+      sellerId: listings.sellerId,
+      status: listings.status,
+      priceAED: listings.priceAED,
+      make: listings.make,
+      model: listings.model,
+      year: listings.year,
+    })
+    .from(listings)
+    .where(eq(listings.id, listingId))
+    .limit(1);
+  const listing = rows[0];
+  if (!listing) throw new Error("Listing not found.");
+  if (listing.sellerId !== user.id) throw new Error("Not your listing.");
+
+  const feeAED = computeListingFee(listing.priceAED);
+  const stripe = stripeClient();
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    customer_email: user.email,
+    line_items: [
+      {
+        price_data: {
+          currency: "aed",
+          product_data: {
+            name: `Listing fee — ${listing.year} ${listing.make} ${listing.model}`,
+          },
+          unit_amount: feeAED * 100, // fils
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: `${appUrl()}/dashboard/my-listings?fee=paid`,
+    cancel_url: `${appUrl()}/dashboard/my-listings?fee=cancelled`,
+    metadata: { type: "listing_fee", listingId: listing.id },
+  });
+  if (!session.url) throw new Error("Could not start checkout session.");
+  return { ok: true, url: session.url };
 }
 
 /** Stripe customer billing portal — real card/payment-method management. */

@@ -17,7 +17,13 @@ import {
 } from "drizzle-orm";
 import type { PgColumn } from "drizzle-orm/pg-core";
 import { db } from "@/lib/db";
-import { listings, dealers, listingMedia, type Listing } from "@/lib/db/schema";
+import {
+  listings,
+  dealers,
+  listingMedia,
+  listingViewEvents,
+  type Listing,
+} from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import {
   mockListings,
@@ -771,4 +777,11 @@ export async function incrementViewCount(id: string): Promise<void> {
     .update(listings)
     .set({ viewCount: sql`${listings.viewCount} + 1` })
     .where(eq(listings.id, id));
+  // Also record a timestamped event so analytics can answer "views today /
+  // last 7 / last 30 days" (the counter above only gives an all-time total).
+  try {
+    await db.insert(listingViewEvents).values({ listingId: id });
+  } catch {
+    // A view-event failure must never break the page render.
+  }
 }

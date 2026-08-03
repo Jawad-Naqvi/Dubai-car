@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { dealers, payments, subscriptions } from "@/lib/db/schema";
+import { dealers, payments, subscriptions, listings } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { bust } from "@/lib/data/revalidate";
 import { subscriptionTiers } from "@/lib/brand";
@@ -47,6 +47,27 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+
+    // Individual per-listing fee: move the paid draft into the review queue.
+    if (session.metadata?.type === "listing_fee" && session.metadata?.listingId) {
+      const listingId = session.metadata.listingId;
+      await db
+        .update(listings)
+        .set({ status: "pending_review" })
+        .where(eq(listings.id, listingId));
+      await db.insert(payments).values({
+        amountAED: Math.round((session.amount_total ?? 0) / 100),
+        type: "featured_listing",
+        gateway: "stripe",
+        gatewayRef: session.id,
+        stripeEventId: event.id,
+        status: "paid",
+        metadata: { type: "listing_fee", listingId },
+      });
+      bust("listings");
+      return NextResponse.json({ ok: true });
+    }
+
     const dealerId = session.metadata?.dealerId;
     const tierId = session.metadata?.tier;
     if (dealerId && tierId) {

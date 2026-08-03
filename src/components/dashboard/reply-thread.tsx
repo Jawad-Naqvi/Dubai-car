@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Send } from "lucide-react";
@@ -20,6 +20,14 @@ export function ReplyThread({
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Near-real-time: while the thread is open, pull new replies from the other
+  // party every 12s (refreshes the server-rendered list). Stops when closed.
+  useEffect(() => {
+    if (!open) return;
+    const id = setInterval(() => router.refresh(), 12_000);
+    return () => clearInterval(id);
+  }, [open, router]);
 
   const send = async () => {
     if (!text.trim()) return;
