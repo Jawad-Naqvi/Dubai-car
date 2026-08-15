@@ -18,9 +18,11 @@ export default async function AuthenticatedLayout({
   const role = await getDashboardRole();
 
   return (
-    <div className="flex flex-col lg:flex-row bg-[#F6F7F9] min-h-screen overflow-x-hidden">
+    // No `overflow-x-hidden` here: it computes overflow-y:auto, making this a
+    // scroll container that breaks the sidebar's `position: sticky`.
+    <div className="flex flex-col lg:flex-row bg-[#F6F7F9] min-h-screen">
       <DashboardSidebar role={role} />
-      <div className="flex-1 min-w-0 overflow-x-hidden">{children}</div>
+      <div className="flex-1 min-w-0">{children}</div>
     </div>
   );
 }

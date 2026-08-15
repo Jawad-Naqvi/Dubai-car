@@ -353,7 +353,15 @@ export interface LeadView {
   replies: LeadReplyView[];
 }
 
-export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> {
+/**
+ * Leads for a seller. Dealers scope by `dealerId`; private sellers have no
+ * dealer record, so they scope by `sellerId` — the owner of the listing the
+ * lead was raised on. Passing neither returns everything (admin views only).
+ */
+export async function getLeadsForDealer(
+  dealerId?: string,
+  sellerId?: string,
+): Promise<LeadView[]> {
   if (!isDbEnabled()) {
     const replyMap = await getRepliesFor(demoStore().leads.map((l) => l.id));
     return demoStore().leads.map((l) => ({
@@ -371,11 +379,24 @@ export async function getLeadsForDealer(dealerId?: string): Promise<LeadView[]> 
       replies: replyMap.get(l.id) ?? [],
     }));
   }
-    const baseQuery = db.select().from(leads);
-  const rows = await (dealerId
-    ? baseQuery.where(eq(leads.dealerId, dealerId))
-    : baseQuery
-  )
+  // Private sellers own listings, not a dealer record — scope through the
+  // listing so one seller can never see another's leads.
+  const scope = dealerId
+    ? eq(leads.dealerId, dealerId)
+    : sellerId
+      ? inArray(
+          leads.listingId,
+          db
+            .select({ id: listings.id })
+            .from(listings)
+            .where(eq(listings.sellerId, sellerId)),
+        )
+      : undefined;
+
+  const rows = await db
+    .select()
+    .from(leads)
+    .where(scope)
     .orderBy(desc(leads.createdAt))
     .limit(200);
   const replyMap = await getRepliesFor(rows.map((l) => l.id));
@@ -402,6 +423,9 @@ export interface MessageThread {
   status: string;
   message: string;
   createdAt: string;
+  /** Links the conversation back to the car it's about. */
+  listingId?: string;
+  listingSlug?: string;
   listingTitle?: string;
   dealerName?: string;
   replies: LeadReplyView[];
@@ -457,6 +481,8 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
         status: leads.status,
         message: leads.message,
         createdAt: leads.createdAt,
+        listingId: leads.listingId,
+        listingSlug: listings.slug,
         make: listings.make,
         model: listings.model,
         year: listings.year,
@@ -475,6 +501,8 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
       status: r.status,
       message: r.message ?? "",
       createdAt: r.createdAt.toISOString(),
+      listingId: r.listingId ?? undefined,
+      listingSlug: r.listingSlug ?? undefined,
       listingTitle: r.make ? `${r.year} ${r.make} ${r.model}` : undefined,
       dealerName: r.dealerName ?? undefined,
       replies: replyMap.get(r.id) ?? [],

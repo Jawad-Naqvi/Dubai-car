@@ -42,8 +42,12 @@ export async function POST(req: Request) {
     );
   }
 
+  // A draft is private to its owner, so it skips the Emirates-ID gate — a
+  // seller can park work in progress while their ID is still being verified.
+  const asDraft = body.saveAsDraft === true;
+
   try {
-    const created = await createListing(body, user);
+    const created = await createListing(body, user, { asDraft });
     return NextResponse.json(created, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to create listing";

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { createLead } from "@/lib/data/leads";
 import { getOrSyncUser } from "@/lib/data/users";
+import { ownsListing, OWN_LISTING_ERROR } from "@/lib/data/ownership";
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -20,6 +21,12 @@ export async function POST(req: Request) {
   if (userId) {
     const u = await getOrSyncUser();
     buyerId = u?.id;
+  }
+
+  // You can't enquire on your own car — it would create a lead and a
+  // conversation with yourself.
+  if (await ownsListing(body.listingId, buyerId)) {
+    return NextResponse.json({ error: OWN_LISTING_ERROR }, { status: 409 });
   }
 
   const { id } = await createLead({

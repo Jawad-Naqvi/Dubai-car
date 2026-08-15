@@ -68,7 +68,9 @@ export function ListingCard({
           <div>
             <div className="flex items-center gap-1.5">
               <div className="text-lg font-bold text-[#141414] leading-none">
-                {formatAED(listing.priceAED, locale)}
+                {listing.saleMode === "quote_only"
+                  ? "On request"
+                  : formatAED(listing.priceAED, locale)}
               </div>
               <DealBadge rating={listing.dealRating} showIcon={false} />
             </div>
@@ -81,6 +83,10 @@ export function ListingCard({
                   <TrendingDown className="h-2 w-2" />
                   {formatAED(listing.previousPrice - listing.priceAED, locale)} off
                 </span>
+              </div>
+            ) : listing.saleMode === "quote_only" ? (
+              <div className="mt-0.5 text-[10px] text-muted">
+                Bulk from {listing.bulkMinQty ?? 2} units
               </div>
             ) : (
               <div className="mt-0.5 text-[10px] text-muted">
@@ -114,12 +120,14 @@ export function ListingCard({
           <span className="truncate">{listing.emirate}</span>
         </div>
 
-        {/* Primary CTA — cars.com cards lead with "Check availability" */}
+        {/* Primary CTA — wording follows the seller's purchase configuration */}
         <Link
           href={`/listings/${listing.id}/${listing.slug}`}
           className="mt-2.5 flex items-center justify-center h-8 w-full rounded-md bg-[#8136B2] text-white text-[11px] font-semibold hover:bg-[#370B55] transition-colors"
         >
-          Check availability
+          {listing.saleMode === "quote_only"
+            ? "Request quote"
+            : "Check availability"}
         </Link>
       </div>
     </div>

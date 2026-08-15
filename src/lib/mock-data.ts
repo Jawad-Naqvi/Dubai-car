@@ -39,6 +39,17 @@ export interface MockListing {
   isInspected: boolean;
   isExportReady: boolean;
   isNew: boolean;
+  /**
+   * How this car can be bought — set by the seller. Drives the buyer's CTAs:
+   * "retail" (price + contact), "both" (price + bulk quote), "quote_only"
+   * (bulk quote, no public transaction price). Defaults to "retail" so a
+   * normal consumer listing never looks like a wholesale lot.
+   */
+  saleMode?: "retail" | "both" | "quote_only";
+  /** Minimum units for a bulk request (only when bulk is enabled). */
+  bulkMinQty?: number;
+  /** Units the seller holds at this spec. */
+  stockQty?: number;
   status: "active" | "reserved" | "sold";
   imageUrl: string;
   imageUrls: string[];
@@ -332,6 +343,10 @@ export const mockListings: MockListing[] = [
     isInspected: true,
     isExportReady: true,
     isNew: true,
+    // Fleet pickup — priced for individuals AND open to bulk buyers.
+    saleMode: "both",
+    bulkMinQty: 5,
+    stockQty: 24,
     status: "active",
     imageUrl: img("Toyota", "Hilux"),
     imageUrls: [img("Toyota", "Hilux")],
@@ -468,6 +483,10 @@ export const mockListings: MockListing[] = [
     isInspected: true,
     isExportReady: true,
     isNew: false,
+    // Wholesale allocation — no retail price, bulk buyers request a quote.
+    saleMode: "quote_only",
+    bulkMinQty: 3,
+    stockQty: 12,
     status: "active",
     imageUrl: img("Toyota", "Land Cruiser"),
     imageUrls: [img("Toyota", "Land Cruiser")],

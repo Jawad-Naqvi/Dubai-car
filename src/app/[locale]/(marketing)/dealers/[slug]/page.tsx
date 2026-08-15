@@ -12,6 +12,7 @@ import { ReviewsSection } from "@/components/dealers/reviews-section";
 import { StarRating } from "@/components/dealers/star-rating";
 import { DealerCard } from "@/components/dealers/dealer-card";
 import { InventoryToolbar } from "@/components/dealers/inventory-toolbar";
+import { RequestQuoteButton } from "@/components/quotes/request-quote-button";
 import { Pagination } from "@/components/listings/pagination";
 import {
   BadgeCheck,
@@ -134,8 +135,9 @@ export default async function DealerStorefront({
           </div>
         </div>
 
-        {/* Contact actions — cars.com keeps phones top-right */}
-        <div className="flex md:flex-col flex-wrap gap-2 flex-shrink-0 md:text-right">
+        {/* Contact actions — cars.com keeps phones top-right. Business buyers
+            get a bulk-enquiry entry point that isn't tied to one listing. */}
+        <div className="flex md:flex-col flex-wrap gap-2 flex-shrink-0 md:text-right md:w-56">
           <Button asChild variant="gold" size="md">
             <a href={`tel:${dealer.phone ?? brand.whatsapp}`}>
               <Phone className="h-4 w-4" />
@@ -155,6 +157,14 @@ export default async function DealerStorefront({
               WhatsApp
             </a>
           </Button>
+          <RequestQuoteButton
+            dealerSlug={slug}
+            dealerName={dealer.name}
+            minQty={2}
+            label="Request bulk quote"
+            variant="gold_outline"
+            className="md:w-full"
+          />
         </div>
       </div>
 

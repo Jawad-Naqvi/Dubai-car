@@ -14,6 +14,9 @@ import { demoStore } from "./demo-store";
 import { getEffectiveDealer, getOrSyncUser } from "./users";
 import { bust } from "./revalidate";
 import { subscriptionTiers } from "@/lib/brand";
+import { getQuotesForDealer } from "./quotes";
+import { getOrdersForDealer } from "./orders";
+import { getLeadsForDealer } from "./leads";
 
 /** The mock dealer we treat as "you" in demo mode (no real dealer identity). */
 const PRIMARY_DEMO_DEALER = "al-futtaim-motors";
@@ -326,6 +329,40 @@ export interface DealerAnalytics {
   topListings: { id: string; slug: string; title: string; views: number; inquiries: number }[];
   /** Rolling-window breakdowns the all-time counters can't provide. */
   timeRanges: { views: TimeRange; leads: TimeRange };
+  /** Every stage of the sales pipeline, so the dealer sees status at a glance. */
+  pipeline: PipelineStats;
+}
+
+export interface StageCount {
+  key: string;
+  label: string;
+  count: number;
+  /** Money represented by this stage, when meaningful. */
+  valueAED?: number;
+}
+
+export interface PipelineStats {
+  /** Listing lifecycle: active / pending review / reserved / sold / draft. */
+  listings: StageCount[];
+  /** Enquiry funnel by status. */
+  enquiries: StageCount[];
+  /** Quotation funnel: requested → responded → accepted / declined. */
+  quotes: StageCount[];
+  /** Order pipeline: pending → confirmed → in progress → completed. */
+  orders: StageCount[];
+  /** Headline money + conversion numbers across the whole funnel. */
+  totals: {
+    quoteRequests: number;
+    quotedValueAED: number;
+    acceptedValueAED: number;
+    openOrders: number;
+    openOrderValueAED: number;
+    completedValueAED: number;
+    /** Accepted quotes ÷ quotes the dealer actually priced, %. */
+    quoteWinRate: number;
+    /** Median hours from request to the dealer's response. */
+    medianResponseHours: number | null;
+  };
 }
 
 const LEAD_TYPE_LABEL: Record<string, string> = {
@@ -358,9 +395,148 @@ function distribute<T>(
   return list.slice(0, top);
 }
 
-/** Real dealer analytics computed from live view/inquiry/lead counters. */
+/** Count rows into a fixed, ordered set of stages (zeroes included). */
+function stages<T>(
+  rows: T[],
+  status: (r: T) => string,
+  order: { key: string; label: string }[],
+  value?: (r: T) => number,
+): StageCount[] {
+  return order.map((s) => {
+    const matching = rows.filter((r) => status(r) === s.key);
+    return {
+      key: s.key,
+      label: s.label,
+      count: matching.length,
+      ...(value
+        ? { valueAED: matching.reduce((sum, r) => sum + (value(r) || 0), 0) }
+        : {}),
+    };
+  });
+}
+
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2
+    ? sorted[mid]
+    : Math.round(((sorted[mid - 1] + sorted[mid]) / 2) * 10) / 10;
+}
+
+/**
+ * Full pipeline snapshot for the signed-in dealer — listings, enquiries,
+ * quotes and orders in one pass so the analytics page can show the status of
+ * everything without each card doing its own query.
+ */
+async function getPipelineStats(
+  inventory: Awaited<ReturnType<typeof getDealerInventory>>,
+  leadRows: { status: string }[],
+): Promise<PipelineStats> {
+  const user = await getOrSyncUser().catch(() => null);
+  const dealer = await getEffectiveDealer().catch(() => null);
+  const [quotes, orders] = await Promise.all([
+    getQuotesForDealer(dealer?.id, user?.id).catch(() => []),
+    getOrdersForDealer(dealer?.id, user?.id).catch(() => []),
+  ]);
+
+  const quotedValue = quotes
+    .filter((q) => q.quotedTotalAED)
+    .reduce((s, q) => s + (q.quotedTotalAED ?? 0), 0);
+  const acceptedValue = quotes
+    .filter((q) => q.status === "accepted")
+    .reduce((s, q) => s + (q.quotedTotalAED ?? 0), 0);
+  const priced = quotes.filter((q) =>
+    ["responded", "accepted", "declined"].includes(q.status),
+  ).length;
+  const won = quotes.filter((q) => q.status === "accepted").length;
+
+  // Response speed: request → dealer's first pricing, in hours.
+  const responseHours = quotes
+    .filter((q) => q.respondedAt)
+    .map(
+      (q) =>
+        Math.round(
+          ((new Date(q.respondedAt!).getTime() -
+            new Date(q.createdAt).getTime()) /
+            3_600_000) *
+            10,
+        ) / 10,
+    )
+    .filter((h) => h >= 0);
+
+  const openOrders = orders.filter((o) =>
+    ["pending", "confirmed", "in_progress"].includes(o.status),
+  );
+
+  return {
+    listings: stages(inventory, (l) => l.status, [
+      { key: "active", label: "Active" },
+      { key: "pending_review", label: "In review" },
+      { key: "reserved", label: "Reserved" },
+      { key: "sold", label: "Sold" },
+      { key: "draft", label: "Draft" },
+    ]),
+    enquiries: stages(leadRows, (l) => l.status, [
+      { key: "new", label: "New" },
+      { key: "contacted", label: "In progress" },
+      { key: "quoted", label: "Quoted" },
+      { key: "closed", label: "Closed" },
+    ]),
+    quotes: stages(
+      quotes,
+      (q) => q.status,
+      [
+        { key: "requested", label: "New request" },
+        { key: "under_review", label: "Under review" },
+        { key: "responded", label: "Quote sent" },
+        { key: "accepted", label: "Accepted" },
+        { key: "declined", label: "Declined" },
+        { key: "withdrawn", label: "Withdrawn" },
+      ],
+      (q) => q.quotedTotalAED ?? 0,
+    ),
+    orders: stages(
+      orders,
+      (o) => o.status,
+      [
+        { key: "pending", label: "Awaiting confirmation" },
+        { key: "confirmed", label: "Confirmed" },
+        { key: "in_progress", label: "In progress" },
+        { key: "completed", label: "Completed" },
+        { key: "cancelled", label: "Cancelled" },
+      ],
+      (o) => o.totalAED,
+    ),
+    totals: {
+      quoteRequests: quotes.length,
+      quotedValueAED: quotedValue,
+      acceptedValueAED: acceptedValue,
+      openOrders: openOrders.length,
+      openOrderValueAED: openOrders.reduce((s, o) => s + o.totalAED, 0),
+      completedValueAED: orders
+        .filter((o) => o.status === "completed")
+        .reduce((s, o) => s + o.totalAED, 0),
+      quoteWinRate: priced > 0 ? Math.round((won / priced) * 100) : 0,
+      medianResponseHours: median(responseHours),
+    },
+  };
+}
+
+/**
+ * Analytics for whoever is signed in. Dealers get their whole inventory;
+ * individuals who sell a car privately have no dealer record, so we fall back
+ * to the listings they personally own — otherwise a private seller's analytics
+ * would just be a page of zeroes.
+ */
 export async function getDealerAnalytics(): Promise<DealerAnalytics> {
-  const inventory = await getDealerInventory();
+  const dealerForScope = await getEffectiveDealer().catch(() => null);
+  const viewer = await getOrSyncUser().catch(() => null);
+  const inventory = dealerForScope
+    ? await getDealerInventory()
+    : viewer
+      ? await getSellerListings(viewer.id).catch(() => [])
+      : [];
   const totalViews = inventory.reduce((s, l) => s + l.viewCount, 0);
   const totalInquiries = inventory.reduce((s, l) => s + l.inquiryCount, 0);
   const activeListings = inventory.filter((l) => l.status === "active").length;
@@ -383,7 +559,7 @@ export async function getDealerAnalytics(): Promise<DealerAnalytics> {
       leads: split(totalDemoLeads),
     };
   } else {
-    const dealer = await getEffectiveDealer();
+    const dealer = dealerForScope;
     leadTypeCounts = dealer
       ? ((await db
           .select({
@@ -409,11 +585,20 @@ export async function getDealerAnalytics(): Promise<DealerAnalytics> {
       inquiries: l.inquiryCount,
     }));
 
+  // Enquiry statuses for the pipeline board (leads carry their own status),
+  // scoped to the dealer OR to the private seller's own listings.
+  const leadRows = await getLeadsForDealer(
+    dealerForScope?.id,
+    dealerForScope ? undefined : viewer?.id,
+  ).catch(() => [] as { status: string }[]);
+  const pipeline = await getPipelineStats(inventory, leadRows);
+
   return {
     totalViews,
     totalInquiries,
     totalLeads,
     activeListings,
+    pipeline,
     conversionRate:
       totalViews > 0 ? Math.round((totalLeads / totalViews) * 1000) / 10 : 0,
     byEmirate: distribute(inventory, (l) => l.emirate, (l) => l.viewCount),

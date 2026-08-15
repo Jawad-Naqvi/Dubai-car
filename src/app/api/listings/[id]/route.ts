@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { listings } from "@/lib/db/schema";
 import { updateListingStatus, deleteListing } from "@/lib/data/dashboard";
-import { updateListing } from "@/lib/data/listing-write";
+import { updateListing, publishDraft } from "@/lib/data/listing-write";
 import { getOrSyncUser, getCurrentDealer, isAdminAllowed, dashboardsOpen } from "@/lib/data/users";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore } from "@/lib/data/demo-store";
@@ -48,6 +48,22 @@ export async function PATCH(
   }
   const body = await req.json().catch(() => null);
   if (!body) return new NextResponse("Invalid JSON", { status: 400 });
+
+  // Taking a draft live runs the identity gate that saving deliberately skips.
+  if (body.action === "publish") {
+    const user = await getOrSyncUser().catch(() => null);
+    if (!user) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+    try {
+      const result = await publishDraft(id, user);
+      return NextResponse.json(result);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Could not publish" },
+        { status: 422 },
+      );
+    }
+  }
+
   await updateListingStatus(id, {
     status: body.status,
     isFeatured: body.isFeatured,

@@ -18,7 +18,12 @@ export const listingInputSchema = z.object({
   trim: z.string().optional(),
   year: z.coerce.number().int().min(1980).max(2027),
   kms: z.coerce.number().int().min(0).max(1_000_000),
-  priceAED: z.coerce.number().int().min(1000).max(50_000_000),
+  // Quote-only stock carries no public price, so 0 is allowed there.
+  priceAED: z.coerce.number().int().min(0).max(50_000_000),
+  /** Purchase configuration — decides the buyer's CTAs on the listing page. */
+  saleMode: z.enum(["retail", "both", "quote_only"]).optional(),
+  bulkMinQty: z.coerce.number().int().min(2).max(999).optional(),
+  stockQty: z.coerce.number().int().min(1).max(9999).optional(),
   bodyType: z.string().optional(),
   fuel: z.string().optional(),
   transmission: z.string().optional(),
@@ -40,6 +45,26 @@ export const listingInputSchema = z.object({
 
 export type ListingInput = z.infer<typeof listingInputSchema>;
 
+/**
+ * A half-finished listing. Only enough to identify the car is required —
+ * everything else takes a safe placeholder so an in-progress wizard can always
+ * be parked without tripping publish-time validation.
+ */
+export const draftInputSchema = listingInputSchema.partial().extend({
+  make: z.string().min(1, "Add a make before saving a draft"),
+  model: z.string().min(1, "Add a model before saving a draft"),
+  year: z.coerce.number().int().min(1980).max(2027).optional(),
+  kms: z.coerce.number().int().min(0).max(1_000_000).optional(),
+  priceAED: z.coerce.number().int().min(0).max(50_000_000).optional(),
+  emirate: z.string().optional(),
+}).transform((d) => ({
+  ...d,
+  year: d.year ?? new Date().getFullYear(),
+  kms: d.kms ?? 0,
+  priceAED: d.priceAED ?? 0,
+  emirate: d.emirate || "Dubai",
+})) as unknown as typeof listingInputSchema;
+
 export interface CreateListingResult {
   id: string;
   slug: string;
@@ -52,8 +77,19 @@ export interface CreateListingResult {
 export async function createListing(
   raw: unknown,
   user?: CurrentUser,
+  opts: {
+    /**
+     * Save without publishing. A draft is private to its owner, so it does NOT
+     * require Emirates ID verification and never triggers a listing fee —
+     * sellers can prepare a listing while their ID is still being verified
+     * instead of losing everything they typed.
+     */
+    asDraft?: boolean;
+  } = {},
 ): Promise<CreateListingResult> {
-  const input = listingInputSchema.parse(raw);
+  const input = opts.asDraft
+    ? draftInputSchema.parse(raw)
+    : listingInputSchema.parse(raw);
   const slug = slugify(
     input.year,
     input.make,
@@ -91,6 +127,9 @@ export async function createListing(
       isFeatured: false,
       isInspected: false,
       isExportReady: !!input.isExportReady,
+      saleMode: input.saleMode ?? "retail",
+      bulkMinQty: input.bulkMinQty ?? 5,
+      stockQty: input.stockQty ?? 1,
       isNew: input.condition === "New",
       status: "active",
       imageUrl:
@@ -99,7 +138,7 @@ export async function createListing(
       imageUrls: images,
       description: input.description ?? "",
       features: input.features ?? [],
-      moderationStatus: "pending_review",
+      moderationStatus: opts.asDraft ? "draft" : "pending_review",
       ownerUserId: user?.id,
       createdAt: new Date().toISOString(),
       viewCount: 0,
@@ -107,7 +146,11 @@ export async function createListing(
     };
     store.newListings.unshift(listing);
     bust("listings");
-    return { id: listing.id, slug, status: "pending_review" };
+    return {
+      id: listing.id,
+      slug,
+      status: opts.asDraft ? "draft" : "pending_review",
+    };
   }
 
   // ---- DB mode ----
@@ -125,8 +168,9 @@ export async function createListing(
   // Identity gate: every seller must have an Emirates ID on file (individuals
   // via /verify-identity, dealers via onboarding). Verified dealers are always
   // allowed. This enforces the "Emirates ID required to sell" rule server-side.
+  // Drafts are exempt — they're private, so preparing one is always allowed.
   const idOnFile = !!user?.emiratesIdNumber;
-  if (!dealerVerified && !idOnFile) {
+  if (!opts.asDraft && !dealerVerified && !idOnFile) {
     throw new Error(
       "Please verify your Emirates ID before listing a car.",
     );
@@ -140,9 +184,13 @@ export async function createListing(
   // a private-seller listing is held as an unpaid "draft" and the caller is
   // told a fee is due; the Stripe webhook flips it to pending_review on payment.
   // Dealers (any dealerId) are exempt — their listings are covered by their tier.
-  const feeApplies = isListingFeeEnabled() && !dealerId;
+  const feeApplies = !opts.asDraft && isListingFeeEnabled() && !dealerId;
   const feeAED = feeApplies ? computeListingFee(input.priceAED) : 0;
-  const finalStatus = feeApplies ? "draft" : initialStatus;
+  const finalStatus = opts.asDraft
+    ? "draft"
+    : feeApplies
+      ? "draft"
+      : initialStatus;
 
   // Denormalise the cars.com-style facets so search stays a plain column read.
   const drivetrain = deriveDrivetrain({
@@ -186,6 +234,9 @@ export async function createListing(
       description: input.description,
       features: input.features ?? [],
       isExportReady: !!input.isExportReady,
+      saleMode: input.saleMode ?? "retail",
+      bulkMinQty: input.bulkMinQty ?? 5,
+      stockQty: input.stockQty ?? 1,
       status: finalStatus,
       ...(finalStatus === "active" ? { publishedAt: new Date() } : {}),
     })
@@ -248,6 +299,59 @@ export interface EditableListing {
   isExportReady: boolean;
   images: string[];
   status: string;
+}
+
+/**
+ * Take a saved draft live. This is where the Emirates-ID gate actually bites —
+ * saving is always allowed, publishing is not — so a seller can build the
+ * listing first and verify second without ever retyping it.
+ */
+export async function publishDraft(
+  id: string,
+  user: CurrentUser,
+): Promise<{ status: string }> {
+  if (!isDbEnabled()) {
+    const listing = demoStore().newListings.find((l) => l.id === id);
+    if (!listing) throw new Error("Listing not found.");
+    listing.moderationStatus = "pending_review";
+    bust("listings");
+    return { status: "pending_review" };
+  }
+
+  const [d] = await db
+    .select({ id: dealers.id, isVerified: dealers.isVerified })
+    .from(dealers)
+    .where(eq(dealers.userId, user.id))
+    .limit(1);
+  const dealerVerified = d?.isVerified ?? false;
+
+  if (!dealerVerified && !user.emiratesIdNumber) {
+    throw new Error(
+      "Please verify your Emirates ID to publish this listing. Your draft is saved.",
+    );
+  }
+
+  const [current] = await db
+    .select({ priceAED: listings.priceAED, status: listings.status })
+    .from(listings)
+    .where(eq(listings.id, id))
+    .limit(1);
+  if (!current) throw new Error("Listing not found.");
+  if (!(current.priceAED > 0)) {
+    throw new Error("Add an asking price before publishing.");
+  }
+
+  const status = dealerVerified ? "active" : "pending_review";
+  await db
+    .update(listings)
+    .set({
+      status,
+      updatedAt: new Date(),
+      ...(status === "active" ? { publishedAt: new Date() } : {}),
+    })
+    .where(eq(listings.id, id));
+  bust("listings");
+  return { status };
 }
 
 /**
@@ -461,6 +565,9 @@ export async function updateListing(
       description: input.description,
       features: input.features ?? [],
       isExportReady: !!input.isExportReady,
+      saleMode: input.saleMode ?? "retail",
+      bulkMinQty: input.bulkMinQty ?? 5,
+      stockQty: input.stockQty ?? 1,
       ...(priceChanged
         ? { previousPrice: current.priceAED, priceUpdatedAt: new Date() }
         : {}),

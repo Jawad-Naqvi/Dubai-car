@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
@@ -29,6 +29,8 @@ import {
   CheckCircle2,
   Sparkles,
   ScanLine,
+  Save,
+  RotateCcw,
 } from "lucide-react";
 
 const STEPS = ["Vehicle", "Details", "Photos", "Contact"];
@@ -51,6 +53,14 @@ const COMMON_FEATURES = [
 const field =
   "w-full h-10 rounded-xl bg-white border border-[#E5E5EA] px-3 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/40 focus:ring-2 focus:ring-[#141414]/10";
 const labelCls = "text-[11px] uppercase tracking-wider text-muted mb-1.5 block";
+
+/**
+ * Where the in-progress listing is parked in the browser. Filling this wizard
+ * takes real effort, so every keystroke is mirrored to localStorage — a failed
+ * publish, an accidental back button or a closed tab must never cost the
+ * seller their work.
+ */
+const AUTOSAVE_KEY = "dxb:sell-wizard:draft";
 
 export function SellWizard() {
   const router = useRouter();
@@ -79,6 +89,10 @@ export function SellWizard() {
     description: "",
     emirate: "Dubai",
     isExportReady: false,
+    /** Purchase configuration — see PurchaseActions on the listing page. */
+    saleMode: "retail" as "retail" | "both" | "quote_only",
+    bulkMinQty: 5,
+    stockQty: 1,
     features: [] as string[],
     images: [] as string[],
     sellerName: "",
@@ -87,6 +101,98 @@ export function SellWizard() {
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  /* ---------------- Autosave / restore ---------------- */
+  const [restored, setRestored] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  // Id of the server-side draft once one exists, so repeat saves update it
+  // instead of piling up duplicates.
+  const draftIdRef = useRef<string | null>(null);
+  const hydrated = useRef(false);
+
+  // Restore anything left from a previous attempt, once, on mount.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(AUTOSAVE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as {
+          form?: typeof form;
+          step?: number;
+          draftId?: string | null;
+        };
+        if (saved.form?.make) {
+          setForm((f) => ({ ...f, ...saved.form }));
+          if (typeof saved.step === "number") setStep(saved.step);
+          draftIdRef.current = saved.draftId ?? null;
+          setRestored(true);
+        }
+      }
+    } catch {
+      /* corrupt storage shouldn't block listing */
+    }
+    hydrated.current = true;
+  }, []);
+
+  // Mirror every change back to storage (skipped until the restore has run so
+  // the empty initial state can't clobber a saved draft).
+  useEffect(() => {
+    if (!hydrated.current) return;
+    try {
+      localStorage.setItem(
+        AUTOSAVE_KEY,
+        JSON.stringify({ form, step, draftId: draftIdRef.current }),
+      );
+    } catch {
+      /* quota / private mode — autosave is best-effort */
+    }
+  }, [form, step]);
+
+  const clearAutosave = () => {
+    try {
+      localStorage.removeItem(AUTOSAVE_KEY);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  /**
+   * Park the listing server-side as a draft. Drafts skip the Emirates-ID gate
+   * (they're private), so this always succeeds once a make/model exists —
+   * which is exactly what makes it a safe fallback when publishing is blocked.
+   */
+  const saveDraft = async (opts: { silent?: boolean } = {}) => {
+    if (!form.make || !form.model) {
+      if (!opts.silent)
+        toast.error("Add a make and model before saving a draft.");
+      return null;
+    }
+    setSavingDraft(true);
+    try {
+      const res = await fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          cylinders: form.cylinders ? Number(form.cylinders) : undefined,
+          saveAsDraft: true,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Could not save draft");
+      draftIdRef.current = data.id;
+      if (!opts.silent) {
+        toast.success("Draft saved — find it under My listings.");
+      }
+      return data.id as string;
+    } catch (e) {
+      if (!opts.silent) {
+        toast.error(e instanceof Error ? e.message : "Could not save draft.");
+      }
+      return null;
+    } finally {
+      setSavingDraft(false);
+    }
+  };
 
   const decodeVinNow = async () => {
     if (!form.vin.trim()) {
@@ -130,7 +236,8 @@ export function SellWizard() {
 
   const canNext = () => {
     if (step === 0) return form.make && form.model && form.year && form.kms >= 0;
-    if (step === 1) return form.priceAED > 0;
+    // Quote-only stock has no public price, so don't demand one.
+    if (step === 1) return form.saleMode === "quote_only" || form.priceAED > 0;
     if (step === 3) return form.sellerName && form.sellerPhone;
     return true;
   };
@@ -167,12 +274,24 @@ export function SellWizard() {
         }
         throw new Error(fd.error ?? "Could not start payment.");
       }
+      clearAutosave();
       setDone({ id: data.id, slug: data.slug, status: data.status });
       toast.success(
         data.status === "active" ? "Listing published!" : "Listing submitted for review!",
       );
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not submit listing.");
+      const message =
+        e instanceof Error ? e.message : "Could not submit listing.";
+      // Publishing can be blocked for reasons that have nothing to do with the
+      // car (unverified Emirates ID, moderation rules). Rescue the work as a
+      // draft so the seller resumes instead of retyping everything.
+      const draftId = await saveDraft({ silent: true });
+      toast.error(
+        draftId
+          ? `${message} Your listing is saved as a draft — finish it from My listings.`
+          : message,
+        { duration: 8000 },
+      );
     } finally {
       setSubmitting(false);
     }
@@ -213,6 +332,31 @@ export function SellWizard() {
       <h1 className="mt-2 text-2xl lg:text-3xl font-light tracking-tight">
         Create <span className="font-extrabold">your listing</span>
       </h1>
+
+      {/* Picked up where they left off */}
+      {restored && (
+        <div className="mt-4 rounded-lg border border-[#8136B2]/30 bg-[#F3EDF9] px-4 py-3 flex items-start gap-2.5">
+          <RotateCcw className="h-4 w-4 text-[#6B21A8] mt-0.5 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-[#141414]">
+              We restored your unfinished listing
+            </p>
+            <p className="text-[11px] text-secondary mt-0.5">
+              Everything you entered last time is still here. Continue where you
+              left off, or start over.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              clearAutosave();
+              window.location.reload();
+            }}
+            className="text-[11px] font-semibold text-[#141414] underline underline-offset-2 hover:opacity-70 flex-shrink-0"
+          >
+            Start over
+          </button>
+        </div>
+      )}
 
       {/* Stepper */}
       <div className="mt-6 flex items-center gap-2">
@@ -571,6 +715,89 @@ export function SellWizard() {
                 This car is export-ready (RTA deregistration possible)
               </span>
             </label>
+
+            {/* ---- How can this car be bought? ------------------------- */}
+            <div className="rounded-lg border border-[#E5E5EA] p-4">
+              <h3 className="text-sm font-bold text-[#141414]">
+                How can buyers purchase this?
+              </h3>
+              <p className="mt-1 text-xs text-secondary">
+                Most cars sell to one buyer. Turn on bulk if you can supply
+                several units to fleet or export buyers.
+              </p>
+
+              <div className="mt-3 space-y-2">
+                {(
+                  [
+                    {
+                      value: "retail",
+                      title: "Individual buyers only",
+                      desc: "Shown with your asking price. Buyers contact you or reserve it.",
+                    },
+                    {
+                      value: "both",
+                      title: "Individual buyers + bulk orders",
+                      desc: "Priced as normal, plus bulk buyers can request a quote.",
+                    },
+                    {
+                      value: "quote_only",
+                      title: "Bulk orders only",
+                      desc: "No public price — buyers request a quote for their quantity.",
+                    },
+                  ] as const
+                ).map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex items-start gap-2.5 rounded-md border p-3 cursor-pointer transition-colors ${
+                      form.saleMode === opt.value
+                        ? "border-[#8136B2] bg-[#F3EDF9]"
+                        : "border-[#E5E5EA] hover:border-[#141414]/25"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="saleMode"
+                      className="mt-0.5 h-4 w-4 accent-[#8136B2]"
+                      checked={form.saleMode === opt.value}
+                      onChange={() => set("saleMode", opt.value)}
+                    />
+                    <span>
+                      <span className="block text-xs font-semibold text-[#141414]">
+                        {opt.title}
+                      </span>
+                      <span className="block text-[11px] text-secondary mt-0.5">
+                        {opt.desc}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              {form.saleMode !== "retail" && (
+                <div className="mt-3 grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Minimum bulk quantity</label>
+                    <input
+                      type="number"
+                      min={2}
+                      className={field}
+                      value={form.bulkMinQty}
+                      onChange={(e) => set("bulkMinQty", Number(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Units in stock</label>
+                    <input
+                      type="number"
+                      min={1}
+                      className={field}
+                      value={form.stockQty}
+                      onChange={(e) => set("stockQty", Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -633,7 +860,7 @@ export function SellWizard() {
       </div>
 
       {/* Nav */}
-      <div className="mt-5 flex items-center justify-between">
+      <div className="mt-5 flex items-center justify-between gap-2">
         <Button
           variant="ghost"
           size="md"
@@ -641,6 +868,22 @@ export function SellWizard() {
         >
           <ChevronLeft className="h-4 w-4" />
           {step === 0 ? "Cancel" : "Back"}
+        </Button>
+
+        {/* Explicit escape hatch — park it and come back later. */}
+        <Button
+          variant="ghost"
+          size="md"
+          className="ms-auto"
+          disabled={savingDraft || !form.make || !form.model}
+          onClick={() => saveDraft()}
+        >
+          {savingDraft ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+          Save draft
         </Button>
 
         {step < STEPS.length - 1 ? (

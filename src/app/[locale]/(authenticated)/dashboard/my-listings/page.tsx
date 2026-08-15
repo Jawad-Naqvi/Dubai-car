@@ -2,6 +2,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { MyListingsView } from "@/components/dashboard/my-listings-view";
 import { getSellerListings } from "@/lib/data/dashboard";
 import { getOrSyncUser } from "@/lib/data/users";
+import { getListingActivity } from "@/lib/data/listing-activity";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,8 @@ export const dynamic = "force-dynamic";
 export default async function MyListingsPage() {
   const user = await getOrSyncUser().catch(() => null);
   const rows = user ? await getSellerListings(user.id).catch(() => []) : [];
+  // Everything buyers have done to these cars, rolled up per listing.
+  const activity = await getListingActivity(rows.map((r) => r.id)).catch(() => ({}));
   const active = rows.filter((r) => r.status === "active").length;
   const pending = rows.filter((r) => r.status === "pending_review").length;
 
@@ -26,7 +29,7 @@ export default async function MyListingsPage() {
             : `${rows.length} listing${rows.length === 1 ? "" : "s"} · ${active} active · ${pending} pending review`
         }
       />
-      <MyListingsView rows={rows} />
+      <MyListingsView rows={rows} activity={activity} />
     </>
   );
 }

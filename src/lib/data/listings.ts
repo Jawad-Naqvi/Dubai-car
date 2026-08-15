@@ -169,6 +169,9 @@ function rowToView(r: DbRow): MockListing {
     isFeatured: l.isFeatured,
     isInspected: l.isInspected,
     isExportReady: l.isExportReady,
+    saleMode: (l.saleMode as MockListing["saleMode"]) ?? "retail",
+    bulkMinQty: l.bulkMinQty ?? 2,
+    stockQty: l.stockQty ?? 1,
     isNew: l.condition === "New",
     status: (l.status === "reserved" || l.status === "sold"
       ? l.status
