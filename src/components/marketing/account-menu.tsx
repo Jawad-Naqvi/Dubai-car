@@ -97,19 +97,32 @@ export function AccountMenu() {
             </div>
           </div>
 
-          {isSeller
-            ? SELLER_ITEMS.map((it) => (
-                <Dropdown.Item key={it.href} asChild>
-                  <Link
-                    href={it.href}
-                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[#141414] outline-none cursor-pointer data-[highlighted]:bg-[#F3EDF9] data-[highlighted]:text-[#8136B2]"
-                  >
-                    <it.icon className="h-4 w-4 text-muted" />
-                    {it.label}
-                  </Link>
-                </Dropdown.Item>
-              ))
-            : BUYER_ITEMS.map((it) => (
+          {isSeller ? (
+            SELLER_ITEMS.map((it) => (
+              <Dropdown.Item key={it.href} asChild>
+                <Link
+                  href={it.href}
+                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[#141414] outline-none cursor-pointer data-[highlighted]:bg-[#F3EDF9] data-[highlighted]:text-[#8136B2]"
+                >
+                  <it.icon className="h-4 w-4 text-muted" />
+                  {it.label}
+                </Link>
+              </Dropdown.Item>
+            ))
+          ) : (
+            <>
+              {/* Direct link to the full buyer hub (the quick items below open
+                  an in-place drawer instead of navigating). */}
+              <Dropdown.Item asChild>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[#141414] outline-none cursor-pointer data-[highlighted]:bg-[#F3EDF9] data-[highlighted]:text-[#8136B2]"
+                >
+                  <LayoutDashboard className="h-4 w-4 text-muted" />
+                  Your hub
+                </Link>
+              </Dropdown.Item>
+              {BUYER_ITEMS.map((it) => (
                 <Dropdown.Item
                   key={it.view}
                   onSelect={() => setView(it.view)}
@@ -119,6 +132,8 @@ export function AccountMenu() {
                   {it.label}
                 </Dropdown.Item>
               ))}
+            </>
+          )}
 
           <div className="my-1 h-px bg-[#E5E5EA]" />
 
