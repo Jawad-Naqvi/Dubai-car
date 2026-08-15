@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { listings } from "@/lib/db/schema";
 import { updateListingStatus, deleteListing } from "@/lib/data/dashboard";
+import { updateListing } from "@/lib/data/listing-write";
 import { getOrSyncUser, getCurrentDealer, isAdminAllowed, dashboardsOpen } from "@/lib/data/users";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { demoStore } from "@/lib/data/demo-store";
@@ -52,6 +53,40 @@ export async function PATCH(
     isFeatured: body.isFeatured,
   });
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * PUT /api/listings/[id] — full self-service edit of a listing by its owner
+ * (private seller or the dealer it belongs to). updateListing re-checks
+ * ownership, records price history on a price change, and refreshes the deal
+ * rating. Distinct from PATCH, which only flips status/featured.
+ */
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  const user = await getOrSyncUser();
+  if (!user) {
+    return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  }
+  const body = await req.json().catch(() => null);
+  if (!body) return new NextResponse("Invalid JSON", { status: 400 });
+  try {
+    const res = await updateListing(id, body, user);
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: res.error },
+        { status: res.error === "Not allowed" ? 403 : 400 },
+      );
+    }
+    return NextResponse.json(res);
+  } catch (e) {
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "Invalid input" },
+      { status: 400 },
+    );
+  }
 }
 
 export async function DELETE(

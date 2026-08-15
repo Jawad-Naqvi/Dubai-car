@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SellerListingActions } from "@/components/dashboard/seller-listing-actions";
 import { formatAED, formatKm } from "@/lib/utils";
 import type { InventoryRow } from "@/lib/data/dashboard";
 import { Plus, Eye, MessageCircle, Tag } from "lucide-react";
@@ -32,11 +33,13 @@ const STATUS_HINT: Record<string, string> = {
   archived: "Archived — no longer visible to buyers.",
 };
 
+/** Statuses a seller may still edit — a sold/reserved car is left as-is. */
+const EDITABLE = new Set(["active", "pending_review", "rejected"]);
+
 /**
- * Read-only view of a buyer's own "sell my car" submissions (private seller,
- * not a dealer account). Intentionally has no edit/delete actions here —
- * changes go through /sell/new's moderation flow, keeping this a simple
- * status tracker rather than a management console.
+ * A buyer's own "sell my car" submissions (private seller, not a dealer
+ * account). Each editable listing gets owner controls — a quick price edit and
+ * a link to the full edit form — via <SellerListingActions>.
  */
 export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
   if (rows.length === 0) {
@@ -132,8 +135,12 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
               </div>
             </div>
 
+            {EDITABLE.has(l.status) && (
+              <SellerListingActions listingId={l.id} price={l.priceAED} />
+            )}
+
             {l.status === "active" && (
-              <Button asChild variant="ghost" size="sm" className="mt-3 w-full">
+              <Button asChild variant="ghost" size="sm" className="mt-2 w-full">
                 <Link href={`/listings/${l.id}/${l.slug}`}>View live listing</Link>
               </Button>
             )}

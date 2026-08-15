@@ -2,10 +2,11 @@ import "server-only";
 import { z } from "zod";
 import { eq, sql, and } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { listings, listingMedia, dealers } from "@/lib/db/schema";
+import { listings, listingMedia, dealers, priceHistory } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { slugify } from "@/lib/utils";
 import { deriveDrivetrain, computeDealRating } from "@/lib/vehicle-derive";
+import { dealRatingFromDb } from "./deal-rating";
 import { demoStore, demoId, type DemoListing } from "./demo-store";
 import { bust } from "./revalidate";
 import { isListingFeeEnabled, computeListingFee } from "./listing-fee";
@@ -216,4 +217,272 @@ export async function createListing(
     status: finalStatus,
     ...(feeApplies ? { feeRequired: true, feeAED } : {}),
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Edit an existing listing (owner self-service)                      */
+/* ------------------------------------------------------------------ */
+
+/** The full editable shape of a listing, prefilled into the edit form. */
+export interface EditableListing {
+  id: string;
+  slug: string;
+  make: string;
+  model: string;
+  trim: string;
+  year: number;
+  kms: number;
+  priceAED: number;
+  bodyType: string;
+  fuel: string;
+  transmission: string;
+  regionalSpec: string;
+  condition: string;
+  colorExterior: string;
+  colorInterior: string;
+  cylinders: string;
+  vin: string;
+  emirate: string;
+  description: string;
+  features: string[];
+  isExportReady: boolean;
+  images: string[];
+  status: string;
+}
+
+/**
+ * Resolve the id of the dealer a user owns (if any). Mirrors the lookup in
+ * createListing so ownership checks agree across create/edit.
+ */
+async function dealerIdForUser(userId: string): Promise<string | undefined> {
+  const d = await db
+    .select({ id: dealers.id })
+    .from(dealers)
+    .where(eq(dealers.userId, userId))
+    .limit(1);
+  return d[0]?.id;
+}
+
+/**
+ * Load a listing for editing, but ONLY if `user` owns it (private seller via
+ * sellerId, or the dealer it belongs to). Returns null when the listing doesn't
+ * exist or isn't the caller's — so a page can 404 rather than leak another
+ * seller's car into an edit form. Demo mode reads from the in-memory store.
+ */
+export async function getEditableListing(
+  id: string,
+  user: CurrentUser,
+): Promise<EditableListing | null> {
+  if (!isDbEnabled()) {
+    const l = demoStore().newListings.find((x) => x.id === id);
+    if (!l || l.ownerUserId !== user.id) return null;
+    return {
+      id: l.id,
+      slug: l.slug,
+      make: l.make,
+      model: l.model,
+      trim: l.trim ?? "",
+      year: l.year,
+      kms: l.kms,
+      priceAED: l.priceAED,
+      bodyType: l.bodyType ?? "",
+      fuel: l.fuel ?? "",
+      transmission: l.transmission ?? "",
+      regionalSpec: l.regionalSpec ?? "GCC",
+      condition: l.isNew ? "New" : "Used",
+      colorExterior: l.exteriorColor ?? "",
+      colorInterior: "",
+      cylinders: "",
+      vin: l.vin ?? "",
+      emirate: l.emirate,
+      description: l.description ?? "",
+      features: l.features ?? [],
+      isExportReady: !!l.isExportReady,
+      images: l.imageUrls ?? [],
+      status: l.status,
+    };
+  }
+
+  const [row] = await db
+    .select()
+    .from(listings)
+    .where(eq(listings.id, id))
+    .limit(1);
+  if (!row) return null;
+
+  const owns =
+    (!!row.sellerId && row.sellerId === user.id) ||
+    (!!row.dealerId && row.dealerId === (await dealerIdForUser(user.id)));
+  if (!owns) return null;
+
+  const media = await db
+    .select({ url: listingMedia.url })
+    .from(listingMedia)
+    .where(eq(listingMedia.listingId, id))
+    .orderBy(listingMedia.sortOrder);
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    make: row.make,
+    model: row.model,
+    trim: row.trim ?? "",
+    year: row.year,
+    kms: row.kms,
+    priceAED: row.priceAED,
+    bodyType: row.bodyType ?? "",
+    fuel: row.fuel ?? "",
+    transmission: row.transmission ?? "",
+    regionalSpec: row.regionalSpec ?? "GCC",
+    condition: row.condition ?? "Used",
+    colorExterior: row.colorExterior ?? "",
+    colorInterior: row.colorInterior ?? "",
+    cylinders: row.cylinders != null ? String(row.cylinders) : "",
+    vin: row.vin ?? "",
+    emirate: row.emirate,
+    description: row.description ?? "",
+    features: (row.features as string[] | null) ?? [],
+    isExportReady: !!row.isExportReady,
+    images: media.map((m) => m.url),
+    status: row.status,
+  };
+}
+
+export interface UpdateListingResult {
+  ok: boolean;
+  id?: string;
+  slug?: string;
+  error?: string;
+}
+
+/**
+ * Update an existing listing the caller owns. Records a price-history row (and
+ * the previous_price / price_updated_at "price drop" signal) when the asking
+ * price changes, refreshes the deal rating against live peers, and replaces the
+ * photo set when new images are supplied. The URL slug is intentionally kept
+ * stable so existing links and SEO don't break.
+ */
+export async function updateListing(
+  id: string,
+  raw: unknown,
+  user: CurrentUser,
+): Promise<UpdateListingResult> {
+  const input = listingInputSchema.parse(raw);
+
+  if (!isDbEnabled()) {
+    const store = demoStore();
+    const l = store.newListings.find((x) => x.id === id);
+    if (!l || l.ownerUserId !== user.id) {
+      return { ok: false, error: "Not found" };
+    }
+    l.make = input.make;
+    l.model = input.model;
+    l.trim = input.trim;
+    l.year = input.year;
+    l.kms = input.kms;
+    l.priceAED = input.priceAED;
+    l.bodyType = input.bodyType ?? l.bodyType;
+    l.fuel = input.fuel ?? l.fuel;
+    l.transmission = input.transmission ?? l.transmission;
+    l.regionalSpec = input.regionalSpec ?? l.regionalSpec;
+    l.exteriorColor = input.colorExterior ?? l.exteriorColor;
+    l.vin = input.vin;
+    l.emirate = input.emirate;
+    l.description = input.description ?? "";
+    l.features = input.features ?? [];
+    l.isExportReady = !!input.isExportReady;
+    l.isNew = input.condition === "New";
+    if (input.images && input.images.length) {
+      l.imageUrls = input.images.filter(Boolean);
+      l.imageUrl = l.imageUrls[0] ?? l.imageUrl;
+    }
+    bust("listings");
+    return { ok: true, id: l.id, slug: l.slug };
+  }
+
+  // ---- DB mode ----
+  const [current] = await db
+    .select({
+      priceAED: listings.priceAED,
+      sellerId: listings.sellerId,
+      dealerId: listings.dealerId,
+      slug: listings.slug,
+    })
+    .from(listings)
+    .where(eq(listings.id, id))
+    .limit(1);
+  if (!current) return { ok: false, error: "Listing not found" };
+
+  const owns =
+    (!!current.sellerId && current.sellerId === user.id) ||
+    (!!current.dealerId && current.dealerId === (await dealerIdForUser(user.id)));
+  if (!owns) return { ok: false, error: "Not allowed" };
+
+  const drivetrain = deriveDrivetrain({
+    make: input.make,
+    model: input.model,
+    bodyType: input.bodyType ?? "",
+  });
+  const dealRating = await dealRatingFromDb(
+    input.make,
+    input.model,
+    input.priceAED,
+    id,
+  );
+
+  const priceChanged = current.priceAED !== input.priceAED;
+  if (priceChanged) {
+    await db
+      .insert(priceHistory)
+      .values({ listingId: id, oldPrice: current.priceAED, newPrice: input.priceAED });
+  }
+
+  await db
+    .update(listings)
+    .set({
+      make: input.make,
+      model: input.model,
+      trim: input.trim,
+      year: input.year,
+      kms: input.kms,
+      priceAED: input.priceAED,
+      bodyType: input.bodyType,
+      fuel: input.fuel,
+      transmission: input.transmission,
+      drivetrain,
+      dealRating: dealRating ?? null,
+      regionalSpec: input.regionalSpec,
+      colorExterior: input.colorExterior,
+      colorInterior: input.colorInterior,
+      emirate: input.emirate,
+      condition: input.condition,
+      vin: input.vin,
+      cylinders: input.cylinders,
+      description: input.description,
+      features: input.features ?? [],
+      isExportReady: !!input.isExportReady,
+      ...(priceChanged
+        ? { previousPrice: current.priceAED, priceUpdatedAt: new Date() }
+        : {}),
+    })
+    .where(eq(listings.id, id));
+
+  // Replace the photo set only when the editor supplied images (an empty/omitted
+  // array leaves the existing photos untouched rather than wiping them).
+  if (input.images && input.images.length) {
+    const images = input.images.filter(Boolean);
+    await db.delete(listingMedia).where(eq(listingMedia.listingId, id));
+    await db.insert(listingMedia).values(
+      images.map((url, i) => ({
+        listingId: id,
+        url,
+        type: "photo",
+        isHero: i === 0,
+        sortOrder: i,
+      })),
+    );
+  }
+
+  bust("listings");
+  return { ok: true, id, slug: current.slug };
 }

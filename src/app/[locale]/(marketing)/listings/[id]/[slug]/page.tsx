@@ -234,7 +234,7 @@ export default async function ListingDetailPage({
                 <HighDemandBadge show={isHighDemand(listing)} />
               </div>
 
-              {listing.previousPrice ? (
+              {listing.previousPrice && listing.previousPrice > listing.priceAED ? (
                 <div className="mt-2 flex items-center gap-1.5">
                   <span className="text-xs text-[#63666A] line-through">
                     {formatAED(listing.previousPrice, loc)}
