@@ -1,5 +1,7 @@
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import { drizzle as drizzlePg, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
 import { Pool } from "pg";
+import { neon } from "@neondatabase/serverless";
 import dns from "node:dns";
 import * as schema from "./schema";
 
@@ -10,12 +12,21 @@ try {
   /* older node */
 }
 
+// All call sites use the standard drizzle query builder, so both drivers expose
+// the same surface. We type against the node-postgres db and cast the Neon one.
 type DB = NodePgDatabase<typeof schema>;
 
 /**
- * Standard node-postgres driver — works with ANY PostgreSQL provider (Neon
- * today, AWS RDS / Aurora later). Migrating providers changes only DATABASE_URL
- * in `.env`; no application code changes are required.
+ * Database driver, chosen by connection string:
+ *
+ *  - **Neon** (`*.neon.tech`) → the Neon serverless **HTTP** driver. Each query
+ *    is a single stateless HTTPS request, so there is no long-lived TCP socket
+ *    to be dropped ("Connection terminated unexpectedly") and a suspended Neon
+ *    compute is woken gracefully instead of timing out. Safe here because the
+ *    app uses no interactive transactions.
+ *  - **Any other Postgres** (RDS / Aurora / Supabase / local) → standard
+ *    node-postgres pool. Migrating providers changes only DATABASE_URL in
+ *    `.env`; no application code changes are required.
  */
 let cachedPool: Pool | null = null;
 let cached: DB | null = null;
@@ -28,11 +39,19 @@ function getDb(): DB {
       "DATABASE_URL is not set. Add your Postgres connection string to .env.",
     );
   }
-  // Managed Postgres (Neon, RDS, Aurora, Supabase) requires TLS; a local dev
-  // Postgres (sslmode=disable / localhost) does not.
+
+  // ---- Neon: HTTP driver (resilient over slow/flaky networks, cold starts) ----
+  if (url.includes("neon.tech")) {
+    const sql = neon(url);
+    cached = drizzleNeon(sql, { schema }) as unknown as DB;
+    return cached;
+  }
+
+  // ---- Other Postgres: node-postgres pool ----
+  // Managed Postgres (RDS, Aurora, Supabase) requires TLS; a local dev Postgres
+  // (sslmode=disable / localhost) does not.
   const needsSsl =
     url.includes("sslmode=require") ||
-    url.includes("neon.tech") ||
     url.includes("rds.amazonaws.com") ||
     url.includes("supabase");
 
@@ -41,14 +60,14 @@ function getDb(): DB {
     ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
     max: 10,
     keepAlive: true,
-    connectionTimeoutMillis: 10000,
+    connectionTimeoutMillis: 15000,
     idleTimeoutMillis: 30000,
   });
   // Don't let an idle-client error crash the process.
   cachedPool.on("error", (err) => {
     console.error("pg pool error (non-fatal):", err.message);
   });
-  cached = drizzle(cachedPool, { schema });
+  cached = drizzlePg(cachedPool, { schema });
   return cached;
 }
 
