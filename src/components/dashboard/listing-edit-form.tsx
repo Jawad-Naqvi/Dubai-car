@@ -19,7 +19,7 @@ import {
 } from "@/lib/brand";
 import { modelsForMake } from "@/lib/car-models";
 import type { EditableListing } from "@/lib/data/listing-write";
-import { Loader2 } from "lucide-react";
+import { Loader2, Rocket } from "lucide-react";
 
 const COMMON_FEATURES = [
   "Sunroof",
@@ -48,6 +48,7 @@ const labelCls = "text-[11px] uppercase tracking-wider text-muted mb-1.5 block";
 export function ListingEditForm({ listing }: { listing: EditableListing }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [form, setForm] = useState({
     make: listing.make,
     model: listing.model,
@@ -81,7 +82,8 @@ export function ListingEditForm({ listing }: { listing: EditableListing }) {
       toast.error("Make, model and year are required.");
       return;
     }
-    if (!(form.priceAED > 0)) {
+    // A draft may legitimately have no price yet — it's only required to publish.
+    if (listing.status !== "draft" && !(form.priceAED > 0)) {
       toast.error("Enter a valid asking price.");
       return;
     }
@@ -108,6 +110,54 @@ export function ListingEditForm({ listing }: { listing: EditableListing }) {
       toast.error(e instanceof Error ? e.message : "Could not save changes.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const isDraft = listing.status === "draft";
+
+  /**
+   * Publish a draft. Saves the latest edits first so nothing typed on this
+   * screen is lost, then runs the server-side publish (which enforces the
+   * Emirates-ID gate that drafts are exempt from).
+   */
+  const publish = async () => {
+    if (!(form.priceAED > 0)) {
+      toast.error("Enter an asking price before publishing.");
+      return;
+    }
+    setPublishing(true);
+    try {
+      const saveRes = await fetch(`/api/listings/${listing.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          cylinders: form.cylinders ? Number(form.cylinders) : undefined,
+        }),
+      });
+      if (!saveRes.ok) {
+        const d = await saveRes.json().catch(() => ({}));
+        throw new Error(d.error ?? "Could not save your changes.");
+      }
+
+      const res = await fetch(`/api/listings/${listing.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "publish" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Could not publish.");
+      toast.success(
+        data.status === "active"
+          ? "Listing published — it's live in search now."
+          : "Listing submitted for review.",
+      );
+      router.push("/dashboard/my-listings");
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not publish.");
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -415,10 +465,30 @@ export function ListingEditForm({ listing }: { listing: EditableListing }) {
           >
             Cancel
           </Button>
-          <Button variant="gold" size="md" onClick={save} disabled={saving}>
+          <Button
+            variant={isDraft ? "ghost" : "gold"}
+            size="md"
+            onClick={save}
+            disabled={saving || publishing}
+          >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-            Save changes
+            {isDraft ? "Save draft" : "Save changes"}
           </Button>
+          {isDraft && (
+            <Button
+              variant="gold"
+              size="md"
+              onClick={publish}
+              disabled={saving || publishing}
+            >
+              {publishing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Rocket className="h-4 w-4" />
+              )}
+              Publish listing
+            </Button>
+          )}
         </div>
       </div>
     </main>

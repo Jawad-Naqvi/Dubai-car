@@ -15,19 +15,21 @@ export function ExportQuoteButton({
   const [open, setOpen] = useState(false);
   return (
     <>
+      {/* Shipping/paperwork service — deliberately worded so it can't be
+          confused with the bulk *pricing* quote on the purchase actions. */}
       <Button
-        variant="gold"
+        variant="gold_outline"
         size="md"
         className="mt-3 w-full"
         onClick={() => setOpen(true)}
       >
-        Request export quote
+        Get shipping quote
       </Button>
       <Modal
         open={open}
         onOpenChange={setOpen}
-        title="Request export quote"
-        description={`${listingTitle} — tell us where it's headed.`}
+        title="Get a shipping quote"
+        description={`${listingTitle} — tell us where it's headed and we'll quote freight and paperwork.`}
       >
         <LeadForm
           listingId={listingId}

@@ -75,6 +75,35 @@ export const kycStatusEnum = pgEnum("kyc_status", [
   "rejected",
 ]);
 
+/**
+ * How a listing can be bought. This is the single switch that makes the
+ * marketplace feel B2C or B2B *per listing* rather than app-wide:
+ *  - retail     → priced, buy/contact only (the default; a normal consumer car)
+ *  - both       → priced AND open to bulk quote requests
+ *  - quote_only → no public transaction price; bulk buyers request a quote
+ */
+export const saleModeEnum = pgEnum("sale_mode", ["retail", "both", "quote_only"]);
+
+/** Quotation lifecycle: request → dealer response → buyer decision → order. */
+export const quoteStatusEnum = pgEnum("quote_status", [
+  "requested",
+  "under_review",
+  "responded",
+  "accepted",
+  "declined",
+  "withdrawn",
+  "expired",
+]);
+
+/** Order lifecycle for both single-car (B2C) and bulk (B2B) purchases. */
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending",
+  "confirmed",
+  "in_progress",
+  "completed",
+  "cancelled",
+]);
+
 /* === Users (mirror Clerk) === */
 export const users = pgTable(
   "users",
@@ -225,6 +254,15 @@ export const listings = pgTable(
     locationLat: doublePrecision("location_lat"),
     locationLng: doublePrecision("location_lng"),
     status: listingStatusEnum("status").notNull().default("draft"),
+    /**
+     * Purchase configuration — set by the seller when listing. Drives which
+     * CTAs the buyer sees (Contact/Buy, Request bulk quote, or both).
+     */
+    saleMode: saleModeEnum("sale_mode").notNull().default("retail"),
+    /** Minimum units a bulk buyer must request (only meaningful when bulk is on). */
+    bulkMinQty: integer("bulk_min_qty").notNull().default(2),
+    /** Units the seller has available at this spec (1 for a single used car). */
+    stockQty: integer("stock_qty").notNull().default(1),
     isExportReady: boolean("is_export_ready").notNull().default(false),
     isFeatured: boolean("is_featured").notNull().default(false),
     isInspected: boolean("is_inspected").notNull().default(false),
@@ -502,6 +540,145 @@ export const exportInquiries = pgTable("export_inquiries", {
   status: varchar("status", { length: 32 }).notNull().default("new"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+/* =========================================================================
+   Quotations — the B2B side of the marketplace.
+
+   A quote can be raised against a specific listing ("I want 10 of these") or
+   against a dealer with no listing attached ("I need 20 SUVs, here's my spec").
+   It carries its own message thread and converts into an order on acceptance.
+   ========================================================================= */
+export const quotes = pgTable(
+  "quotes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    /** Human-facing reference shown in dashboards and notifications (QT-XXXXXX). */
+    reference: varchar("reference", { length: 24 }).notNull().unique(),
+    listingId: uuid("listing_id").references(() => listings.id, {
+      onDelete: "set null",
+    }),
+    dealerId: uuid("dealer_id").references(() => dealers.id, {
+      onDelete: "cascade",
+    }),
+    /** Private sellers can receive quotes too — routed by sellerId when no dealer. */
+    sellerId: uuid("seller_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    buyerId: uuid("buyer_id").references(() => users.id, { onDelete: "set null" }),
+    buyerName: varchar("buyer_name", { length: 160 }),
+    buyerEmail: varchar("buyer_email", { length: 320 }),
+    buyerPhone: varchar("buyer_phone", { length: 32 }),
+    buyerCompany: varchar("buyer_company", { length: 200 }),
+    /* --- What the buyer asked for --- */
+    quantity: integer("quantity").notNull().default(1),
+    requirements: text("requirements"),
+    targetUnitPriceAED: bigint("target_unit_price_aed", { mode: "number" }),
+    destinationCountry: varchar("destination_country", { length: 64 }),
+    /* --- What the seller came back with --- */
+    quotedUnitPriceAED: bigint("quoted_unit_price_aed", { mode: "number" }),
+    quotedTotalAED: bigint("quoted_total_aed", { mode: "number" }),
+    quotedQuantity: integer("quoted_quantity"),
+    quotedNotes: text("quoted_notes"),
+    validUntil: timestamp("valid_until"),
+    respondedAt: timestamp("responded_at"),
+    status: quoteStatusEnum("status").notNull().default("requested"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    dealerIdx: index("quotes_dealer_idx").on(t.dealerId),
+    buyerIdx: index("quotes_buyer_idx").on(t.buyerId),
+    statusIdx: index("quotes_status_idx").on(t.status),
+    listingIdx: index("quotes_listing_idx").on(t.listingId),
+  }),
+);
+
+/** Negotiation thread on a quote (both sides post here). */
+export const quoteMessages = pgTable("quote_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  quoteId: uuid("quote_id")
+    .notNull()
+    .references(() => quotes.id, { onDelete: "cascade" }),
+  senderRole: varchar("sender_role", { length: 16 }).notNull(), // "buyer" | "dealer"
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* =========================================================================
+   Orders — the shared destination of BOTH journeys. A B2C buyer reserving a
+   single car and a B2B buyer accepting a bulk quote both land here, so the
+   dealer has one place to run their sales pipeline.
+   ========================================================================= */
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    reference: varchar("reference", { length: 24 }).notNull().unique(),
+    /** Set when the order came from an accepted quote (B2B path). */
+    quoteId: uuid("quote_id").references(() => quotes.id, { onDelete: "set null" }),
+    listingId: uuid("listing_id").references(() => listings.id, {
+      onDelete: "set null",
+    }),
+    dealerId: uuid("dealer_id").references(() => dealers.id, {
+      onDelete: "cascade",
+    }),
+    sellerId: uuid("seller_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    buyerId: uuid("buyer_id").references(() => users.id, { onDelete: "set null" }),
+    buyerName: varchar("buyer_name", { length: 160 }),
+    buyerEmail: varchar("buyer_email", { length: 320 }),
+    buyerPhone: varchar("buyer_phone", { length: 32 }),
+    /** "retail" (single car) | "bulk" (from a quote) — drives buyer-facing wording. */
+    kind: varchar("kind", { length: 16 }).notNull().default("retail"),
+    title: varchar("title", { length: 240 }),
+    quantity: integer("quantity").notNull().default(1),
+    unitPriceAED: bigint("unit_price_aed", { mode: "number" }).notNull(),
+    totalAED: bigint("total_aed", { mode: "number" }).notNull(),
+    status: orderStatusEnum("status").notNull().default("pending"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    dealerIdx: index("orders_dealer_idx").on(t.dealerId),
+    buyerIdx: index("orders_buyer_idx").on(t.buyerId),
+    statusIdx: index("orders_status_idx").on(t.status),
+  }),
+);
+
+/**
+ * In-app notification log. Every dispatch through the notification service
+ * writes a row here as well as fanning out to email/WhatsApp, so both buyers
+ * and dealers get a durable history instead of only transient emails.
+ */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Event key, e.g. "quote.responded" — see lib/notifications/events.ts */
+    event: varchar("event", { length: 64 }).notNull(),
+    title: varchar("title", { length: 200 }).notNull(),
+    body: text("body"),
+    href: text("href"),
+    /** Which channels actually delivered, e.g. ["email","whatsapp"]. */
+    channels: jsonb("channels").$type<string[]>().default([]),
+    readAt: timestamp("read_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    userIdx: index("notifications_user_idx").on(t.userId),
+    createdIdx: index("notifications_created_idx").on(t.createdAt),
+  }),
+);
+
+export type Quote = typeof quotes.$inferSelect;
+export type QuoteMessage = typeof quoteMessages.$inferSelect;
+export type Order = typeof orders.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
 
 /* === Payments === */
 export const payments = pgTable("payments", {
