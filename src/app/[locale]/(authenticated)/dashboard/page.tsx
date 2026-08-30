@@ -15,7 +15,13 @@ import {
   getExportInquiriesForUser,
 } from "@/lib/data/b2b";
 import { getFeaturedListings } from "@/lib/data/listings";
-import { getDashboardRole, getOrSyncUser } from "@/lib/data/users";
+import {
+  getDashboardRole,
+  getOrSyncUser,
+  getCurrentDealer,
+} from "@/lib/data/users";
+import { getQuotesForBuyer, getQuotesForDealer } from "@/lib/data/quotes";
+import { getOrdersForBuyer, getOrdersForDealer } from "@/lib/data/orders";
 import { Link } from "@/i18n/routing";
 import { ListingCard } from "@/components/listings/listing-card";
 import { GradientArt } from "@/components/marketing/gradient-art";
@@ -33,6 +39,8 @@ import {
   Heart,
   ShieldCheck,
   Clock,
+  Layers,
+  Package,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -84,12 +92,23 @@ export default async function DashboardPage({
    DEALER (also the admin fallback) — unchanged from the original overview.
    ========================================================================= */
 async function DealerOverview() {
-  const [ctx, stats, inventory, leads] = await Promise.all([
+  const user = await getOrSyncUser().catch(() => null);
+  const dealer = await getCurrentDealer().catch(() => null);
+  const [ctx, stats, inventory, leads, quotes, orders] = await Promise.all([
     getDealerContext(),
     getDashboardStats(),
     getDealerInventory(),
     getLeadsForDealer(),
+    getQuotesForDealer(dealer?.id, user?.id).catch(() => []),
+    getOrdersForDealer(dealer?.id, user?.id).catch(() => []),
   ]);
+
+  const openQuotes = quotes.filter((q) =>
+    ["requested", "under_review"].includes(q.status),
+  );
+  const openOrders = orders.filter((o) =>
+    ["pending", "confirmed", "in_progress"].includes(o.status),
+  );
 
   const quotaPct =
     ctx.listingQuota === Infinity
@@ -98,9 +117,9 @@ async function DealerOverview() {
 
   const kpis = [
     { label: "Active listings", value: String(stats.activeListings), icon: Car },
-    { label: "Total views", value: stats.totalViews.toLocaleString(), icon: Eye },
-    { label: "Leads", value: String(stats.totalLeads), icon: MessageCircle },
-    { label: "Revenue (mo)", value: formatAED(stats.revenueMonth), icon: TrendingUp },
+    { label: "Enquiries", value: String(stats.totalLeads), icon: MessageCircle },
+    { label: "Quote requests", value: String(openQuotes.length), icon: Layers },
+    { label: "Open orders", value: String(openOrders.length), icon: Package },
   ];
 
   const topPerformers = [...inventory]
@@ -251,6 +270,50 @@ async function DealerOverview() {
               </Button>
             </div>
 
+            {/* Quote requests needing a price — the B2B side of the pipeline */}
+            <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-xs">Quote requests</h3>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/dashboard/quotes">
+                    All
+                    <ArrowRight className="h-3 w-3 rtl-flip" />
+                  </Link>
+                </Button>
+              </div>
+              {openQuotes.length === 0 ? (
+                <p className="mt-3 text-xs text-muted leading-relaxed">
+                  No bulk enquiries waiting. Mark listings as bulk-available to
+                  attract fleet and export buyers.
+                </p>
+              ) : (
+                <div className="mt-3 space-y-2">
+                  {openQuotes.slice(0, 3).map((q) => (
+                    <Link
+                      key={q.id}
+                      href="/dashboard/quotes"
+                      className="block rounded-lg border border-[#E5E5EA] p-2.5 hover:border-[#8136B2]/40 transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold text-[#141414]">
+                          {q.reference}
+                        </span>
+                        <span className="text-[10px] text-[#6B21A8] font-semibold">
+                          {q.quantity} units
+                        </span>
+                      </div>
+                      <p className="mt-0.5 text-xs font-semibold truncate">
+                        {q.listingTitle ?? "Bulk enquiry"}
+                      </p>
+                      <p className="text-[10px] text-muted truncate">
+                        {q.buyerCompany || q.buyerName || "Buyer"}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4">
               <h3 className="font-semibold">Quick actions</h3>
               <div className="mt-4 space-y-2">
@@ -261,7 +324,7 @@ async function DealerOverview() {
                   </Link>
                 </Button>
                 <Button asChild variant="ghost" size="md" className="w-full justify-start">
-                  <Link href="/dashboard/leads">View leads</Link>
+                  <Link href="/dashboard/orders">Manage orders</Link>
                 </Button>
                 <Button asChild variant="ghost" size="md" className="w-full justify-start">
                   <Link href="/dashboard/billing">View invoices</Link>
@@ -321,10 +384,18 @@ async function DealerOverview() {
 async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
   const user = await getOrSyncUser().catch(() => null);
   const firstName = user?.name?.split(" ")[0] ?? "there";
-  const [messages, recommended] = await Promise.all([
+  const [messages, recommended, quotes, orders] = await Promise.all([
     user ? getMessagesForUser(user.id).catch(() => []) : Promise.resolve([]),
     getFeaturedListings(8).catch(() => []),
+    user ? getQuotesForBuyer(user.id).catch(() => []) : Promise.resolve([]),
+    user ? getOrdersForBuyer(user.id).catch(() => []) : Promise.resolve([]),
   ]);
+
+  const activeOrders = orders.filter((o) =>
+    ["pending", "confirmed", "in_progress"].includes(o.status),
+  );
+  // Quotes the seller has priced are the ones needing the buyer's decision.
+  const awaitingDecision = quotes.filter((q) => q.status === "responded");
 
   return (
     <>
@@ -354,6 +425,38 @@ async function BuyerOverview({ locale }: { locale: "en" | "ar" }) {
 
         {/* Stat tiles (saved & alerts read client-side, messages from server) */}
         <BuyerStats messagesCount={messages.length} />
+
+        {/* Purchases: only surfaces once the buyer actually has activity, so a
+            first-time shopper never sees an empty B2B-looking panel. */}
+        {(activeOrders.length > 0 || quotes.length > 0) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link
+              href="/dashboard/orders"
+              className="rounded-2xl bg-white border border-[#E5E5EA] p-5 hover:border-[#8136B2]/40 transition-colors"
+            >
+              <Package className="h-5 w-5 text-[#8136B2]" />
+              <div className="mt-3 text-base font-bold">{activeOrders.length}</div>
+              <div className="text-xs text-muted mt-0.5">
+                Active order{activeOrders.length === 1 ? "" : "s"}
+              </div>
+            </Link>
+            <Link
+              href="/dashboard/quotes"
+              className="rounded-2xl bg-white border border-[#E5E5EA] p-5 hover:border-[#8136B2]/40 transition-colors"
+            >
+              <Layers className="h-5 w-5 text-[#8136B2]" />
+              <div className="mt-3 text-base font-bold">{quotes.length}</div>
+              <div className="text-xs text-muted mt-0.5">
+                Quote request{quotes.length === 1 ? "" : "s"}
+                {awaitingDecision.length > 0 && (
+                  <span className="ms-1 text-[#6B21A8] font-semibold">
+                    · {awaitingDecision.length} awaiting your decision
+                  </span>
+                )}
+              </div>
+            </Link>
+          </div>
+        )}
 
         {/* Recommended for you — real inventory, so the hub is never a dead end */}
         {recommended.length > 0 && (

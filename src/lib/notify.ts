@@ -2,20 +2,66 @@ import "server-only";
 import nodemailer, { type Transporter } from "nodemailer";
 
 /**
- * Email adapter (SMTP via nodemailer).
+ * Email adapter — supports two providers, chosen by which env vars are set:
  *
- * Configure with standard SMTP env vars — works with any provider (Gmail /
- * Google Workspace, Microsoft 365, Zoho, Amazon SES SMTP, Mailgun SMTP, a VPS
- * postfix, etc.):
- *   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
- *   SMTP_SECURE   ("true" for port 465 implicit TLS; else STARTTLS)
- *   SMTP_FROM     default From header, e.g. "DXB Motors <leads@dxbmotors.ae>"
+ *  1. Resend (HTTP API) — set RESEND_API_KEY. Simplest once you own a domain
+ *     and verify it in Resend. `from` must be on the verified domain.
+ *  2. SMTP (nodemailer) — set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
+ *     SMTP_SECURE. Works with any provider (Google Workspace, M365, Zoho,
+ *     Amazon SES SMTP, Mailgun, a VPS postfix, …).
  *
- * When SMTP isn't configured it logs to the server console so lead/alert flows
- * stay observable in dev without a mail server.
+ * Shared:
+ *   SMTP_FROM / LEADS_FROM_EMAIL   default From header, e.g. "DXB Motors <leads@dxbmotors.ae>"
+ *
+ * Resend is preferred when both are set. When neither is configured it logs to
+ * the server console so lead/alert flows stay observable in dev.
  */
+/**
+ * True only for a real value — treats blanks and obvious placeholders
+ * (e.g. "re_xxxxx", "your-key", "changeme") as unset, so a stubbed .env
+ * doesn't make a provider look configured and then fail at send time.
+ */
+export function envSet(v?: string): boolean {
+  return Boolean(v && v.trim() && !/x{3,}|your[-_]|changeme|placeholder/i.test(v));
+}
+
 export function isEmailEnabled(): boolean {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER);
+  return Boolean(
+    envSet(process.env.RESEND_API_KEY) ||
+      (envSet(process.env.SMTP_HOST) && envSet(process.env.SMTP_USER)),
+  );
+}
+
+async function sendViaResend(opts: {
+  to: string;
+  subject: string;
+  body: string;
+  replyTo?: string;
+}): Promise<boolean> {
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: fromAddress(),
+        to: [opts.to],
+        subject: opts.subject,
+        text: opts.body,
+        ...(opts.replyTo ? { reply_to: opts.replyTo } : {}),
+      }),
+    });
+    if (!res.ok) {
+      console.error("Resend send failed:", res.status, await res.text().catch(() => ""));
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("Resend send error:", e);
+    return false;
+  }
 }
 
 function fromAddress(): string {
@@ -62,6 +108,10 @@ export async function sendEmail(opts: {
       `📧 [${opts.label ?? "email"}] → ${to ?? "(no recipient configured)"} | ${opts.subject}\n${opts.body}`,
     );
     return false;
+  }
+  // Prefer Resend when configured, else fall back to SMTP.
+  if (envSet(process.env.RESEND_API_KEY)) {
+    return sendViaResend({ to, subject: opts.subject, body: opts.body, replyTo: opts.replyTo });
   }
   try {
     await transport().sendMail({

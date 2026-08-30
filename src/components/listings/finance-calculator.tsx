@@ -27,9 +27,13 @@ export function FinanceCalculator({
   locale?: "en" | "ar";
   className?: string;
 }) {
+  // UAE-tuned defaults: banks require ~20% down for residents; typical
+  // reducing-balance car-loan APR sits ~3.5–5%. Overridable via env without a
+  // code change (NEXT_PUBLIC_FINANCE_DEFAULT_APR).
+  const defaultApr = Number(process.env.NEXT_PUBLIC_FINANCE_DEFAULT_APR) || 4.5;
   const [downPct, setDownPct] = useState(20);
   const [termMonths, setTermMonths] = useState(48);
-  const [apr, setApr] = useState(4);
+  const [apr, setApr] = useState(defaultApr);
 
   const down = Math.round((price * downPct) / 100);
   const principal = price - down;
@@ -69,7 +73,7 @@ export function FinanceCalculator({
               onChange={setTermMonths}
             />
             <Slider
-              label="APR"
+              label="APR (UAE avg)"
               value={`${apr.toFixed(1)}%`}
               min={1}
               max={10}

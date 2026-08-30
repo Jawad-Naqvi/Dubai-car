@@ -2,7 +2,12 @@ import "server-only";
 import type { MockListing } from "@/lib/mock-data";
 
 export type DemoListing = MockListing & {
-  moderationStatus: "pending_review" | "active" | "rejected" | "archived";
+  moderationStatus:
+    | "draft"
+    | "pending_review"
+    | "active"
+    | "rejected"
+    | "archived";
   ownerUserId?: string;
   createdAt: string;
   viewCount: number;
@@ -75,6 +80,64 @@ export interface DemoPayment {
   createdAt: string;
 }
 
+/** A quotation request — the B2B counterpart to a lead. */
+export interface DemoQuote {
+  id: string;
+  reference: string;
+  listingId?: string;
+  listingTitle?: string;
+  dealerSlug?: string;
+  dealerName: string;
+  buyerId?: string;
+  buyerName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
+  buyerCompany?: string;
+  quantity: number;
+  requirements?: string;
+  targetUnitPriceAED?: number;
+  destinationCountry?: string;
+  quotedUnitPriceAED?: number;
+  quotedTotalAED?: number;
+  quotedQuantity?: number;
+  quotedNotes?: string;
+  validUntil?: string;
+  respondedAt?: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DemoQuoteMessage {
+  id: string;
+  quoteId: string;
+  senderRole: "buyer" | "dealer";
+  body: string;
+  createdAt: string;
+}
+
+export interface DemoOrder {
+  id: string;
+  reference: string;
+  quoteId?: string;
+  listingId?: string;
+  dealerName: string;
+  dealerSlug?: string;
+  buyerId?: string;
+  buyerName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
+  kind: "retail" | "bulk";
+  title: string;
+  quantity: number;
+  unitPriceAED: number;
+  totalAED: number;
+  status: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface Store {
   leads: DemoLead[];
   leadReplies: DemoLeadReply[];
@@ -82,6 +145,9 @@ interface Store {
   valuations: DemoValuation[];
   b2bBuyers: DemoB2BBuyer[];
   payments: DemoPayment[];
+  quotes: DemoQuote[];
+  quoteMessages: DemoQuoteMessage[];
+  orders: DemoOrder[];
   currentTier: string;
 }
 
@@ -95,6 +161,9 @@ export function demoStore(): Store {
   s.newListings ??= [];
   s.valuations ??= [];
   s.b2bBuyers ??= [];
+  s.quotes ??= [];
+  s.quoteMessages ??= [];
+  s.orders ??= [];
   s.currentTier ??= "gold";
   if (!s.payments) {
     s.payments = [
@@ -116,4 +185,20 @@ let counter = 1000;
 export function demoId(prefix: string) {
   counter += 1;
   return `${prefix}-${counter}`;
+}
+
+/**
+ * Human-facing reference for quotes/orders (QT-M4K2P9, OR-M4K2QB).
+ *
+ * Derived from the clock plus randomness rather than a counter: an in-memory
+ * counter restarts with the process, which collided with references already in
+ * the database and broke the write with a unique-constraint error. Time-based
+ * ids keep working across restarts, deploys and multiple server instances.
+ */
+export function makeReference(prefix: "QT" | "OR") {
+  const stamp = Date.now().toString(36).toUpperCase().slice(-6);
+  // 4 random chars (~1.7M combinations) so two references minted in the same
+  // millisecond — concurrent requests — still don't collide.
+  const rand = Math.random().toString(36).toUpperCase().slice(2, 6).padEnd(4, "0");
+  return `${prefix}-${stamp}${rand}`;
 }

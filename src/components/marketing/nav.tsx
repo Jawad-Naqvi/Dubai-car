@@ -133,15 +133,13 @@ export function Nav() {
           </SignedOut>
 
           <SignedIn>
-            {/* Sellers still get a dashboard link; buyers use the profile menu. */}
-            {isSeller && (
-              <Link
-                href="/dashboard"
-                className="hidden md:inline-flex text-[13px] font-medium text-secondary hover:text-[#141414] px-2 py-1.5 transition-colors"
-              >
-                Dashboard
-              </Link>
-            )}
+            {/* Every signed-in user gets a direct link to their hub/dashboard. */}
+            <Link
+              href="/dashboard"
+              className="hidden md:inline-flex text-[13px] font-medium text-secondary hover:text-[#141414] px-2 py-1.5 transition-colors"
+            >
+              Dashboard
+            </Link>
             {/* cars.com/Shopify-style account dropdown off the profile icon */}
             <AccountMenu />
           </SignedIn>
@@ -180,15 +178,15 @@ export function Nav() {
               </Link>
             </SignedOut>
             <SignedIn>
-              {isSeller ? (
-                <Link
-                  href="/dashboard"
-                  onClick={() => setOpen(false)}
-                  className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]"
-                >
-                  Dashboard
-                </Link>
-              ) : (
+              {/* Everyone gets a Dashboard link; buyers also get quick shortcuts. */}
+              <Link
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+                className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]"
+              >
+                Dashboard
+              </Link>
+              {!isSeller && (
                 <>
                   <Link href="/dashboard/saved" onClick={() => setOpen(false)} className="px-2 py-3 text-sm font-semibold text-[#141414] border-b border-[#E5E5EA]">
                     Saved cars

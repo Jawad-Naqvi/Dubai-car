@@ -71,8 +71,15 @@
     color: var(--color-text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  /* Horizontal-overflow clipping lives on the ROOT only. The root's overflow
+     propagates to the viewport, so this still prevents sideways scrolling but
+     keeps the viewport as the scrollport — which `position: sticky` needs.
+     Putting overflow-x on <body> instead makes body its own scroll container
+     and silently breaks EVERY sticky descendant (filter rail, dashboard
+     sidebar, listing right rail). Do not add overflow-x to body. */
+  html {
     overflow-x: hidden;
-    max-width: 100vw;
   }
   body {
     font-family: var(--font-sans);

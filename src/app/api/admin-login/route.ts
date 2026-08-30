@@ -19,7 +19,8 @@ export async function POST(req: Request) {
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 8, // 8 hours
-    secure: false, // localhost is http; set true behind HTTPS in production
+    // Secure in production (HTTPS); http localhost in dev can't set secure cookies.
+    secure: process.env.NODE_ENV === "production",
   });
   return NextResponse.json({ ok: true });
 }

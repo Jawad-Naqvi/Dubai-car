@@ -16,14 +16,20 @@ export function PriceHistoryTable({
 }) {
   if (points.length === 0) return null;
 
+  // Show only the 3 most recent changes (points are newest-first).
+  const recent = points.slice(0, 3);
+
   return (
     <div className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
       <div className="flex items-center gap-2 mb-3">
         <History className="h-4 w-4 text-[#8136B2]" />
         <h2 className="text-sm font-bold">Price history</h2>
+        {points.length > 3 && (
+          <span className="ml-auto text-[10px] text-muted">last 3 changes</span>
+        )}
       </div>
       <div className="divide-y divide-[#E5E5EA]">
-        {points.map((p, i) => {
+        {recent.map((p, i) => {
           const dropped = p.newPrice < p.oldPrice;
           return (
             <div key={i} className="flex items-center justify-between gap-3 py-2">

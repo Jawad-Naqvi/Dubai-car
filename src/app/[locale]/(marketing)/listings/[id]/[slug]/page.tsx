@@ -14,7 +14,10 @@ import { FinanceCalculator } from "@/components/listings/finance-calculator";
 import { ExportQuoteButton } from "@/components/listings/export-quote-button";
 import { Button } from "@/components/ui/button";
 import { ListingCard } from "@/components/listings/listing-card";
-import { ContactPaywall } from "@/components/listings/paywall";
+import {
+  PurchaseActions,
+  BulkAvailableChip,
+} from "@/components/listings/purchase-actions";
 import { MobileContactBar } from "@/components/listings/mobile-contact-bar";
 import { DealBadge, HighDemandBadge } from "@/components/listings/deal-badge";
 import { PriceContextMeter } from "@/components/listings/price-context-meter";
@@ -27,6 +30,13 @@ import { getVehicleHistory } from "@/lib/data/vehicle-history";
 import { PriceHistoryTable } from "@/components/listings/price-history-table";
 import { getPriceHistory } from "@/lib/data/price";
 import { StarRating } from "@/components/dealers/star-rating";
+import { OwnerPanel } from "@/components/listings/owner-panel";
+import { ownsListing } from "@/lib/data/ownership";
+import {
+  getListingActivity,
+  type ListingActivity,
+} from "@/lib/data/listing-activity";
+import { getOrSyncUser } from "@/lib/data/users";
 import {
   MapPin,
   BadgeCheck,
@@ -132,6 +142,21 @@ export default async function ListingDetailPage({
   const emi = monthlyEMI(listing.priceAED);
   const listingTitle = `${listing.year} ${listing.make} ${listing.model}`;
   const loc = locale as "en" | "ar";
+  // Wholesale-only stock has no public retail price — the page leads with the
+  // quote proposition instead of a price the buyer can't actually transact on.
+  const quoteOnly = listing.saleMode === "quote_only";
+
+  // Sellers landing on their own car get owner controls, not buyer CTAs —
+  // messaging or reserving your own listing is never a real intent.
+  const viewer = await getOrSyncUser().catch(() => null);
+  const isOwner = await ownsListing(listing.id, viewer?.id).catch(() => false);
+  const ownerActivity = isOwner
+    ? (
+        await getListingActivity([listing.id]).catch(
+          () => ({}) as Record<string, ListingActivity>,
+        )
+      )[listing.id]
+    : undefined;
   // "Service history" is a real signal only when the seller listed it as a feature.
   const hasServiceHistory = (listing.features ?? []).some((f) =>
     /service history|full history|dealer history/i.test(f),
@@ -224,37 +249,60 @@ export default async function ListingDetailPage({
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 items-start">
           {/* ---------------------------------------------- LEFT column */}
           <div className="min-w-0 space-y-5">
-            {/* Price summary card */}
+            {/* Price summary card. Quote-only stock has no public retail
+                price, so the headline becomes the bulk proposition instead. */}
             <div className="rounded-lg bg-white border border-[#E5E5EA] p-5">
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="text-2xl font-extrabold text-[#141414] leading-none">
-                  {formatAED(listing.priceAED, loc)}
-                </span>
-                <DealBadge rating={listing.dealRating} />
-                <HighDemandBadge show={isHighDemand(listing)} />
-              </div>
-
-              {listing.previousPrice ? (
-                <div className="mt-2 flex items-center gap-1.5">
-                  <span className="text-xs text-[#63666A] line-through">
-                    {formatAED(listing.previousPrice, loc)}
-                  </span>
-                  <span className="inline-flex items-center gap-0.5 rounded-full bg-[#137A43] text-white px-1.5 py-0.5 text-[10px] font-semibold">
-                    {formatAED(listing.previousPrice - listing.priceAED, loc)} price drop
-                  </span>
-                </div>
+              {quoteOnly ? (
+                <>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="text-2xl font-extrabold text-[#141414] leading-none">
+                      Price on request
+                    </span>
+                    <BulkAvailableChip listing={listing} />
+                  </div>
+                  <p className="mt-2 text-xs text-[#63666A]">
+                    This seller offers this vehicle to bulk buyers from{" "}
+                    {listing.bulkMinQty ?? 2} units. Request a quote for your
+                    quantity and spec.
+                  </p>
+                </>
               ) : (
-                <a
-                  href="#finance"
-                  className="mt-2 inline-block text-xs text-[#141414] underline underline-offset-2 decoration-[#8136B2]/50"
-                >
-                  Est. {formatAED(emi, loc)}/mo
-                </a>
+                <>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="text-2xl font-extrabold text-[#141414] leading-none">
+                      {formatAED(listing.priceAED, loc)}
+                    </span>
+                    <DealBadge rating={listing.dealRating} />
+                    <HighDemandBadge show={isHighDemand(listing)} />
+                    <BulkAvailableChip listing={listing} />
+                  </div>
+
+                  {listing.previousPrice && listing.previousPrice > listing.priceAED ? (
+                    <div className="mt-2 flex items-center gap-1.5">
+                      <span className="text-xs text-[#63666A] line-through">
+                        {formatAED(listing.previousPrice, loc)}
+                      </span>
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-[#137A43] text-white px-1.5 py-0.5 text-[10px] font-semibold">
+                        {formatAED(listing.previousPrice - listing.priceAED, loc)} price drop
+                      </span>
+                    </div>
+                  ) : (
+                    <a
+                      href="#finance"
+                      className="mt-2 inline-block text-xs text-[#141414] underline underline-offset-2 decoration-[#8136B2]/50"
+                    >
+                      Est. {formatAED(emi, loc)}/mo
+                    </a>
+                  )}
+                </>
               )}
 
               <div className="mt-3 pt-3 border-t border-[#E5E5EA] flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#63666A]">
                 {!listing.isNew && <span>{formatKm(listing.kms, loc)}</span>}
                 <span>{listing.regionalSpec} spec</span>
+                {(listing.stockQty ?? 1) > 1 && (
+                  <span>{listing.stockQty} units in stock</span>
+                )}
                 {daysOnMarket(listing.listedAt) && (
                   <span className="inline-flex items-center gap-1">
                     <Clock className="h-3 w-3" />
@@ -264,13 +312,15 @@ export default async function ListingDetailPage({
               </div>
             </div>
 
-            {/* Deal meter — price vs similar cars */}
-            <PriceContextMeter
-              price={listing.priceAED}
-              peerPrices={similar.map((s) => s.priceAED)}
-              rating={listing.dealRating}
-              locale={loc}
-            />
+            {/* Deal meter — only meaningful when there's a retail price */}
+            {!quoteOnly && (
+              <PriceContextMeter
+                price={listing.priceAED}
+                peerPrices={similar.map((s) => s.priceAED)}
+                rating={listing.dealRating}
+                locale={loc}
+              />
+            )}
 
             {/* Price history */}
             {priceHistory.length > 0 && (
@@ -400,23 +450,32 @@ export default async function ListingDetailPage({
           >
             {/* Contact seller */}
             <div className="rounded-lg bg-white border border-[#E5E5EA] p-4">
-              <h2 className="text-base font-bold tracking-tight text-[#141414]">
-                Contact seller
-              </h2>
-              <p className="mt-0.5 text-[11px] text-[#63666A]">
-                {listing.dealer.name} usually responds within a few hours.
-              </p>
-              <div className="mt-3">
-                <ContactPaywall
-                  listingId={listing.id}
-                  listingTitle={listingTitle}
-                  dealerPhone={listing.dealer.phone}
-                  dealerWhatsapp={listing.dealer.whatsapp}
-                />
-              </div>
-              <div className="mt-2 flex justify-center">
-                <ReportListingButton listingId={listing.id} />
-              </div>
+              {isOwner ? (
+                <>
+                  <h2 className="text-base font-bold tracking-tight text-[#141414]">
+                    Your listing
+                  </h2>
+                  <div className="mt-3">
+                    <OwnerPanel listingId={listing.id} activity={ownerActivity} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-base font-bold tracking-tight text-[#141414]">
+                    {quoteOnly ? "Request pricing" : "Contact seller"}
+                  </h2>
+                  <p className="mt-0.5 text-[11px] text-[#63666A]">
+                    {listing.dealer.name} usually responds within a few hours.
+                  </p>
+                  <div className="mt-3">
+                    {/* Actions adapt to how the seller configured this listing */}
+                    <PurchaseActions listing={listing} listingTitle={listingTitle} />
+                  </div>
+                  <div className="mt-2 flex justify-center">
+                    <ReportListingButton listingId={listing.id} />
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Export panel */}

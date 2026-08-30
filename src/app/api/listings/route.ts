@@ -21,9 +21,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // Listing is open to guests (private sellers); we attach the user when signed
-  // in so dealers get ownership + quota tracking. Rate-limited per IP so the
-  // open endpoint can't be used to spam the marketplace with listings.
+  // Listing now requires a verified account (Emirates ID on file) — sign-in is
+  // mandatory. Rate-limited per IP so it can't be used to spam the marketplace.
   const rl = rateLimit(`listings:${clientIp(req)}`, 8, 60 * 60_000);
   if (!rl.ok) {
     return NextResponse.json(
@@ -36,9 +35,19 @@ export async function POST(req: Request) {
   if (!body) return new NextResponse("Invalid JSON", { status: 400 });
 
   const user = await getOrSyncUser().catch(() => null);
+  if (!user) {
+    return NextResponse.json(
+      { error: "Please sign in and verify your Emirates ID to list a car." },
+      { status: 401 },
+    );
+  }
+
+  // A draft is private to its owner, so it skips the Emirates-ID gate — a
+  // seller can park work in progress while their ID is still being verified.
+  const asDraft = body.saveAsDraft === true;
 
   try {
-    const created = await createListing(body, user ?? undefined);
+    const created = await createListing(body, user, { asDraft });
     return NextResponse.json(created, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to create listing";

@@ -2,9 +2,12 @@ import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SellerListingActions } from "@/components/dashboard/seller-listing-actions";
 import { formatAED, formatKm } from "@/lib/utils";
 import type { InventoryRow } from "@/lib/data/dashboard";
-import { Plus, Eye, MessageCircle, Tag } from "lucide-react";
+import type { ListingActivity } from "@/lib/data/listing-activity";
+import { ListingActivityStrip } from "./listing-activity-strip";
+import { Plus, Eye, MessageCircle, Tag, PenLine } from "lucide-react";
 
 function statusBadge(status: string) {
   switch (status) {
@@ -18,12 +21,15 @@ function statusBadge(status: string) {
       return <Badge tone="featured">SOLD</Badge>;
     case "rejected":
       return <Badge tone="neutral">REJECTED</Badge>;
+    case "draft":
+      return <Badge tone="reserved">DRAFT</Badge>;
     default:
       return <Badge tone="neutral">{status.toUpperCase()}</Badge>;
   }
 }
 
 const STATUS_HINT: Record<string, string> = {
+  draft: "Unfinished — pick up where you left off and publish when you're ready.",
   pending_review: "Our moderation team is reviewing this listing — usually within a few hours.",
   rejected: "This listing didn't pass review. Contact support for details.",
   active: "Live and visible to buyers.",
@@ -32,13 +38,21 @@ const STATUS_HINT: Record<string, string> = {
   archived: "Archived — no longer visible to buyers.",
 };
 
+/** Statuses a seller may still edit — a sold/reserved car is left as-is. */
+const EDITABLE = new Set(["active", "pending_review", "rejected", "draft"]);
+
 /**
- * Read-only view of a buyer's own "sell my car" submissions (private seller,
- * not a dealer account). Intentionally has no edit/delete actions here —
- * changes go through /sell/new's moderation flow, keeping this a simple
- * status tracker rather than a management console.
+ * A buyer's own "sell my car" submissions (private seller, not a dealer
+ * account). Each editable listing gets owner controls — a quick price edit and
+ * a link to the full edit form — via <SellerListingActions>.
  */
-export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
+export function MyListingsView({
+  rows,
+  activity = {},
+}: {
+  rows: InventoryRow[];
+  activity?: Record<string, ListingActivity>;
+}) {
   if (rows.length === 0) {
     return (
       <main className="p-5">
@@ -50,7 +64,7 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
             account required.
           </p>
           <Button asChild variant="gold" size="md" className="mt-5">
-            <Link href="/sell/new">
+            <Link href="/dashboard/sell/new">
               <Plus className="h-4 w-4" />
               List your car
             </Link>
@@ -60,18 +74,47 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
     );
   }
 
+  const totalViews = rows.reduce((s, l) => s + l.viewCount, 0);
+  const totalInquiries = rows.reduce((s, l) => s + l.inquiryCount, 0);
+  const liveCount = rows.filter((l) => l.status === "active").length;
+  const draftCount = rows.filter((l) => l.status === "draft").length;
+  // Drafts need the seller's attention most, so they sort to the top.
+  const ordered = [...rows].sort(
+    (a, b) => Number(b.status === "draft") - Number(a.status === "draft"),
+  );
+  const stats = [
+    { icon: Eye, label: "Total views", value: totalViews.toLocaleString() },
+    { icon: MessageCircle, label: "Total inquiries", value: totalInquiries.toLocaleString() },
+    draftCount > 0
+      ? { icon: PenLine, label: "Drafts", value: draftCount.toLocaleString() }
+      : { icon: Tag, label: "Live listings", value: liveCount.toLocaleString() },
+  ];
+
   return (
     <main className="p-5 space-y-4">
+      <div className="grid grid-cols-3 gap-3">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4"
+          >
+            <s.icon className="h-4 w-4 text-[#8136B2]" />
+            <div className="mt-2 text-lg font-bold text-[#141414]">{s.value}</div>
+            <div className="text-[11px] text-muted">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
       <div className="flex items-center justify-end">
         <Button variant="gold" size="md" asChild>
-          <Link href="/sell/new">
+          <Link href="/dashboard/sell/new">
             <Plus className="h-4 w-4" /> List another car
           </Link>
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {rows.map((l) => (
+        {ordered.map((l) => (
           <div
             key={l.id}
             className="rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-4 hover:shadow-card-hover transition-shadow"
@@ -94,6 +137,11 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
               </div>
             </div>
 
+            {/* Buyer activity on this specific car */}
+            <div className="mt-3 pt-3 border-t border-[#E5E5EA]">
+              <ListingActivityStrip activity={activity[l.id]} />
+            </div>
+
             <div className="mt-3 flex items-center justify-between pt-3 border-t border-[#E5E5EA]">
               <p className="text-[11px] text-muted flex-1 pe-3">
                 {STATUS_HINT[l.status] ?? ""}
@@ -110,8 +158,21 @@ export function MyListingsView({ rows }: { rows: InventoryRow[] }) {
               </div>
             </div>
 
+            {EDITABLE.has(l.status) && (
+              <SellerListingActions listingId={l.id} price={l.priceAED} />
+            )}
+
+            {l.status === "draft" && (
+              <Button asChild variant="gold" size="sm" className="mt-2 w-full">
+                <Link href={`/dashboard/my-listings/${l.id}/edit`}>
+                  <PenLine className="h-3.5 w-3.5" />
+                  Continue this listing
+                </Link>
+              </Button>
+            )}
+
             {l.status === "active" && (
-              <Button asChild variant="ghost" size="sm" className="mt-3 w-full">
+              <Button asChild variant="ghost" size="sm" className="mt-2 w-full">
                 <Link href={`/listings/${l.id}/${l.slug}`}>View live listing</Link>
               </Button>
             )}

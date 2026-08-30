@@ -7,6 +7,7 @@ import type { MockListing } from "@/lib/mock-data";
 import { SaveButton } from "./save-button";
 import { CompareButton } from "./compare-button";
 import { DealBadge, HighDemandBadge } from "./deal-badge";
+import { BulkAvailableChip } from "./purchase-actions";
 import { isHighDemand } from "@/lib/vehicle-derive";
 
 /**
@@ -66,16 +67,30 @@ export function ListingRow({
           </div>
         )}
 
-        <div className="mt-2 text-xl font-bold text-[#141414] leading-none">
-          {formatAED(listing.priceAED, locale)}
-        </div>
-        <div className="mt-1 text-[11px] text-[#141414] underline underline-offset-2 decoration-[#8136B2]/50">
-          Est. {formatAED(monthlyEMI(listing.priceAED), locale)}/mo
-        </div>
+        {listing.saleMode === "quote_only" ? (
+          <>
+            <div className="mt-2 text-xl font-bold text-[#141414] leading-none">
+              Price on request
+            </div>
+            <div className="mt-1 text-[11px] text-[#63666A]">
+              Bulk orders from {listing.bulkMinQty ?? 2} units
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mt-2 text-xl font-bold text-[#141414] leading-none">
+              {formatAED(listing.priceAED, locale)}
+            </div>
+            <div className="mt-1 text-[11px] text-[#141414] underline underline-offset-2 decoration-[#8136B2]/50">
+              Est. {formatAED(monthlyEMI(listing.priceAED), locale)}/mo
+            </div>
+          </>
+        )}
 
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <DealBadge rating={listing.dealRating} />
           <HighDemandBadge show={isHighDemand(listing)} />
+          <BulkAvailableChip listing={listing} />
           {listing.isInspected && (
             <Badge tone="inspected">
               <BadgeCheck className="h-2 w-2 mr-0.5" /> Inspected
@@ -98,7 +113,9 @@ export function ListingRow({
             href={href}
             className="flex-shrink-0 inline-flex items-center justify-center h-9 px-4 rounded-full bg-[#141414] text-white text-xs font-semibold hover:bg-[#2E2C28] transition-colors"
           >
-            Check availability
+            {listing.saleMode === "quote_only"
+              ? "Request quote"
+              : "Check availability"}
           </Link>
         </div>
       </div>

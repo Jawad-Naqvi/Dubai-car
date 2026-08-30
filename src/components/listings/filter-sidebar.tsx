@@ -358,7 +358,9 @@ export function FilterSidebar({
   );
 
   return (
-    <aside className={cn("w-full", className)}>
+    // lg:self-start stops the grid item stretching to the full row height,
+    // which would leave `sticky` no room to move. top-20 clears the 64px nav.
+    <aside className={cn("w-full lg:sticky lg:top-20 lg:self-start", className)}>
       {/* cars.com filter rail sits flat on the page — no card chrome */}
       <div className="bg-white">
         <div className="flex items-center justify-between pb-2">
@@ -382,7 +384,9 @@ export function FilterSidebar({
         {/* In the drawer the parent already scrolls, so don't nest a scroller. */}
         <div
           className={cn(
-            !onApplied && "max-h-[calc(100vh-180px)] overflow-y-auto pr-1",
+            // Fits the sticky rail inside the viewport: 80px sticky offset +
+            // ~36px header + bottom breathing room.
+            !onApplied && "max-h-[calc(100vh-140px)] overflow-y-auto pr-1",
           )}
         >
           <FilterGroup title={t("emirate")}>

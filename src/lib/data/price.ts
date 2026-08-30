@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { listings, priceHistory } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { bust } from "./revalidate";
+import { dealRatingFromDb } from "./deal-rating";
 
 export interface PricePoint {
   oldPrice: number;
@@ -25,7 +26,11 @@ export async function updateListingPrice(
     return { ok: false, error: "Price out of range" };
   }
   const [current] = await db
-    .select({ price: listings.priceAED })
+    .select({
+      price: listings.priceAED,
+      make: listings.make,
+      model: listings.model,
+    })
     .from(listings)
     .where(eq(listings.id, listingId))
     .limit(1);
@@ -34,12 +39,22 @@ export async function updateListingPrice(
   if (oldPrice === newPrice) return { ok: true, oldPrice, newPrice };
 
   await db.insert(priceHistory).values({ listingId, oldPrice, newPrice });
+  // Refresh the deal rating against live peers at the new price so the "good
+  // deal" badge/meter stays accurate after a reprice (it was previously frozen
+  // at the value computed when the listing was first created).
+  const dealRating = await dealRatingFromDb(
+    current.make,
+    current.model,
+    newPrice,
+    listingId,
+  );
   await db
     .update(listings)
     .set({
       priceAED: newPrice,
       previousPrice: oldPrice,
       priceUpdatedAt: new Date(),
+      dealRating: dealRating ?? null,
     })
     .where(eq(listings.id, listingId));
 

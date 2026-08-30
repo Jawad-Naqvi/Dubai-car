@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Link } from "@/i18n/routing";
 import { useSavedListings } from "@/lib/saved-listings";
 import { SellWizard } from "@/components/sell/sell-wizard";
+import { AccountThreadChat } from "@/components/marketing/account-thread-chat";
 import { formatAED } from "@/lib/utils";
 import { X, Heart, Bell, MessageSquare, Tag, Loader2, Search } from "lucide-react";
 
@@ -253,13 +254,17 @@ interface Thread {
   id: string;
   message: string;
   createdAt: string;
+  listingId?: string;
+  listingSlug?: string;
   listingTitle?: string;
   dealerName?: string;
   status: string;
+  replies?: { senderRole: "buyer" | "dealer"; body: string; createdAt: string }[];
 }
 
 function MessagesView() {
   const [threads, setThreads] = useState<Thread[] | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     fetch("/api/account/messages")
@@ -286,13 +291,21 @@ function MessagesView() {
       />
     );
 
+  const openThread = openId ? threads.find((t) => t.id === openId) ?? null : null;
+  if (openThread) {
+    return (
+      <AccountThreadChat thread={openThread} onBack={() => setOpenId(null)} />
+    );
+  }
+
   return (
     <div className="p-3 space-y-2">
       {threads.map((m) => (
-        <Link
+        <button
           key={m.id}
-          href="/dashboard/messages"
-          className="block rounded-lg border border-[#E5E5EA] p-3 hover:bg-[#F4F4F6]"
+          type="button"
+          onClick={() => setOpenId(m.id)}
+          className="block w-full text-left rounded-lg border border-[#E5E5EA] p-3 hover:bg-[#F4F4F6]"
         >
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-semibold text-[#141414] truncate">
@@ -301,7 +314,7 @@ function MessagesView() {
             <span className="text-[10px] text-muted flex-shrink-0">{m.dealerName}</span>
           </div>
           <p className="mt-1 text-[11px] text-secondary line-clamp-1">{m.message || "—"}</p>
-        </Link>
+        </button>
       ))}
     </div>
   );

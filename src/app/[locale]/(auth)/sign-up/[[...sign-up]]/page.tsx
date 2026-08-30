@@ -4,9 +4,13 @@ import { AuthShell, clerkAuthAppearance } from "@/components/auth/auth-shell";
 import { RoleChoiceCards } from "@/components/auth/role-choice-cards";
 
 const ROLE_REDIRECT: Record<string, string> = {
-  // Buyers land back on the site to browse, like any storefront customer —
-  // only sellers get routed into a dedicated flow (KYC intake).
-  buyer: "/",
+  // Both account types complete identity verification right after signup:
+  //  - Individual → Emirates ID verification (required before selling)
+  //  - Dealer     → Emirates ID + trade license onboarding
+  // (Legacy "buyer"/"seller" aliases kept so old links keep working.)
+  individual: "/verify-identity",
+  dealer: "/sell/become-seller",
+  buyer: "/verify-identity",
   seller: "/sell/become-seller",
 };
 

@@ -11,7 +11,21 @@
       "Bash(./node_modules/.bin/next dev *)",
       "Bash(netstat -ano)",
       "Bash(taskkill //F //PID 20016)",
-      "Bash(xargs sed *)"
+      "Bash(xargs sed *)",
+      "Read(//c/Users/Arzaan Ali Khan/OneDrive/Desktop/Developer/Cars/**)",
+      "Bash(rm -rf .next)",
+      "Bash(npm run *)",
+      "Bash(echo \"BUILD_EXIT=$?\")",
+      "Read(//tmp/**)",
+      "Bash(cp \"/c/Users/Arzaan Ali Khan/AppData/Local/Temp/claude/c--Users-Arzaan-Ali-Khan-OneDrive-Desktop-Developer-Cars/a805fa5d-bf9a-4178-a197-da68d0141225/scratchpad/apply-migration.mjs\" ./.apply-migration.mjs)",
+      "Bash(node ./.apply-migration.mjs drizzle/0002_flaky_tarot.sql)",
+      "Bash(echo \"---exit=$?\")",
+      "Bash(rm -f ./.apply-migration.mjs)",
+      "Bash(mv .verify-quote-flow.ts .verify-quote-flow.mts)",
+      "Bash(npx tsx *)",
+      "Bash(grep -vE \"SECURITY WARNING|sslmode|libpq|postgresql.org|explicitly use|want libpq|prepare for|^\\\\s*$|Warning:|trace-warnings|^-\")",
+      "Bash(sed -n '/if \\(done\\)/,/^  }/p' src/components/sell/sell-wizard.tsx)",
+      "Bash(sed -n '/if \\(done\\)/,/^  }$/p' src/components/sell/sell-wizard.tsx)"
     ],
     "additionalDirectories": [
       "c:\\Users\\msi user\\Desktop\\Developer\\DXB Car\\src\\app"

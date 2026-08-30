@@ -1,11 +1,39 @@
 import "server-only";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users, dealers, type User } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 
 export type Role = "buyer" | "dealer" | "b2b_importer" | "admin";
+
+/**
+ * Normalise an Emirates ID to a canonical form (digits only) so "784-1990-
+ * 1234567-1", "784 1990 1234567 1" and "78419901234567 1" all compare equal
+ * and the uniqueness rule can't be bypassed by reformatting.
+ */
+export function normalizeEmiratesId(raw: string): string {
+  return (raw || "").replace(/\D/g, "");
+}
+
+/**
+ * True when this Emirates ID is already on another account (any role). Used to
+ * enforce "one Emirates ID = one account" at submit time, in addition to the DB
+ * unique index (the index is the hard guarantee; this gives a friendly error).
+ */
+export async function emiratesIdInUse(
+  emiratesIdNumber: string,
+  exceptUserId?: string,
+): Promise<boolean> {
+  if (!isDbEnabled()) return false;
+  const normalized = normalizeEmiratesId(emiratesIdNumber);
+  if (!normalized) return false;
+  const where = exceptUserId
+    ? and(eq(users.emiratesIdNumber, normalized), ne(users.id, exceptUserId))
+    : eq(users.emiratesIdNumber, normalized);
+  const rows = await db.select({ id: users.id }).from(users).where(where).limit(1);
+  return !!rows[0];
+}
 
 /** Role from Clerk publicMetadata (source of truth for RBAC). */
 export async function getCurrentRole(): Promise<Role> {
@@ -35,6 +63,10 @@ export interface CurrentUser {
   name: string;
   role: Role;
   imageUrl?: string;
+  /** Canonical (digits-only) Emirates ID number, or null if not yet verified. */
+  emiratesIdNumber?: string | null;
+  /** True once the user has submitted their Emirates ID (identity on file). */
+  idVerified: boolean;
 }
 
 /**
@@ -60,6 +92,8 @@ export async function getOrSyncUser(): Promise<CurrentUser | null> {
       name,
       role,
       imageUrl: cu.imageUrl,
+      emiratesIdNumber: null,
+      idVerified: false,
     };
   }
 
@@ -102,6 +136,8 @@ export async function getOrSyncUser(): Promise<CurrentUser | null> {
     name: row.name ?? name,
     role: row.role,
     imageUrl: row.imageUrl ?? undefined,
+    emiratesIdNumber: row.emiratesIdNumber ?? null,
+    idVerified: !!row.emiratesIdNumber,
   };
 }
 

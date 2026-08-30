@@ -57,8 +57,32 @@ export function ModerationQueue({ items }: { items: ModerationItem[] }) {
           }`}
         >
           <div className="grid grid-cols-[160px_1fr]">
-            <div className="relative aspect-square bg-[#F4F4F6]">
-              <Image src={l.imageUrl} alt="" fill sizes="160px" className="object-cover" />
+            <div className="bg-[#F4F4F6]">
+              <div className="relative aspect-square">
+                <Image src={l.imageUrl} alt="" fill sizes="160px" className="object-cover" />
+                {l.images.length > 1 && (
+                  <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1.5 py-0.5 text-[9px] font-semibold text-white">
+                    {l.images.length} photos
+                  </span>
+                )}
+              </div>
+              {l.images.length > 1 && (
+                <div className="flex gap-1 overflow-x-auto p-1">
+                  {l.images.slice(0, 6).map((src, i) => (
+                    <div
+                      key={i}
+                      className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded bg-[#E5E5EA]"
+                    >
+                      <Image src={src} alt="" fill sizes="36px" className="object-cover" />
+                    </div>
+                  ))}
+                  {l.images.length > 6 && (
+                    <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded bg-[#E5E5EA] text-[9px] font-semibold text-secondary">
+                      +{l.images.length - 6}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
             <div className="p-5">
               <div className="flex items-start justify-between gap-2">

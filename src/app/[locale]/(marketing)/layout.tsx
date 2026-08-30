@@ -7,9 +7,15 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen bg-page overflow-x-hidden">
+    // NOTE: no `overflow-x-hidden` here. An intermediate ancestor with
+    // overflow-x:hidden computes overflow-y:auto, becoming a scroll container
+    // that silently breaks `position: sticky` for every descendant (the filter
+    // rail, the listing right rail, the nav). Horizontal scroll is already
+    // prevented globally by html/body in globals.css, which is sticky-safe
+    // because root/body overflow propagates to the viewport.
+    <div className="relative min-h-screen bg-page">
       <Nav />
-      <main className="relative overflow-x-hidden">{children}</main>
+      <main className="relative">{children}</main>
       <Footer />
     </div>
   );

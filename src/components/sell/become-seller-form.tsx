@@ -1,79 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { emirates } from "@/lib/brand";
-import { Building2, Loader2, Upload, FileCheck2, ShieldCheck } from "lucide-react";
+import { Building2, Loader2, ShieldCheck } from "lucide-react";
+import { DocUpload } from "@/components/account/doc-upload";
 
 const inputCls =
   "w-full h-11 rounded-xl bg-white border border-[#E5E5EA] px-3.5 text-sm text-[#141414] placeholder:text-muted focus:outline-none focus:border-[#141414]/30 focus:ring-2 focus:ring-[#141414]/10";
-
-function DocUpload({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (url: string) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleFile = async (files: FileList | null) => {
-    const file = files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append("files", file);
-      const res = await fetch("/api/upload-doc", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      onChange(data.urls[0]);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed. Try again.");
-    } finally {
-      setUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  };
-
-  return (
-    <div>
-      <label className="block text-xs font-medium text-[#141414] mb-1">{label} *</label>
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        className={`flex w-full items-center gap-2 h-11 rounded-xl border px-3.5 text-sm transition-colors ${
-          value
-            ? "border-[#137A43]/30 bg-[#137A43]/5 text-[#137A43]"
-            : "border-dashed border-[#D8D4C6] bg-[#F4F4F6] text-secondary hover:border-[#141414]/30"
-        }`}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,application/pdf"
-          className="hidden"
-          onChange={(e) => handleFile(e.target.files)}
-        />
-        {uploading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : value ? (
-          <FileCheck2 className="h-4 w-4" />
-        ) : (
-          <Upload className="h-4 w-4" />
-        )}
-        <span className="truncate">
-          {uploading ? "Uploading…" : value ? "Uploaded — tap to replace" : "Upload JPG, PNG, or PDF"}
-        </span>
-      </button>
-    </div>
-  );
-}
 
 /**
  * Seller/KYC application. Submits business + Emirates ID + trade license

@@ -28,45 +28,150 @@ import {
   Lock,
   Menu,
   X,
+  Layers,
+  Package,
 } from "lucide-react";
 
-const dealerNav = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/inventory", label: "Inventory", icon: Car },
-  { href: "/dashboard/leads", label: "Leads", icon: MessageSquare },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
-  { href: "/dashboard/profile", label: "Profile", icon: Building2 },
+/**
+ * Navigation is grouped by what the user is trying to DO, not by which system
+ * module the feature lives in. Both journeys share the same vocabulary:
+ * Marketplace (supply + demand coming in) → Sales (money moving) →
+ * Communication → Business.
+ */
+interface NavItem {
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+}
+interface NavGroup {
+  heading?: string;
+  items: NavItem[];
+}
+
+const dealerNav: NavGroup[] = [
+  { items: [{ href: "/dashboard", label: "Overview", icon: LayoutDashboard }] },
+  {
+    heading: "Marketplace",
+    items: [
+      { href: "/dashboard/inventory", label: "Inventory", icon: Car },
+      { href: "/dashboard/leads", label: "Enquiries", icon: MessageSquare },
+      { href: "/dashboard/quotes", label: "Quote requests", icon: Layers },
+    ],
+  },
+  {
+    heading: "Sales",
+    items: [
+      { href: "/dashboard/orders", label: "Orders", icon: Package },
+      { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    heading: "Communication",
+    items: [
+      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
+  {
+    heading: "Business",
+    items: [
+      { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
+      { href: "/dashboard/profile", label: "Dealership profile", icon: Building2 },
+    ],
+  },
 ];
 
-// A buyer's workspace is purely for shopping. "Sell your car" is a gateway
-// (it converts them into a seller) — it is NOT a buyer feature, so it's
-// rendered separately as a CTA, not a peer nav item.
-const buyerNav = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/saved", label: "Saved cars", icon: Heart },
-  { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
-  { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+// An Individual can BUY and SELL from one account, so their workspace has both
+// shopping (saved, alerts, messages) and selling (my listings). "Sell your car"
+// also stays as a prominent CTA at the bottom. Quote requests only matter to
+// buyers purchasing in volume, so they sit under Buying, not in their own silo.
+const buyerNav: NavGroup[] = [
+  { items: [{ href: "/dashboard", label: "Overview", icon: LayoutDashboard }] },
+  {
+    heading: "Buying",
+    items: [
+      { href: "/dashboard/orders", label: "My orders", icon: Package },
+      { href: "/dashboard/quotes", label: "Quote requests", icon: Layers },
+      { href: "/dashboard/saved", label: "Saved cars", icon: Heart },
+      { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
+    ],
+  },
+  {
+    heading: "Selling",
+    items: [
+      { href: "/dashboard/my-listings", label: "My listings", icon: Car },
+      // Individuals sell too — they get performance on their own cars.
+      { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    heading: "Communication",
+    items: [
+      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
 ];
 
-const b2bNav = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/inquiries", label: "Export inquiries", icon: Ship },
-  { href: "/dashboard/documents", label: "Documents", icon: FileText },
-  { href: "/dashboard/saved", label: "Watchlist", icon: Heart },
+// Importers are bulk buyers first — quotes and orders lead, export paperwork
+// is a service on top rather than the whole product.
+const b2bNav: NavGroup[] = [
+  { items: [{ href: "/dashboard", label: "Overview", icon: LayoutDashboard }] },
+  {
+    heading: "Buying",
+    items: [
+      { href: "/dashboard/quotes", label: "Quote requests", icon: Layers },
+      { href: "/dashboard/orders", label: "My orders", icon: Package },
+      { href: "/dashboard/saved", label: "Watchlist", icon: Heart },
+    ],
+  },
+  {
+    heading: "Export",
+    items: [
+      { href: "/dashboard/inquiries", label: "Shipments", icon: Ship },
+      { href: "/dashboard/documents", label: "Documents", icon: FileText },
+    ],
+  },
+  {
+    heading: "Communication",
+    items: [
+      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
 ];
 
-const adminNav = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/moderation", label: "Moderation", icon: ShieldCheck },
-  { href: "/admin/reports", label: "Reported listings", icon: Flag },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/dealers", label: "Dealers", icon: Building2 },
-  { href: "/admin/revenue", label: "Revenue", icon: TrendingUp },
-  { href: "/admin/banners", label: "Banners", icon: ImageIcon },
-  { href: "/admin/catalog", label: "Car Catalog", icon: RefreshCw },
-  { href: "/admin/audit", label: "Audit log", icon: Database },
+const adminNav: NavGroup[] = [
+  { items: [{ href: "/admin", label: "Overview", icon: LayoutDashboard }] },
+  {
+    heading: "Marketplace",
+    items: [
+      { href: "/admin/moderation", label: "Moderation", icon: ShieldCheck },
+      { href: "/admin/reports", label: "Reported listings", icon: Flag },
+      { href: "/admin/catalog", label: "Car catalog", icon: RefreshCw },
+    ],
+  },
+  {
+    heading: "People",
+    items: [
+      { href: "/admin/users", label: "Users", icon: Users },
+      { href: "/admin/dealers", label: "Dealers", icon: Building2 },
+    ],
+  },
+  {
+    heading: "Business",
+    items: [
+      { href: "/admin/revenue", label: "Revenue", icon: TrendingUp },
+      { href: "/admin/banners", label: "Banners", icon: ImageIcon },
+      { href: "/admin/audit", label: "Audit log", icon: Database },
+    ],
+  },
 ];
+
+/** Plain-language workspace label — buyers never see "B2B" or "B2C". */
+const ROLE_LABEL: Record<"dealer" | "buyer" | "b2b" | "admin", string> = {
+  dealer: "DEALER",
+  buyer: "MY ACCOUNT",
+  b2b: "BUSINESS BUYER",
+  admin: "ADMIN",
+};
 
 export function DashboardSidebar({
   role = "dealer",
@@ -76,7 +181,7 @@ export function DashboardSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const items =
+  const groups =
     role === "admin" ? adminNav : role === "buyer" ? buyerNav : role === "b2b" ? b2bNav : dealerNav;
   const isAdmin = role === "admin";
 
@@ -120,30 +225,39 @@ export function DashboardSidebar({
 
       <div className="px-3 py-3">
         <div className="px-3 mb-2 text-[10px] uppercase tracking-widest text-white/40">
-          {isAdmin ? "ADMIN" : role.toUpperCase()}
+          {isAdmin ? "ADMIN" : ROLE_LABEL[role]}
         </div>
-        <nav className="space-y-1">
-          {items.map((item) => {
-            const isActive = pathname.endsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onNavigate}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-colors",
-                  isActive
-                    ? "bg-white/10 text-white font-semibold ring-1 ring-white/10"
-                    : "text-white/55 hover:bg-white/5 hover:text-white",
-                )}
-              >
-                <item.icon
-                  className={cn("h-4 w-4", isActive ? "text-[#8136B2]" : "")}
-                />
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav className="space-y-4">
+          {groups.map((group, gi) => (
+            <div key={group.heading ?? `group-${gi}`} className="space-y-1">
+              {group.heading && (
+                <div className="px-3 pt-1 pb-1 text-[9px] uppercase tracking-widest text-white/30">
+                  {group.heading}
+                </div>
+              )}
+              {group.items.map((item) => {
+                const isActive = pathname.endsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-colors",
+                      isActive
+                        ? "bg-white/10 text-white font-semibold ring-1 ring-white/10"
+                        : "text-white/55 hover:bg-white/5 hover:text-white",
+                    )}
+                  >
+                    <item.icon
+                      className={cn("h-4 w-4", isActive ? "text-[#8136B2]" : "")}
+                    />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
       </div>
 
@@ -186,7 +300,9 @@ export function DashboardSidebar({
   return (
     <>
       {/* Desktop rail */}
-      <aside className="hidden lg:flex w-64 flex-col bg-[#0B0B10] min-h-screen sticky top-0 text-white">
+      {/* h-screen + self-start (not min-h-screen/stretch) so the rail is exactly
+          viewport-tall and `sticky top-0` actually has room to stick. */}
+      <aside className="hidden lg:flex w-64 flex-col bg-[#0B0B10] h-screen sticky top-0 self-start overflow-y-auto text-white">
         {panel(() => {})}
       </aside>
 
@@ -205,7 +321,7 @@ export function DashboardSidebar({
         </div>
         <span className="font-bold">{brand.name}</span>
         <span className="ms-auto text-[10px] uppercase tracking-widest text-white/40">
-          {isAdmin ? "ADMIN" : role.toUpperCase()}
+          {isAdmin ? "ADMIN" : ROLE_LABEL[role]}
         </span>
       </div>
 
