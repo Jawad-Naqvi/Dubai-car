@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { auth } from "@clerk/nextjs/server";
 import { ListingRow } from "@/components/listings/listing-row";
 import { ListingCard } from "@/components/listings/listing-card";
 import { ViewToggle } from "@/components/listings/view-toggle";
@@ -8,10 +9,25 @@ import { SaveSearchButton } from "@/components/listings/save-search-button";
 import { MobileFilterBar } from "@/components/listings/mobile-filter-bar";
 import { ListingSortSelect } from "@/components/listings/listings-toolbar";
 import { Pagination } from "@/components/listings/pagination";
+import { SignupWall } from "@/components/marketing/signup-wall";
 import { searchListings } from "@/lib/data/listings";
 import { parseListingParams } from "@/lib/data/search-params";
 import { SearchX, ChevronRight } from "lucide-react";
 import { Link } from "@/i18n/routing";
+
+/** Cars a signed-out visitor sees before the sign-up wall. */
+const GUEST_LIMIT = 9;
+
+/** Rebuild the current query string so auth CTAs can return to this exact view. */
+function queryString(sp: Record<string, string | string[] | undefined>): string {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (k === "page") continue; // guests always land on page 1
+    if (Array.isArray(v)) v.forEach((x) => x && qs.append(k, x));
+    else if (v) qs.set(k, v);
+  }
+  return qs.toString();
+}
 
 export default async function BuyPage({
   params,
@@ -24,9 +40,18 @@ export default async function BuyPage({
   setRequestLocale(locale);
 
   const sp = await searchParams;
+  const { userId } = await auth();
+  const isGuest = !userId;
+
   const query = parseListingParams(sp);
+  if (isGuest) query.page = 1; // guests can't paginate past the wall
   const result = await searchListings(query);
   const view = (Array.isArray(sp.view) ? sp.view[0] : sp.view) === "grid" ? "grid" : "list";
+
+  // Cap the public list for signed-out visitors.
+  const gated = isGuest && result.total > GUEST_LIMIT;
+  const visibleItems = gated ? result.items.slice(0, GUEST_LIMIT) : result.items;
+  const redirectTo = `/${locale}/buy${queryString(sp) ? `?${queryString(sp)}` : ""}`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-6 py-5 pb-16">
@@ -82,7 +107,7 @@ export default async function BuyPage({
           {result.items.length > 0 ? (
             view === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {result.items.map((listing) => (
+                {visibleItems.map((listing) => (
                   <ListingCard
                     key={listing.id}
                     listing={listing}
@@ -92,7 +117,7 @@ export default async function BuyPage({
               </div>
             ) : (
               <div className="space-y-3">
-                {result.items.map((listing) => (
+                {visibleItems.map((listing) => (
                   <ListingRow
                     key={listing.id}
                     listing={listing}
@@ -119,7 +144,16 @@ export default async function BuyPage({
             </div>
           )}
 
-          <Pagination page={result.page} totalPages={result.totalPages} />
+          {gated ? (
+            <SignupWall
+              remaining={result.total - GUEST_LIMIT}
+              total={result.total}
+              label="cars"
+              redirectTo={redirectTo}
+            />
+          ) : (
+            <Pagination page={result.page} totalPages={result.totalPages} />
+          )}
         </div>
       </div>
     </div>

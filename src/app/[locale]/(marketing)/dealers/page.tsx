@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
+import { auth } from "@clerk/nextjs/server";
 import { Link } from "@/i18n/routing";
 import { getDealers, type DealerView } from "@/lib/data/dealers";
+import { SignupWall } from "@/components/marketing/signup-wall";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Button } from "@/components/ui/button";
 import { DealerCard } from "@/components/dealers/dealer-card";
@@ -13,11 +15,24 @@ import { Pagination } from "@/components/listings/pagination";
 import { SearchX, Store } from "lucide-react";
 
 const PER_PAGE = 12;
+/** Dealers a signed-out visitor sees before the sign-up wall. */
+const GUEST_LIMIT = 8;
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
 function first(v: string | string[] | undefined): string | undefined {
   return Array.isArray(v) ? v[0] : v;
+}
+
+/** Rebuild the current query string so auth CTAs return to this exact view. */
+function queryString(sp: SearchParams): string {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (k === "page") continue;
+    if (Array.isArray(v)) v.forEach((x) => x && qs.append(k, x));
+    else if (v) qs.set(k, v);
+  }
+  return qs.toString();
 }
 
 function filterAndSort(dealers: DealerView[], sp: SearchParams): DealerView[] {
@@ -70,12 +85,21 @@ export default async function DealersPage({
   setRequestLocale(locale);
 
   const sp = await searchParams;
+  const { userId } = await auth();
+  const isGuest = !userId;
+
   const allDealers = await getDealers();
   const results = filterAndSort(allDealers, sp);
 
-  const page = Math.max(1, parseInt(first(sp.page) ?? "1", 10) || 1);
+  const page = isGuest ? 1 : Math.max(1, parseInt(first(sp.page) ?? "1", 10) || 1);
   const totalPages = Math.max(1, Math.ceil(results.length / PER_PAGE));
-  const pageItems = results.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  // Cap the public directory for signed-out visitors.
+  const gated = isGuest && results.length > GUEST_LIMIT;
+  const pageItems = gated
+    ? results.slice(0, GUEST_LIMIT)
+    : results.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const redirectTo = `/${locale}/dealers${queryString(sp) ? `?${queryString(sp)}` : ""}`;
 
   const hasFilters = Boolean(
     first(sp.q) || first(sp.emirate) || first(sp.rating) || first(sp.verified),
@@ -150,7 +174,16 @@ export default async function DealersPage({
           </div>
         )}
 
-        <Pagination page={page} totalPages={totalPages} />
+        {gated ? (
+          <SignupWall
+            remaining={results.length - GUEST_LIMIT}
+            total={results.length}
+            label="dealers"
+            redirectTo={redirectTo}
+          />
+        ) : (
+          <Pagination page={page} totalPages={totalPages} />
+        )}
 
         {/* Become-a-dealer CTA */}
         <div className="mt-10 rounded-2xl bg-[#370B55] text-white p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
