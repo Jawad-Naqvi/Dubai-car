@@ -9,9 +9,10 @@ import {
   shipmentLines,
   shipmentEvents,
   shipmentParticipants,
-  shipmentDocuments,
   shipmentFinancials,
   organizations,
+  organizationMembers,
+  conversations,
   orders,
   users,
 } from "@/lib/db/schema";
@@ -19,14 +20,15 @@ import { isDbEnabled } from "@/lib/db/enabled";
 import { getOrSyncUser } from "@/lib/data/users";
 import {
   assertOrgAccess,
+  ensureOrg,
   getMyOrgs,
   isPlatformAdmin,
+  type OrgContext,
   type OrgType,
 } from "@/lib/data/orgs";
 import {
   getMilestone,
   milestoneLabel,
-  MILESTONES,
   type ShipmentStatus,
 } from "@/lib/freight/milestones";
 import {
@@ -126,8 +128,20 @@ export async function createFreightRequest(input: {
     }
   }
 
+  // Guarantee the buyer has an organization before the request exists. Without
+  // one, buyerOrgId stays null and the award step cannot make them a shipment
+  // participant — they would be locked out of tracking their own car.
   const orgs = await getMyOrgs();
-  const buyerOrg = orgs.find((o) => o.type === "buyer") ?? orgs[0] ?? null;
+  let buyerOrg: OrgContext | null =
+    orgs.find((o) => o.type === "buyer") ?? orgs[0] ?? null;
+  if (!buyerOrg) {
+    buyerOrg = await ensureOrg({
+      userId: user.id,
+      type: "buyer",
+      name: user.name || user.email || "Buyer",
+      status: "active",
+    });
+  }
   const originCountry = input.originCountry ?? "AE";
 
   const [request] = await db
@@ -436,8 +450,20 @@ export async function awardFreightQuote(
   }
 
   const participants: Array<{ orgId: string; partyRole: OrgType }> = [];
-  if (request.buyerOrgId) {
-    participants.push({ orgId: request.buyerOrgId, partyRole: "buyer" });
+  // Older requests may predate the guarantee above, so resolve a buyer org
+  // here too rather than silently dropping the buyer from their own shipment.
+  let buyerOrgId = request.buyerOrgId;
+  if (!buyerOrgId) {
+    const created = await ensureOrg({
+      userId: user.id,
+      type: "buyer",
+      name: user.name || user.email || "Buyer",
+      status: "active",
+    });
+    buyerOrgId = created?.id ?? null;
+  }
+  if (buyerOrgId) {
+    participants.push({ orgId: buyerOrgId, partyRole: "buyer" });
   }
   if (dealerOrgId) participants.push({ orgId: dealerOrgId, partyRole: "dealer" });
   participants.push({ orgId: quote.forwarderOrgId, partyRole: "forwarder" });
@@ -454,7 +480,7 @@ export async function awardFreightQuote(
     await db.insert(shipmentFinancials).values([
       {
         shipmentId: shipment.id,
-        orgId: request.buyerOrgId ?? quote.forwarderOrgId,
+        orgId: buyerOrgId ?? quote.forwarderOrgId,
         kind: "buyer_payable",
         currency: quote.currency,
         amountMinor: quote.totalMinor,
@@ -494,6 +520,42 @@ export async function awardFreightQuote(
     })
     .where(eq(freightRequests.id, request.id));
 
+  // One thread for all three parties, from the moment the job is awarded.
+  const chatParticipants: Array<{
+    userId: string;
+    orgId?: string | null;
+    role: OrgType;
+  }> = [{ userId: user.id, orgId: buyerOrgId, role: "buyer" }];
+  if (dealerUserId) {
+    chatParticipants.push({
+      userId: dealerUserId,
+      orgId: dealerOrgId,
+      role: "dealer",
+    });
+  }
+  // Add the winning forwarder's staff so all three sides are in one thread.
+  // This is the moment they gain access — never before the award.
+  const forwarderStaff = await db
+    .select({ userId: organizationMembers.userId })
+    .from(organizationMembers)
+    .where(eq(organizationMembers.orgId, quote.forwarderOrgId));
+  for (const staff of forwarderStaff) {
+    chatParticipants.push({
+      userId: staff.userId,
+      orgId: quote.forwarderOrgId,
+      role: "forwarder",
+    });
+  }
+
+  await getOrCreateConversation({
+    kind: "shipment",
+    subjectId: shipment.id,
+    title: `Shipment ${shipment.reference}`,
+    participants: chatParticipants,
+  });
+
+  // Recorded AFTER the thread exists so the opening milestone lands in a
+  // conversation that actually has participants in it.
   await recordMilestone({
     shipmentId: shipment.id,
     milestone: "booking_confirmed",
@@ -502,36 +564,6 @@ export async function awardFreightQuote(
     source: "platform",
     note: "Freight booking awarded.",
     skipAuth: true,
-  });
-
-  // One thread for all three parties, from the moment the job is awarded.
-  const chatParticipants: Array<{
-    userId: string;
-    orgId?: string | null;
-    role: OrgType;
-  }> = [{ userId: user.id, orgId: request.buyerOrgId, role: "buyer" }];
-  if (dealerUserId) {
-    chatParticipants.push({
-      userId: dealerUserId,
-      orgId: dealerOrgId,
-      role: "dealer",
-    });
-  }
-  const forwarderStaff = await db
-    .select({ userId: users.id })
-    .from(users)
-    .innerJoin(
-      organizations,
-      eq(organizations.id, quote.forwarderOrgId),
-    )
-    .limit(0);
-  void forwarderStaff;
-
-  await getOrCreateConversation({
-    kind: "shipment",
-    subjectId: shipment.id,
-    title: `Shipment ${shipment.reference}`,
-    participants: chatParticipants,
   });
 
   return { ok: true, shipmentId: shipment.id };
@@ -612,6 +644,15 @@ export async function recordMilestone(input: {
 
   const classifier = input.classifier ?? "ACT";
 
+  // Labels are country-specific ("RTA Export Certificate" in the UAE), so read
+  // the shipment's origin rather than assuming one market.
+  const originRow = await db
+    .select({ originCountry: shipments.originCountry })
+    .from(shipments)
+    .where(eq(shipments.id, input.shipmentId))
+    .limit(1);
+  const originCountry = originRow[0]?.originCountry ?? "AE";
+
   await db.insert(shipmentEvents).values({
     shipmentId: input.shipmentId,
     lineId: input.lineId ?? null,
@@ -639,16 +680,22 @@ export async function recordMilestone(input: {
       .where(eq(shipments.id, input.shipmentId));
 
     // Mirror the milestone into the shared thread so all parties see it.
-    const conv = await getOrCreateConversation({
-      kind: "shipment",
-      subjectId: input.shipmentId,
-      title: "Shipment",
-      participants: [],
-    });
-    if (conv) {
+    // Only post into a thread that already exists — creating one here with no
+    // participants would produce a conversation nobody is able to read.
+    const existing = await db
+      .select({ id: conversations.id })
+      .from(conversations)
+      .where(
+        and(
+          eq(conversations.kind, "shipment"),
+          eq(conversations.subjectId, input.shipmentId),
+        ),
+      )
+      .limit(1);
+    if (existing[0]) {
       await postSystemMessage(
-        conv,
-        milestoneLabel(def.key, "AE"),
+        existing[0].id,
+        milestoneLabel(def.key, originCountry),
         def.key,
       );
     }

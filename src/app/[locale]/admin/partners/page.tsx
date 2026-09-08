@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { partnerApplications, organizations } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { listInvitations } from "@/lib/data/invitations";
-import { getOrgsForReview } from "@/lib/data/orgs";
+import { getOrgReviewQueue } from "@/lib/data/orgs";
 import { isAdminAllowed } from "@/lib/data/users";
 import { InvitationsPanel } from "@/components/admin/invitations-panel";
 import { OrgReviewList } from "@/components/admin/org-review-list";
@@ -41,7 +41,7 @@ export default async function AdminPartnersPage({
           .limit(50)
       : Promise.resolve([]),
     listInvitations(50),
-    getOrgsForReview(),
+    getOrgReviewQueue(),
   ]);
 
   const h = await headers();
@@ -62,15 +62,7 @@ export default async function AdminPartnersPage({
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
         <div className="space-y-4">
-          <OrgReviewList
-            orgs={pendingOrgs.map((o) => ({
-              id: o.id,
-              name: o.name,
-              type: o.type,
-              countryCode: o.countryCode,
-              submittedAt: o.submittedAt?.toISOString() ?? null,
-            }))}
-          />
+          <OrgReviewList orgs={pendingOrgs} />
 
           <div className="rounded-xl border border-[#E5E5EA] bg-white overflow-hidden">
             <div className="flex items-center gap-2 border-b border-[#E5E5EA] px-4 py-3">

@@ -3,7 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
-import { Loader2, ShieldCheck, Check, X, Building2 } from "lucide-react";
+import {
+  Loader2,
+  ShieldCheck,
+  Check,
+  X,
+  Building2,
+  FileText,
+  ExternalLink,
+} from "lucide-react";
 
 /**
  * Verification queue. Approving here is what flips an organization to
@@ -14,12 +22,23 @@ import { Loader2, ShieldCheck, Check, X, Building2 } from "lucide-react";
  * what to fix just produces a support ticket.
  */
 
+interface ReviewDoc {
+  id: string;
+  docType: string;
+  docNumber: string | null;
+  status: string;
+  frontUrl: string | null;
+  backUrl: string | null;
+}
+
 interface OrgRow {
   id: string;
   name: string;
   type: string;
   countryCode: string;
   submittedAt: string | null;
+  contactEmail: string | null;
+  documents: ReviewDoc[];
 }
 
 export function OrgReviewList({ orgs }: { orgs: OrgRow[] }) {
@@ -27,6 +46,7 @@ export function OrgReviewList({ orgs }: { orgs: OrgRow[] }) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rejecting, setRejecting] = useState<string | null>(null);
   const [reason, setReason] = useState("");
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const decide = async (
     id: string,
@@ -90,6 +110,18 @@ export function OrgReviewList({ orgs }: { orgs: OrgRow[] }) {
                         ? ` · submitted ${new Date(org.submittedAt).toLocaleDateString(undefined, { day: "numeric", month: "short" })}`
                         : ""}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExpanded(expanded === org.id ? null : org.id)
+                      }
+                      className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-[#8136B2] hover:underline"
+                    >
+                      <FileText className="h-2.5 w-2.5" />
+                      {org.documents.length} document
+                      {org.documents.length === 1 ? "" : "s"}
+                      {expanded === org.id ? " — hide" : " — review"}
+                    </button>
                   </div>
                 </div>
 
@@ -119,6 +151,66 @@ export function OrgReviewList({ orgs }: { orgs: OrgRow[] }) {
                   </button>
                 </div>
               </div>
+
+              {expanded === org.id && (
+                <div className="mt-2.5 rounded-lg bg-[#F4F4F6] p-2.5">
+                  {org.documents.length === 0 ? (
+                    <p className="text-[10px] text-muted">
+                      Nothing uploaded yet — this organization submitted without
+                      documents. Send it back asking for them.
+                    </p>
+                  ) : (
+                    <ul className="space-y-1.5">
+                      {org.documents.map((d) => (
+                        <li
+                          key={d.id}
+                          className="flex items-center justify-between gap-2"
+                        >
+                          <span className="min-w-0">
+                            <span className="block text-[10px] font-semibold text-[#141414]">
+                              {d.docType.replace(/_/g, " ")}
+                            </span>
+                            {d.docNumber && (
+                              <span className="block text-[10px] text-muted tabular-nums">
+                                {d.docNumber}
+                              </span>
+                            )}
+                          </span>
+                          <span className="flex items-center gap-1.5 flex-shrink-0">
+                            {d.frontUrl && (
+                              <a
+                                href={d.frontUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 h-6 px-2 rounded-md border border-[#E5E5EA] bg-white text-[10px] font-semibold text-[#141414] hover:bg-[#F4F4F6]"
+                              >
+                                <ExternalLink className="h-2.5 w-2.5" />
+                                Front
+                              </a>
+                            )}
+                            {d.backUrl && (
+                              <a
+                                href={d.backUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 h-6 px-2 rounded-md border border-[#E5E5EA] bg-white text-[10px] font-semibold text-[#141414] hover:bg-[#F4F4F6]"
+                              >
+                                <ExternalLink className="h-2.5 w-2.5" />
+                                Back
+                              </a>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {org.contactEmail && (
+                    <p className="mt-2 border-t border-[#E5E5EA] pt-1.5 text-[10px] text-muted">
+                      {org.contactEmail}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {rejecting === org.id && (
                 <div className="mt-2.5 flex items-center gap-2">

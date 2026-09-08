@@ -1,9 +1,10 @@
 import "server-only";
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, inArray, isNull, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   organizations,
   organizationMembers,
+  identityDocuments,
   dealers,
   users,
 } from "@/lib/db/schema";
@@ -255,6 +256,76 @@ export async function setOrgStatus(
     })
     .where(eq(organizations.id, orgId));
   return true;
+}
+
+/**
+ * Admin review payload: the org PLUS the documents it submitted.
+ *
+ * Without this the approve button asked an admin to verify an organization
+ * they could not actually look at — the queue listed a name and a country and
+ * nothing else. Verification has to be based on the papers.
+ */
+export interface OrgReviewItem {
+  id: string;
+  name: string;
+  type: OrgType;
+  countryCode: string;
+  submittedAt: string | null;
+  contactEmail: string | null;
+  documents: Array<{
+    id: string;
+    docType: string;
+    docNumber: string | null;
+    status: string;
+    frontUrl: string | null;
+    backUrl: string | null;
+  }>;
+}
+
+export async function getOrgReviewQueue(): Promise<OrgReviewItem[]> {
+  if (!isDbEnabled()) return [];
+  const orgs = await db
+    .select()
+    .from(organizations)
+    .where(eq(organizations.status, "pending"))
+    .limit(100);
+  if (orgs.length === 0) return [];
+
+  const docs = await db
+    .select()
+    .from(identityDocuments)
+    .where(
+      inArray(
+        identityDocuments.orgId,
+        orgs.map((o) => o.id),
+      ),
+    );
+
+  const byOrg = new Map<string, OrgReviewItem["documents"]>();
+  for (const d of docs) {
+    if (!d.orgId) continue;
+    const list = byOrg.get(d.orgId) ?? [];
+    list.push({
+      id: d.id,
+      docType: d.docType,
+      docNumber: d.docNumber,
+      status: d.status,
+      // Private assets — /api/media/[id] checks the admin role before serving.
+      frontUrl: d.frontMediaId ? `/api/media/${d.frontMediaId}` : null,
+      backUrl: d.backMediaId ? `/api/media/${d.backMediaId}` : null,
+    });
+    byOrg.set(d.orgId, list);
+  }
+
+  return orgs.map((o) => ({
+    id: o.id,
+    name: o.name,
+    type: o.type as OrgType,
+    countryCode: o.countryCode,
+    submittedAt: o.submittedAt?.toISOString() ?? null,
+    contactEmail: o.contactEmail,
+    documents: byOrg.get(o.id) ?? [],
+  }));
 }
 
 /** Admin listing of orgs awaiting review, newest first. */

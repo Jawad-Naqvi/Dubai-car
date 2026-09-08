@@ -3,6 +3,8 @@ import { RequestShipping } from "@/components/freight/request-shipping";
 import { QuoteComparison } from "@/components/freight/quote-comparison";
 import { getMyFreightRequests } from "@/lib/data/freight";
 import { getDestinationCountries } from "@/lib/data/countries";
+import { getOrdersForBuyer } from "@/lib/data/orders";
+import { getOrSyncUser } from "@/lib/data/users";
 
 export const dynamic = "force-dynamic";
 
@@ -10,11 +12,22 @@ export const dynamic = "force-dynamic";
  * The buyer's shipping desk: raise a request, compare the bids that come back,
  * book one. Once booked it becomes a shipment with a shared timeline.
  */
-export default async function ShippingPage() {
-  const [requests, destinations] = await Promise.all([
+export default async function ShippingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ order?: string }>;
+}) {
+  const { order } = await searchParams;
+  const user = await getOrSyncUser().catch(() => null);
+  const [requests, destinations, orders] = await Promise.all([
     getMyFreightRequests(),
     getDestinationCountries(),
+    user ? getOrdersForBuyer(user.id).catch(() => []) : Promise.resolve([]),
   ]);
+
+  // "Ship it" on an order deep-links here; pre-select that car so the buyer
+  // doesn't have to describe what they already bought.
+  const selected = order ? orders.find((o) => o.id === order) : undefined;
 
   const open = requests.filter((r) => r.status === "open");
 
@@ -25,7 +38,11 @@ export default async function ShippingPage() {
         subtitle="Get quotes from verified freight partners and track your cars"
       />
       <main className="p-5 grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-4 items-start">
-        <RequestShipping destinations={destinations} />
+        <RequestShipping
+          destinations={destinations}
+          orderId={selected?.id}
+          vehicleSummary={selected?.title ?? undefined}
+        />
 
         <div className="space-y-3">
           {requests.length === 0 ? (

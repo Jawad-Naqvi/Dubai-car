@@ -7,7 +7,9 @@ import { formatAED, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { OrderStatusBadge } from "./quote-status-badge";
 import type { OrderView, OrderStatus } from "@/lib/data/orders";
-import { Package, Layers, ShoppingBag } from "lucide-react";
+import { Package, Layers, ShoppingBag,
+  Ship,
+} from "lucide-react";
 
 const FILTERS = [
   { key: "open", label: "Active" },
@@ -168,6 +170,17 @@ export function OrdersWorkspace({
               </div>
 
               <div className="flex gap-2 flex-shrink-0">
+                {/* Freight is offered where the need actually arises — on a
+                    confirmed order — rather than only in the sidebar. */}
+                {audience === "buyer" &&
+                  o.status !== "cancelled" && (
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/dashboard/shipping?order=${o.id}`}>
+                        <Ship className="h-3 w-3" />
+                        Ship it
+                      </Link>
+                    </Button>
+                  )}
                 {audience === "seller" && next && (
                   <Button
                     variant="gold"
