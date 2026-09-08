@@ -14,7 +14,10 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:seed": "tsx src/lib/db/seed-prisma.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test --project=chromium",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:auth": "playwright test --project=authenticated-ui"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.1",
@@ -63,6 +66,8 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@clerk/testing": "^2.2.33",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.5",
     "@types/nodemailer": "^8.0.1",

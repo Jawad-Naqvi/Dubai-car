@@ -76,9 +76,14 @@ export async function getOnboardingState(): Promise<OnboardingState | null> {
 
   const primary = pickPrimaryOrg(orgs);
 
-  // A buyer org that was auto-created still counts as "hasn't chosen yet",
-  // so returning users get the picker once instead of being stuck as buyers.
-  const needsTypeChoice = !primary || (orgs.length === 1 && !primary.dealerId && primary.type === "buyer" && primary.status === "incomplete");
+  // "Has this person told us what they're here to do?"
+  //
+  // A dealer/forwarder/platform org is an explicit answer. So is a buyer org
+  // that chooseAccountType() promoted to "active". An auto-created buyer org
+  // still sitting at "incomplete" is NOT an answer — it is the placeholder we
+  // made for them — so the picker is still owed.
+  const needsTypeChoice =
+    !primary || (primary.type === "buyer" && primary.status === "incomplete");
 
   const kyc = primary
     ? await getKycProgress(primary.countryCode, primary.type, {
@@ -156,6 +161,27 @@ export async function chooseAccountType(input: {
     status: type === "buyer" ? "active" : "incomplete",
   });
   if (!org) return { ok: false, error: "Could not set up your account." };
+
+  // ensureOrg is idempotent — when an org already exists it returns it
+  // UNCHANGED, including its status. Onboarding always finds one, because a
+  // placeholder buyer org is created the first time the user is seen. Without
+  // this explicit promotion the choice never persisted: the placeholder stayed
+  // "incomplete", so the picker reappeared on every visit and the user could
+  // never get past it.
+  if (type === "buyer" && org.status !== "active") {
+    await db
+      .update(organizations)
+      .set({ status: "active", name, updatedAt: new Date() })
+      .where(eq(organizations.id, org.id));
+    org.status = "active";
+    org.isVerified = true;
+  } else if (type === "dealer" && input.organizationName?.trim()) {
+    // Keep the business name the seller actually typed.
+    await db
+      .update(organizations)
+      .set({ name, updatedAt: new Date() })
+      .where(eq(organizations.id, org.id));
+  }
 
   // Give the dealer their workspace now; publishing stays gated on approval.
   if (type === "dealer" && user.role !== "dealer" && user.role !== "admin") {

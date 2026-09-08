@@ -230,11 +230,17 @@ export async function backfillOrgForUser(
     });
   }
 
+  // "incomplete" on purpose. A user with no dealer record has never told us
+  // what they are here to do, so the account-type picker must still be shown.
+  // Creating this as "active" silently answered the question for them and
+  // skipped onboarding entirely — new accounts landed straight on the
+  // marketplace and were never asked whether they wanted to buy or sell.
+  // chooseAccountType() is what promotes a buyer org to "active".
   return ensureOrg({
     userId: user.id,
     type: "buyer",
     name: user.name || user.email || "Buyer",
-    status: "active",
+    status: "incomplete",
   });
 }
 
