@@ -6,6 +6,7 @@ import { invitations, users } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { ensureOrg, type MemberRole, type OrgType } from "@/lib/data/orgs";
 import type { CurrentUser } from "@/lib/data/users";
+import { recordAudit } from "@/lib/audit";
 
 /**
  * ADMIN-ISSUED ONBOARDING LINKS.
@@ -182,6 +183,14 @@ export async function acceptInvitation(
       .set({ role: "admin" })
       .where(eq(users.id, user.id));
   }
+
+  await recordAudit({
+    action: "invitation.accepted",
+    actorId: user.id,
+    entityType: "organization",
+    entityId: org.id,
+    metadata: { orgType, grantsAdmin: invite.grantsAdmin, invitationId: invite.id },
+  });
 
   return {
     ok: true,

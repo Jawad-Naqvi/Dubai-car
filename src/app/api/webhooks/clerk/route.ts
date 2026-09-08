@@ -2,8 +2,10 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import type { WebhookEvent } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { users, identityDocuments } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { recordAudit } from "@/lib/audit";
+import { log } from "@/lib/log";
 
 export async function POST(req: Request) {
   const SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -79,10 +81,42 @@ export async function POST(req: Request) {
       }
     } else if (type === "user.deleted") {
       const id = evt.data.id;
-      if (id) await db.delete(users).where(eq(users.clerkId, id));
+      if (id) {
+        // Tombstone rather than DELETE. A hard delete cascaded through foreign
+        // keys and took other people's orders, messages and shipment history
+        // with it — a buyer closing their account must not erase a seller's
+        // records. Personal identifiers and ID documents are cleared here; the
+        // in-app flow (lib/data/account-data.ts) does the fuller erasure.
+        const [row] = await db
+          .update(users)
+          .set({
+            email: `deleted+${id.slice(-8)}@removed.invalid`,
+            name: "Deleted user",
+            phone: null,
+            imageUrl: null,
+            emiratesIdNumber: null,
+            emiratesIdFrontUrl: null,
+            emiratesIdBackUrl: null,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.clerkId, id))
+          .returning({ id: users.id });
+        if (row) {
+          await db
+            .delete(identityDocuments)
+            .where(eq(identityDocuments.userId, row.id));
+          await recordAudit({
+            action: "account.deleted",
+            actorId: row.id,
+            entityType: "user",
+            entityId: row.id,
+            metadata: { via: "clerk_webhook" },
+          });
+        }
+      }
     }
   } catch (err) {
-    console.error("[clerk-webhook]", err);
+    log.error("clerk_webhook.failed", { err });
     return new Response("Internal error", { status: 500 });
   }
 

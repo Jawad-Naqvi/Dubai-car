@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/alerts",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/freight-expiry",
+      "schedule": "15 * * * *"
     }
   ]
 }

@@ -23,10 +23,27 @@ export type NotificationEventKey =
   | "quote.message"
   /* --- Orders (both journeys converge here) --- */
   | "order.created"
-  | "order.status_changed";
+  | "order.status_changed"
+  /* --- Freight (the shipping service) --- */
+  | "freight.quote_received"
+  | "freight.awarded"
+  | "freight.milestone"
+  | "freight.request_expiring"
+  /* --- Account & partner lifecycle --- */
+  | "org.verified"
+  | "org.rejected"
+  | "invitation.sent"
+  /* --- Messaging --- */
+  | "chat.message";
 
-/** Who a rendered notification is aimed at. */
-export type Audience = "buyer" | "seller";
+/**
+ * Who a rendered notification is aimed at.
+ *
+ * "forwarder" exists because freight introduced a third party: a shipment
+ * update goes to the buyer, the seller AND the freight partner, and forcing
+ * the forwarder to masquerade as a "seller" would send them the wrong copy.
+ */
+export type Audience = "buyer" | "seller" | "forwarder";
 
 export interface Recipient {
   /** Internal users.id — when present, an in-app notification row is written. */

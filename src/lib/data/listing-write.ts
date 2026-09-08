@@ -4,6 +4,7 @@ import { eq, sql, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { listings, listingMedia, dealers, priceHistory } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
+import { checkListingIntegrity } from "./integrity";
 import { slugify } from "@/lib/utils";
 import { deriveDrivetrain, computeDealRating } from "@/lib/vehicle-derive";
 import { dealRatingFromDb } from "./deal-rating";
@@ -132,9 +133,10 @@ export async function createListing(
       stockQty: input.stockQty ?? 1,
       isNew: input.condition === "New",
       status: "active",
-      imageUrl:
-        images[0] ||
-        "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80",
+      // No stock-photo fallback: substituting a generic image of a different
+      // car misrepresents the goods. Real listings must carry real photos
+      // (enforced by checkListingIntegrity); drafts may legitimately have none.
+      imageUrl: images[0] ?? "",
       imageUrls: images,
       description: input.description ?? "",
       features: input.features ?? [],
@@ -176,9 +178,28 @@ export async function createListing(
     );
   }
 
+  // Integrity gate. Runs BEFORE anything is written: a duplicate live chassis
+  // number, a bait price or a listing with no real photos must never reach the
+  // marketplace, and a suspiciously cheap car is routed to a human rather than
+  // rejected outright.
+  const integrity = await checkListingIntegrity({
+    vin: input.vin,
+    priceAED: input.priceAED,
+    make: input.make,
+    model: input.model,
+    year: input.year,
+    imageCount: images.length,
+    saleMode: input.saleMode,
+  });
+  if (!opts.asDraft && integrity.blocked) {
+    throw new Error(integrity.blockingMessage ?? "This listing cannot be published.");
+  }
+
   // KYC-approved dealers publish instantly — moderation is for unvetted
-  // sellers (private listings, or dealers still pending approval).
-  const initialStatus = dealerVerified ? "active" : "pending_review";
+  // sellers (private listings, or dealers still pending approval). An
+  // integrity signal overrides that: it goes to review whoever posted it.
+  const initialStatus =
+    dealerVerified && !integrity.needsReview ? "active" : "pending_review";
 
   // Individual per-listing fee (default OFF during the free launch). When on,
   // a private-seller listing is held as an unpaid "draft" and the caller is

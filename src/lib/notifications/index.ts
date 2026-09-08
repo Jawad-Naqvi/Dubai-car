@@ -4,6 +4,7 @@ import { notifications } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { sendEmail } from "@/lib/notify";
 import { sendWhatsApp } from "@/lib/whatsapp";
+import { log } from "@/lib/log";
 import type {
   Audience,
   NotificationEvent,
@@ -86,7 +87,7 @@ async function deliver(
  * so a slow provider never delays the user's response.
  */
 export async function notify(event: NotificationEvent): Promise<void> {
-  const audiences: Audience[] = ["buyer", "seller"];
+  const audiences: Audience[] = ["buyer", "seller", "forwarder"];
   await Promise.all(
     audiences.map(async (audience) => {
       const to = event.to[audience];
@@ -96,7 +97,7 @@ export async function notify(event: NotificationEvent): Promise<void> {
       try {
         await deliver(event, audience, to, msg);
       } catch (e) {
-        console.error(`notify(${event.key}/${audience}) failed:`, e);
+        log.error("notify.failed", { event: event.key, audience, err: e });
       }
     }),
   );

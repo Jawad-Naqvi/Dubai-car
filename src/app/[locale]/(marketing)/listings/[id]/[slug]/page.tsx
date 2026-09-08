@@ -28,6 +28,7 @@ import { getInspection } from "@/lib/data/inspection";
 import { VehicleHistory } from "@/components/listings/vehicle-history";
 import { getVehicleHistory } from "@/lib/data/vehicle-history";
 import { PriceHistoryTable } from "@/components/listings/price-history-table";
+import { LandedCostCalculator } from "@/components/listings/landed-cost-calculator";
 import { getPriceHistory } from "@/lib/data/price";
 import { StarRating } from "@/components/dealers/star-rating";
 import { OwnerPanel } from "@/components/listings/owner-panel";
@@ -189,11 +190,23 @@ export default async function ListingDetailPage({
       value: listing.kms,
       unitCode: "KMT",
     },
+    ...(listing.vin ? { vehicleIdentificationNumber: listing.vin } : {}),
+    itemCondition:
+      listing.isNew
+        ? "https://schema.org/NewCondition"
+        : "https://schema.org/UsedCondition",
     offers: {
       "@type": "Offer",
       price: listing.priceAED,
       priceCurrency: "AED",
-      availability: "https://schema.org/InStock",
+      // Must reflect reality: a sold car marked InStock is a false signal to
+      // search engines and to buyers arriving from them.
+      availability:
+        listing.status === "sold"
+          ? "https://schema.org/SoldOut"
+          : listing.status === "reserved"
+            ? "https://schema.org/LimitedAvailability"
+            : "https://schema.org/InStock",
       seller: { "@type": "AutoDealer", name: listing.dealer.name },
     },
   };
@@ -325,6 +338,15 @@ export default async function ListingDetailPage({
             {/* Price history */}
             {priceHistory.length > 0 && (
               <PriceHistoryTable points={priceHistory} locale={loc} />
+            )}
+
+            {/* For an export buyer the sticker price is less than half the
+                story — Kenya stacks duty, excise and VAT; India's taxes can
+                exceed the car. Answering "what does this cost me at home?"
+                here is what keeps the deal on the platform instead of dying
+                in a WhatsApp thread. Shown for any priced car. */}
+            {!quoteOnly && (
+              <LandedCostCalculator vehicleAED={listing.priceAED} />
             )}
 
             {/* Features & specs */}

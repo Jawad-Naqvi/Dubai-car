@@ -1,4 +1,5 @@
 import "server-only";
+import { log } from "@/lib/log";
 import nodemailer, { type Transporter } from "nodemailer";
 
 /**
@@ -54,12 +55,12 @@ async function sendViaResend(opts: {
       }),
     });
     if (!res.ok) {
-      console.error("Resend send failed:", res.status, await res.text().catch(() => ""));
+      log.error("email.resend_failed", { status: res.status });
       return false;
     }
     return true;
   } catch (e) {
-    console.error("Resend send error:", e);
+    log.error("email.resend_error", { err: e });
     return false;
   }
 }
@@ -123,7 +124,7 @@ export async function sendEmail(opts: {
     });
     return true;
   } catch (e) {
-    console.error("SMTP send failed:", e);
+    log.error("email.smtp_failed", { err: e });
     return false;
   }
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { partnerApplications } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 /**
  * Public "apply to become a freight forwarder" form.
@@ -16,11 +16,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unavailable" }, { status: 503 });
   }
 
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-  if (!rateLimit(`partner-apply:${ip}`, 5, 60 * 60 * 1000)) {
+  // BUG FIXED: this read `if (!rateLimit(...))`. rateLimit returns a
+  // RateLimitResult OBJECT, which is always truthy, so the negation was always
+  // false and the limiter never fired — on the one endpoint that is public,
+  // unauthenticated and writes to the database.
+  const limit = rateLimit(`partner-apply:${clientIp(req)}`, 5, 60 * 60 * 1000);
+  if (!limit.ok) {
     return NextResponse.json(
       { error: "Too many applications. Try again later." },
-      { status: 429 },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSec) } },
     );
   }
 

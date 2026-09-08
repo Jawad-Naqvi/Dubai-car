@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getOrSyncUser, getCurrentRole } from "@/lib/data/users";
 import { getMyIdentity } from "@/lib/data/identity";
 import { NotificationPrefs } from "@/components/dashboard/notification-prefs";
+import { PrivacyControls } from "@/components/account/privacy-controls";
 import { IdentityDocuments } from "@/components/account/identity-documents";
 import { Link } from "@/i18n/routing";
 import { User, Globe, ShieldCheck } from "lucide-react";
@@ -61,6 +62,13 @@ export default async function SettingsPage() {
             <Eyebrow tone="gold">PREFERENCES</Eyebrow>
           </div>
           <NotificationPrefs />
+
+          <section className="mt-4">
+            <h2 className="mb-2 text-xs font-bold text-[#141414]">
+              Your data
+            </h2>
+            <PrivacyControls />
+          </section>
         </div>
 
         {/* Plan shortcut */}

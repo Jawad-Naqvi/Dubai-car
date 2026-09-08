@@ -36,6 +36,7 @@ import {
   postSystemMessage,
 } from "@/lib/data/chat";
 import { makeReference } from "@/lib/data/demo-store";
+import { recordAudit } from "@/lib/audit";
 
 /**
  * FREIGHT FORWARDING as a marketplace service.
@@ -566,6 +567,21 @@ export async function awardFreightQuote(
     skipAuth: true,
   });
 
+  await recordAudit({
+    action: "freight.awarded",
+    actorId: user.id,
+    entityType: "shipment",
+    entityId: shipment.id,
+    metadata: {
+      requestId: request.id,
+      quoteId: quote.id,
+      forwarderOrgId: quote.forwarderOrgId,
+      lane: `${request.originCountry}->${request.destCountry}`,
+      mode: request.mode,
+      incoterm: request.incoterm,
+    },
+  });
+
   return { ok: true, shipmentId: shipment.id };
 }
 
@@ -711,6 +727,21 @@ export async function recordMilestone(input: {
       .set({ etd: input.eventAt, updatedAt: new Date() })
       .where(eq(shipments.id, input.shipmentId));
   }
+
+  // Milestones drive money and cargo release, so who claimed what and when
+  // has to survive a later dispute.
+  await recordAudit({
+    action: "shipment.milestone_recorded",
+    actorId: user?.id,
+    entityType: "shipment",
+    entityId: input.shipmentId,
+    metadata: {
+      milestone: def.key,
+      classifier,
+      eventAt: input.eventAt.toISOString(),
+      source: input.source ?? "forwarder",
+    },
+  });
 
   return { ok: true };
 }

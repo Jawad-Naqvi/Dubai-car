@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { moderateListing } from "@/lib/data/admin";
-import { isAdminAllowed } from "@/lib/data/users";
+import { isAdminAllowed, getOrSyncUser } from "@/lib/data/users";
+import { recordAudit } from "@/lib/audit";
 
 export async function PATCH(
   req: Request,
@@ -15,5 +16,13 @@ export async function PATCH(
     return NextResponse.json({ error: "action must be approve|reject" }, { status: 400 });
   }
   await moderateListing(id, body.action);
+  const actor = await getOrSyncUser().catch(() => null);
+  await recordAudit({
+    action: "listing.moderated",
+    actorId: actor?.id,
+    entityType: "listing",
+    entityId: id,
+    metadata: { decision: body.action },
+  });
   return NextResponse.json({ ok: true });
 }
