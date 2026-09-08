@@ -98,7 +98,8 @@ async function DealerOverview() {
     getDealerContext(),
     getDashboardStats(),
     getDealerInventory(),
-    getLeadsForDealer(),
+    // Scoped to this dealer/seller. Unscoped, this returns every dealer's leads.
+    getLeadsForDealer(dealer?.id, user?.id),
     getQuotesForDealer(dealer?.id, user?.id).catch(() => []),
     getOrdersForDealer(dealer?.id, user?.id).catch(() => []),
   ]);

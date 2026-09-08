@@ -104,10 +104,33 @@ const buyerNav: NavGroup[] = [
     ],
   },
   {
+    heading: "Shipping",
+    items: [
+      { href: "/dashboard/shipping", label: "Get quotes", icon: Ship },
+      { href: "/dashboard/shipments", label: "Track shipments", icon: Package },
+    ],
+  },
+  {
     heading: "Communication",
     items: [
       { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
     ],
+  },
+];
+
+/** Freight partners get their own workspace — bids, lanes and live shipments. */
+const forwarderNav: NavGroup[] = [
+  { items: [{ href: "/dashboard/freight", label: "Requests", icon: Package }] },
+  {
+    heading: "Operations",
+    items: [
+      { href: "/dashboard/shipments", label: "Shipments", icon: Ship },
+      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+    ],
+  },
+  {
+    heading: "Company",
+    items: [{ href: "/dashboard/settings", label: "Settings", icon: Settings }],
   },
 ];
 
@@ -153,6 +176,7 @@ const adminNav: NavGroup[] = [
     items: [
       { href: "/admin/users", label: "Users", icon: Users },
       { href: "/admin/dealers", label: "Dealers", icon: Building2 },
+      { href: "/admin/partners", label: "Partner network", icon: Ship },
     ],
   },
   {
@@ -166,28 +190,42 @@ const adminNav: NavGroup[] = [
 ];
 
 /** Plain-language workspace label — buyers never see "B2B" or "B2C". */
-const ROLE_LABEL: Record<"dealer" | "buyer" | "b2b" | "admin", string> = {
+const ROLE_LABEL: Record<
+  "dealer" | "buyer" | "b2b" | "admin" | "forwarder",
+  string
+> = {
   dealer: "DEALER",
   buyer: "MY ACCOUNT",
   b2b: "BUSINESS BUYER",
   admin: "ADMIN",
+  forwarder: "FREIGHT PARTNER",
 };
 
 export function DashboardSidebar({
   role = "dealer",
 }: {
-  role?: "dealer" | "buyer" | "b2b" | "admin";
+  role?: "dealer" | "buyer" | "b2b" | "admin" | "forwarder";
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const groups =
-    role === "admin" ? adminNav : role === "buyer" ? buyerNav : role === "b2b" ? b2bNav : dealerNav;
+    role === "admin"
+      ? adminNav
+      : role === "forwarder"
+        ? forwarderNav
+        : role === "buyer"
+          ? buyerNav
+          : role === "b2b"
+            ? b2bNav
+            : dealerNav;
   const isAdmin = role === "admin";
 
-  const lockAdmin = async () => {
-    await fetch("/api/admin-login", { method: "DELETE" });
-    router.push("/admin-login");
+  // Admin is a role on the normal session now, not a separate PIN login, so
+  // leaving the admin area is just navigating away — there is no second
+  // credential to discard.
+  const lockAdmin = () => {
+    router.push("/dashboard");
     router.refresh();
   };
 

@@ -25,7 +25,8 @@ export function AuthShell({
   quoteSub: string;
   title: string;
   subtitle: string;
-  footer: React.ReactNode;
+  /** Optional — onboarding steps have no "already have an account?" line. */
+  footer?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -90,7 +91,9 @@ export function AuthShell({
             <div className="mt-6 sm:mt-8">{children}</div>
           </div>
 
-          <div className="text-center text-xs text-secondary">{footer}</div>
+          {footer ? (
+            <div className="text-center text-xs text-secondary">{footer}</div>
+          ) : null}
         </div>
       </div>
     </div>

@@ -22,6 +22,20 @@
       "when": 1786819182443,
       "tag": "0002_flaky_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788836373723,
+      "tag": "0003_equal_captain_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788836986398,
+      "tag": "0004_majestic_kid_colt",
+      "breakpoints": true
     }
   ]
 }

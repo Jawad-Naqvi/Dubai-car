@@ -331,6 +331,15 @@ export const mediaAssets = pgTable("media_assets", {
   mimeType: varchar("mime_type", { length: 64 }).notNull().default("image/jpeg"),
   size: integer("size").notNull().default(0),
   data: bytea("data").notNull(),
+  /**
+   * SECURITY: identity documents must not share a public namespace with car
+   * photos. "public" is served to anyone (listing images); "private" requires
+   * the uploading user/org or a platform admin. Defaults to public so existing
+   * listing media keeps working; every KYC upload sets "private" explicitly.
+   */
+  visibility: varchar("visibility", { length: 16 }).notNull().default("public"),
+  ownerUserId: uuid("owner_user_id"),
+  ownerOrgId: uuid("owner_org_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type MediaAsset = typeof mediaAssets.$inferSelect;
@@ -858,3 +867,770 @@ export type CatalogMake = typeof catalogMakes.$inferSelect;
 export type CatalogModel = typeof catalogModels.$inferSelect;
 export type CatalogTrim = typeof catalogTrims.$inferSelect;
 export type CatalogSyncRun = typeof catalogSyncRuns.$inferSelect;
+
+/* ===========================================================================
+   PLATFORM FOUNDATION — organizations, invitations, country-agnostic KYC.
+
+   Design notes that matter:
+   - An ORGANIZATION, not a user, is the unit of tenancy. A forwarder is a
+     company with staff; so is a dealer. Every access check and every shipment
+     participant scopes by org, so one login can hold several contexts.
+   - Country requirements are DATA (see countries / kycRequirements), never
+     `if (country === "AE")`. UAE is the launch market and the only seeded
+     pack; adding Japan or Germany later is row insertion, not a refactor.
+   - Money is stored as (amountMinor, currency). AED is the default so nothing
+     changes today, but the seam exists for a second currency.
+   =========================================================================== */
+
+export const orgTypeEnum = pgEnum("org_type", [
+  "buyer",
+  "dealer",
+  "forwarder",
+  "platform",
+]);
+
+/**
+ * Lifecycle of an organization's verification:
+ *  incomplete - onboarding started, documents skipped ("add later")
+ *  pending    - documents submitted, awaiting admin review
+ *  active     - admin verified; full capabilities unlocked
+ *  rejected   - needs changes, can resubmit
+ *  suspended  - admin revoked access
+ */
+export const orgStatusEnum = pgEnum("org_status", [
+  "incomplete",
+  "pending",
+  "active",
+  "rejected",
+  "suspended",
+]);
+
+export const orgMemberRoleEnum = pgEnum("org_member_role", [
+  "owner",
+  "admin",
+  "staff",
+]);
+
+export const organizations = pgTable(
+  "organizations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    type: orgTypeEnum("type").notNull(),
+    name: varchar("name", { length: 200 }).notNull(),
+    slug: varchar("slug", { length: 140 }).unique(),
+    /** ISO-3166 alpha-2. Drives which KYC requirement pack applies. */
+    countryCode: varchar("country_code", { length: 2 }).notNull().default("AE"),
+    status: orgStatusEnum("status").notNull().default("incomplete"),
+    contactEmail: varchar("contact_email", { length: 320 }),
+    contactPhone: varchar("contact_phone", { length: 32 }),
+    /** Links a dealer org back to its existing storefront row (migration path). */
+    dealerId: uuid("dealer_id").references(() => dealers.id, {
+      onDelete: "set null",
+    }),
+    rejectionReason: text("rejection_reason"),
+    submittedAt: timestamp("submitted_at"),
+    verifiedAt: timestamp("verified_at"),
+    verifiedByUserId: uuid("verified_by_user_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    typeIdx: index("orgs_type_idx").on(t.type),
+    statusIdx: index("orgs_status_idx").on(t.status),
+    countryIdx: index("orgs_country_idx").on(t.countryCode),
+  }),
+);
+
+export const organizationMembers = pgTable(
+  "organization_members",
+  {
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: orgMemberRoleEnum("role").notNull().default("staff"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.orgId, t.userId] }),
+    userIdx: index("org_members_user_idx").on(t.userId),
+  }),
+);
+
+/**
+ * Admin-issued onboarding links. The ROLE TRAVELS IN THE INVITE, never in a
+ * query param the visitor controls - this is what makes forwarder onboarding
+ * invite-only. Only a hash of the token is stored, so a database leak cannot
+ * be replayed into an account.
+ */
+export const invitations = pgTable(
+  "invitations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull().unique(),
+    email: varchar("email", { length: 320 }),
+    /** Org type this invite creates (or joins, when orgId is set). */
+    orgType: orgTypeEnum("org_type").notNull(),
+    orgId: uuid("org_id").references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
+    memberRole: orgMemberRoleEnum("member_role").notNull().default("owner"),
+    /** Grants platform-admin rights on acceptance - replaces the admin PIN. */
+    grantsAdmin: boolean("grants_admin").notNull().default(false),
+    orgName: varchar("org_name", { length: 200 }),
+    countryCode: varchar("country_code", { length: 2 }).notNull().default("AE"),
+    note: text("note"),
+    invitedByUserId: uuid("invited_by_user_id"),
+    expiresAt: timestamp("expires_at").notNull(),
+    acceptedAt: timestamp("accepted_at"),
+    acceptedByUserId: uuid("accepted_by_user_id"),
+    revokedAt: timestamp("revoked_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    emailIdx: index("invitations_email_idx").on(t.email),
+    expiresIdx: index("invitations_expires_idx").on(t.expiresAt),
+  }),
+);
+
+/**
+ * Public "apply to become a partner" submissions (freight forwarders, and any
+ * future partner type). Admin reviews, then issues an invitation - applicants
+ * never self-serve into a privileged role.
+ */
+export const partnerApplications = pgTable(
+  "partner_applications",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    orgType: orgTypeEnum("org_type").notNull().default("forwarder"),
+    companyName: varchar("company_name", { length: 200 }).notNull(),
+    contactName: varchar("contact_name", { length: 160 }).notNull(),
+    email: varchar("email", { length: 320 }).notNull(),
+    phone: varchar("phone", { length: 32 }),
+    countryCode: varchar("country_code", { length: 2 }).notNull().default("AE"),
+    website: text("website"),
+    /** Free-text pitch: lanes served, fleet, licences held. */
+    message: text("message"),
+    status: varchar("status", { length: 24 }).notNull().default("new"),
+    reviewedByUserId: uuid("reviewed_by_user_id"),
+    reviewedAt: timestamp("reviewed_at"),
+    invitationId: uuid("invitation_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    statusIdx: index("partner_apps_status_idx").on(t.status),
+  }),
+);
+
+/** Countries the platform operates in. UAE is seeded active at launch. */
+export const countries = pgTable("countries", {
+  code: varchar("code", { length: 2 }).primaryKey(),
+  name: varchar("name", { length: 120 }).notNull(),
+  currency: varchar("currency", { length: 3 }).notNull().default("AED"),
+  dialCode: varchar("dial_code", { length: 8 }),
+  /** Cars can be sold FROM here. */
+  originEnabled: boolean("origin_enabled").notNull().default(false),
+  /** Cars can be shipped TO here. */
+  destinationEnabled: boolean("destination_enabled").notNull().default(false),
+});
+
+/**
+ * The country requirement pack. "Emirates ID" is not a schema column any more -
+ * it is a row: (AE, dealer, national_id, "Emirates ID", required).
+ */
+export const kycRequirements = pgTable(
+  "kyc_requirements",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    countryCode: varchar("country_code", { length: 2 }).notNull(),
+    /** Which kind of org must supply it. */
+    partyType: orgTypeEnum("party_type").notNull(),
+    /** Neutral type: national_id, passport, trade_licence, freight_licence... */
+    docType: varchar("doc_type", { length: 48 }).notNull(),
+    label: varchar("label", { length: 120 }).notNull(),
+    helpText: text("help_text"),
+    required: boolean("required").notNull().default(true),
+    /** Needs a two-sided capture (front + back). */
+    twoSided: boolean("two_sided").notNull().default(false),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => ({
+    lookupIdx: index("kyc_req_lookup_idx").on(t.countryCode, t.partyType),
+    uniq: uniqueIndex("kyc_req_uniq").on(t.countryCode, t.partyType, t.docType),
+  }),
+);
+
+export const docStatusEnum = pgEnum("doc_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
+
+/**
+ * Country-agnostic identity/verification documents, replacing the hardcoded
+ * `users.emirates_id_*` and `dealers.trade_licence_*` columns. Attached to a
+ * user (personal ID) or an org (company papers).
+ */
+export const identityDocuments = pgTable(
+  "identity_documents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id").references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
+    countryCode: varchar("country_code", { length: 2 }).notNull().default("AE"),
+    docType: varchar("doc_type", { length: 48 }).notNull(),
+    docNumber: varchar("doc_number", { length: 64 }),
+    frontMediaId: uuid("front_media_id"),
+    backMediaId: uuid("back_media_id"),
+    expiresAt: timestamp("expires_at"),
+    status: docStatusEnum("status").notNull().default("pending"),
+    rejectionReason: text("rejection_reason"),
+    submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+    reviewedAt: timestamp("reviewed_at"),
+    reviewedByUserId: uuid("reviewed_by_user_id"),
+  },
+  (t) => ({
+    userIdx: index("identity_docs_user_idx").on(t.userId),
+    orgIdx: index("identity_docs_org_idx").on(t.orgId),
+    statusIdx: index("identity_docs_status_idx").on(t.status),
+  }),
+);
+
+/* ===========================================================================
+   CONVERSATION LAYER — one thread per record, many parties, per-message
+   visibility.
+
+   Deliberately NOT one inbox per party-pair. A shipment involves a buyer, a
+   dealer and a forwarder; splitting that into three pairwise inboxes is what
+   fragments a transaction. Instead: one canonical thread bound to the subject
+   record, every participant reads it, and a message can be narrowed with
+   `visibility` when someone needs a private word with the platform.
+   =========================================================================== */
+
+export const conversationKindEnum = pgEnum("conversation_kind", [
+  "listing",
+  "quote",
+  "order",
+  "shipment",
+  "support",
+]);
+
+/** Who may read a given message inside an otherwise shared thread. */
+export const messageVisibilityEnum = pgEnum("message_visibility", [
+  "all_parties",
+  "admin_only",
+  "buyer_admin",
+  "dealer_admin",
+  "forwarder_admin",
+]);
+
+export const conversations = pgTable(
+  "conversations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    kind: conversationKindEnum("kind").notNull(),
+    /** The record this thread hangs off (listing / quote / order / shipment). */
+    subjectId: uuid("subject_id"),
+    title: varchar("title", { length: 240 }),
+    /** Denormalized for inbox ordering without touching the message table. */
+    lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
+    lastMessagePreview: varchar("last_message_preview", { length: 200 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    subjectIdx: index("conversations_subject_idx").on(t.kind, t.subjectId),
+    recentIdx: index("conversations_recent_idx").on(t.lastMessageAt),
+  }),
+);
+
+/**
+ * Membership IS the authorization. A read or write is allowed only when the
+ * caller has a row here - there is no "or admin sees everything" shortcut in
+ * the query layer; admins are added as participants explicitly.
+ */
+export const conversationParticipants = pgTable(
+  "conversation_participants",
+  {
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id").references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
+    /** Party role in THIS thread - drives which visibility levels they see. */
+    partyRole: orgTypeEnum("party_role").notNull().default("buyer"),
+    /** Unread counting: messages newer than this are unread for this user. */
+    lastReadAt: timestamp("last_read_at"),
+    mutedAt: timestamp("muted_at"),
+    leftAt: timestamp("left_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.conversationId, t.userId] }),
+    userIdx: index("conv_participants_user_idx").on(t.userId),
+  }),
+);
+
+export const messages = pgTable(
+  "messages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    senderUserId: uuid("sender_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    senderOrgId: uuid("sender_org_id").references(() => organizations.id, {
+      onDelete: "set null",
+    }),
+    /** Party role at send time, so history survives a role change. */
+    senderRole: orgTypeEnum("sender_role").notNull().default("buyer"),
+    body: text("body").notNull(),
+    visibility: messageVisibilityEnum("visibility")
+      .notNull()
+      .default("all_parties"),
+    /** Set for system-generated milestone/status posts in the same timeline. */
+    systemEvent: varchar("system_event", { length: 48 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    convIdx: index("messages_conv_idx").on(t.conversationId, t.createdAt),
+  }),
+);
+
+/* ===========================================================================
+   FREIGHT FORWARDING — the added service.
+
+   Two rules drive this shape:
+   1. A SHIPMENT IS NOT AN ORDER. Forwarders consolidate 2-4 cars from
+      different buyers and dealers into one container, so a shipment holds
+      many lines and each line points at one order. Modelling one shipment per
+      order would have to be undone the first time anyone consolidates.
+   2. STATUS IS AN EVENT LOG, not a column. shipmentEvents is append-only and
+      follows the DCSA track-and-trace shape (category + code + ACT/EST/PLN),
+      so the same code recorded as EST is the ETA and as ACT is the arrival.
+      `shipments.status` is a cached projection for querying, never the truth.
+   =========================================================================== */
+
+/** RO-RO has no container number, so it gets no carrier API coverage. */
+export const shipmentModeEnum = pgEnum("shipment_mode", [
+  "roro",
+  "container_fcl",
+  "container_lcl",
+  "air",
+]);
+
+/** Decides who pays and who acts at each leg. */
+export const incotermEnum = pgEnum("incoterm", [
+  "EXW",
+  "FOB",
+  "CFR",
+  "CIF",
+  "DAP",
+  "DDP",
+]);
+
+export const freightRequestStatusEnum = pgEnum("freight_request_status", [
+  "open",
+  "awarded",
+  "cancelled",
+  "expired",
+]);
+
+export const freightQuoteStatusEnum = pgEnum("freight_quote_status", [
+  "invited",
+  "submitted",
+  "withdrawn",
+  "accepted",
+  "rejected",
+  "expired",
+]);
+
+/** Buyer-facing progress. Projected from the event log. */
+export const shipmentStatusEnum = pgEnum("shipment_status", [
+  "booked",
+  "collected",
+  "export_clearance",
+  "at_origin_port",
+  "loaded",
+  "in_transit",
+  "arrived",
+  "import_clearance",
+  "released",
+  "delivered",
+  "cancelled",
+]);
+
+export const shipmentEventCategoryEnum = pgEnum("shipment_event_category", [
+  "SHIPMENT",
+  "TRANSPORT",
+  "EQUIPMENT",
+]);
+
+/** DCSA classifier: the same event code as a plan, an estimate, or a fact. */
+export const shipmentEventClassifierEnum = pgEnum("shipment_event_classifier", [
+  "PLN",
+  "EST",
+  "ACT",
+]);
+
+export const shipmentDocStatusEnum = pgEnum("shipment_doc_status", [
+  "draft",
+  "pending_review",
+  "approved",
+  "rejected",
+  "issued",
+  "void",
+]);
+
+/**
+ * Lanes a forwarder actually serves. An RFQ fans out only to forwarders whose
+ * lane matches - never a blast to every forwarder on the platform.
+ */
+export const forwarderLanes = pgTable(
+  "forwarder_lanes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    originCountry: varchar("origin_country", { length: 2 }).notNull(),
+    destCountry: varchar("dest_country", { length: 2 }).notNull(),
+    mode: shipmentModeEnum("mode").notNull().default("roro"),
+    /** Indicative transit for buyer-facing estimates. */
+    transitDays: integer("transit_days"),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    matchIdx: index("forwarder_lanes_match_idx").on(
+      t.originCountry,
+      t.destCountry,
+      t.mode,
+      t.active,
+    ),
+    orgIdx: index("forwarder_lanes_org_idx").on(t.orgId),
+  }),
+);
+
+/** The buyer's request for shipping on a completed order (the RFQ). */
+export const freightRequests = pgTable(
+  "freight_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    reference: varchar("reference", { length: 24 }).notNull().unique(),
+    orderId: uuid("order_id").references(() => orders.id, {
+      onDelete: "set null",
+    }),
+    buyerUserId: uuid("buyer_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    buyerOrgId: uuid("buyer_org_id").references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
+    originCountry: varchar("origin_country", { length: 2 })
+      .notNull()
+      .default("AE"),
+    originCity: varchar("origin_city", { length: 120 }),
+    destCountry: varchar("dest_country", { length: 2 }).notNull(),
+    destCity: varchar("dest_city", { length: 120 }),
+    destPort: varchar("dest_port", { length: 120 }),
+    mode: shipmentModeEnum("mode").notNull().default("roro"),
+    incoterm: incotermEnum("incoterm").notNull().default("CIF"),
+    vehicleCount: integer("vehicle_count").notNull().default(1),
+    /** Snapshot of what is being shipped, so the RFQ survives listing edits. */
+    vehicleSummary: jsonb("vehicle_summary"),
+    notes: text("notes"),
+    status: freightRequestStatusEnum("status").notNull().default("open"),
+    expiresAt: timestamp("expires_at"),
+    awardedQuoteId: uuid("awarded_quote_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    statusIdx: index("freight_requests_status_idx").on(t.status),
+    buyerIdx: index("freight_requests_buyer_idx").on(t.buyerUserId),
+    laneIdx: index("freight_requests_lane_idx").on(
+      t.originCountry,
+      t.destCountry,
+    ),
+  }),
+);
+
+/**
+ * One row per invited forwarder. Created at fan-out with status "invited", so
+ * response rates are measurable and a forwarder can decline without silence.
+ * NOTE: an invitation does NOT grant sight of the buyer's identity - only the
+ * lane, the vehicle summary and the dates.
+ */
+export const freightQuotes = pgTable(
+  "freight_quotes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    requestId: uuid("request_id")
+      .notNull()
+      .references(() => freightRequests.id, { onDelete: "cascade" }),
+    forwarderOrgId: uuid("forwarder_org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    status: freightQuoteStatusEnum("status").notNull().default("invited"),
+    currency: varchar("currency", { length: 3 }).notNull().default("AED"),
+    /** Minor units (fils/cents) - avoids float rounding on money. */
+    totalMinor: bigint("total_minor", { mode: "number" }),
+    /** Itemised: freight, THC, documentation, customs, insurance, inland. */
+    lineItems: jsonb("line_items"),
+    transitDays: integer("transit_days"),
+    /** Mandatory on submit - quotes expire by cron, not by hope. */
+    validUntil: timestamp("valid_until"),
+    notes: text("notes"),
+    invitedAt: timestamp("invited_at").defaultNow().notNull(),
+    respondedAt: timestamp("responded_at"),
+    decidedAt: timestamp("decided_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    requestIdx: index("freight_quotes_request_idx").on(t.requestId),
+    forwarderIdx: index("freight_quotes_forwarder_idx").on(t.forwarderOrgId),
+    uniq: uniqueIndex("freight_quotes_uniq").on(t.requestId, t.forwarderOrgId),
+  }),
+);
+
+export const shipments = pgTable(
+  "shipments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    reference: varchar("reference", { length: 24 }).notNull().unique(),
+    forwarderOrgId: uuid("forwarder_org_id").references(
+      () => organizations.id,
+      { onDelete: "set null" },
+    ),
+    quoteId: uuid("quote_id").references(() => freightQuotes.id, {
+      onDelete: "set null",
+    }),
+    mode: shipmentModeEnum("mode").notNull().default("roro"),
+    incoterm: incotermEnum("incoterm").notNull().default("CIF"),
+    originCountry: varchar("origin_country", { length: 2 })
+      .notNull()
+      .default("AE"),
+    originPort: varchar("origin_port", { length: 120 }),
+    destCountry: varchar("dest_country", { length: 2 }).notNull(),
+    destPort: varchar("dest_port", { length: 120 }),
+    /** Carrier identifiers, appearing in this order as the shipment matures. */
+    bookingNumber: varchar("booking_number", { length: 64 }),
+    containerNumber: varchar("container_number", { length: 32 }),
+    blNumber: varchar("bl_number", { length: 64 }),
+    vesselName: varchar("vessel_name", { length: 120 }),
+    voyageNumber: varchar("voyage_number", { length: 40 }),
+    etd: timestamp("etd"),
+    eta: timestamp("eta"),
+    atd: timestamp("atd"),
+    ata: timestamp("ata"),
+    /** Cached projection of the event log - never the source of truth. */
+    status: shipmentStatusEnum("status").notNull().default("booked"),
+    statusUpdatedAt: timestamp("status_updated_at").defaultNow().notNull(),
+    /**
+     * Documents of title stay locked until funds clear. Releasing a telex
+     * before payment hands over control of the cargo, so this is an explicit
+     * state rather than an implicit convention.
+     */
+    documentReleaseHold: boolean("document_release_hold")
+      .notNull()
+      .default(true),
+    documentReleasedAt: timestamp("document_released_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    statusIdx: index("shipments_status_idx").on(t.status),
+    forwarderIdx: index("shipments_forwarder_idx").on(t.forwarderOrgId),
+    containerIdx: index("shipments_container_idx").on(t.containerNumber),
+  }),
+);
+
+/**
+ * One vehicle on a shipment. This is the many-to-many join that makes
+ * consolidation possible: several lines, from several orders and several
+ * dealers, can share one container.
+ */
+export const shipmentLines = pgTable(
+  "shipment_lines",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    shipmentId: uuid("shipment_id")
+      .notNull()
+      .references(() => shipments.id, { onDelete: "cascade" }),
+    orderId: uuid("order_id").references(() => orders.id, {
+      onDelete: "set null",
+    }),
+    listingId: uuid("listing_id").references(() => listings.id, {
+      onDelete: "set null",
+    }),
+    buyerUserId: uuid("buyer_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    dealerId: uuid("dealer_id").references(() => dealers.id, {
+      onDelete: "set null",
+    }),
+    description: varchar("description", { length: 240 }),
+    vin: varchar("vin", { length: 32 }),
+    /** House B/L - one per customer even when the container has a single MBL. */
+    houseBlNumber: varchar("house_bl_number", { length: 64 }),
+    declaredValueMinor: bigint("declared_value_minor", { mode: "number" }),
+    currency: varchar("currency", { length: 3 }).notNull().default("AED"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    shipmentIdx: index("shipment_lines_shipment_idx").on(t.shipmentId),
+    orderIdx: index("shipment_lines_order_idx").on(t.orderId),
+    buyerIdx: index("shipment_lines_buyer_idx").on(t.buyerUserId),
+  }),
+);
+
+/**
+ * Who can see this shipment. Row-scoping by org, exactly like conversations.
+ * The winning forwarder gets a row ONLY at award - losing bidders never
+ * become participants, which is the main leakage boundary in the RFQ flow.
+ */
+export const shipmentParticipants = pgTable(
+  "shipment_participants",
+  {
+    shipmentId: uuid("shipment_id")
+      .notNull()
+      .references(() => shipments.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    partyRole: orgTypeEnum("party_role").notNull(),
+    removedAt: timestamp("removed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.shipmentId, t.orgId] }),
+    orgIdx: index("shipment_participants_org_idx").on(t.orgId),
+  }),
+);
+
+/**
+ * Append-only. Never UPDATE, never DELETE - a three-party financial
+ * transaction needs a defensible history when someone disputes a date.
+ * `eventAt` is when it happened in the world; `recordedAt` is when we learned
+ * it. Those diverge constantly and both matter.
+ */
+export const shipmentEvents = pgTable(
+  "shipment_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    shipmentId: uuid("shipment_id")
+      .notNull()
+      .references(() => shipments.id, { onDelete: "cascade" }),
+    /** Null = whole shipment; set = this one vehicle (gate-in, release). */
+    lineId: uuid("line_id").references(() => shipmentLines.id, {
+      onDelete: "cascade",
+    }),
+    category: shipmentEventCategoryEnum("category").notNull(),
+    /** Country-neutral milestone key; labels come from the country pack. */
+    milestone: varchar("milestone", { length: 48 }).notNull(),
+    classifier: shipmentEventClassifierEnum("classifier")
+      .notNull()
+      .default("ACT"),
+    eventAt: timestamp("event_at").notNull(),
+    recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+    location: varchar("location", { length: 160 }),
+    /** api | forwarder | admin - RO-RO milestones are always manual. */
+    source: varchar("source", { length: 24 }).notNull().default("forwarder"),
+    actorOrgId: uuid("actor_org_id").references(() => organizations.id, {
+      onDelete: "set null",
+    }),
+    actorUserId: uuid("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    note: text("note"),
+    payload: jsonb("payload"),
+  },
+  (t) => ({
+    shipmentIdx: index("shipment_events_shipment_idx").on(
+      t.shipmentId,
+      t.eventAt,
+    ),
+    milestoneIdx: index("shipment_events_milestone_idx").on(t.milestone),
+  }),
+);
+
+/**
+ * Shipment paperwork. `visibleTo` is an explicit allow-list of party roles
+ * because some documents must NOT reach every party - a commercial invoice
+ * showing dealer cost should not go to the forwarder.
+ */
+export const shipmentDocuments = pgTable(
+  "shipment_documents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    shipmentId: uuid("shipment_id")
+      .notNull()
+      .references(() => shipments.id, { onDelete: "cascade" }),
+    lineId: uuid("line_id").references(() => shipmentLines.id, {
+      onDelete: "cascade",
+    }),
+    /** commercial_invoice | bill_of_lading | export_certificate | ... */
+    docType: varchar("doc_type", { length: 48 }).notNull(),
+    title: varchar("title", { length: 200 }),
+    mediaId: uuid("media_id"),
+    version: integer("version").notNull().default(1),
+    status: shipmentDocStatusEnum("status").notNull().default("draft"),
+    /** Party roles allowed to read it. */
+    visibleTo: jsonb("visible_to"),
+    uploadedByOrgId: uuid("uploaded_by_org_id").references(
+      () => organizations.id,
+      { onDelete: "set null" },
+    ),
+    uploadedByUserId: uuid("uploaded_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedAt: timestamp("reviewed_at"),
+    rejectionReason: text("rejection_reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    shipmentIdx: index("shipment_docs_shipment_idx").on(t.shipmentId),
+    typeIdx: index("shipment_docs_type_idx").on(t.docType),
+  }),
+);
+
+/**
+ * Party-private money. Each row is owned by ONE org, so ordinary row-level
+ * scoping gives field-level secrecy: the dealer's cost, the forwarder's buy
+ * rate and the platform's margin simply are not rows the other parties can
+ * select. Far safer than remembering to omit a column in every query.
+ */
+export const shipmentFinancials = pgTable(
+  "shipment_financials",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    shipmentId: uuid("shipment_id")
+      .notNull()
+      .references(() => shipments.id, { onDelete: "cascade" }),
+    /** The ONLY org that may read this row (plus platform admins). */
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    /** buyer_payable | forwarder_receivable | platform_commission | cost */
+    kind: varchar("kind", { length: 32 }).notNull(),
+    currency: varchar("currency", { length: 3 }).notNull().default("AED"),
+    amountMinor: bigint("amount_minor", { mode: "number" }).notNull(),
+    description: varchar("description", { length: 240 }),
+    settledAt: timestamp("settled_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    shipmentIdx: index("shipment_financials_shipment_idx").on(t.shipmentId),
+    orgIdx: index("shipment_financials_org_idx").on(t.orgId),
+  }),
+);

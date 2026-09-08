@@ -1,62 +1,28 @@
-import { setRequestLocale } from "next-intl/server";
 import { DashboardHeader } from "@/components/dashboard/header";
-import { ConversationInbox } from "@/components/messages/conversation-inbox";
-import { getConversationsFor } from "@/lib/data/conversations";
-import {
-  getDashboardRole,
-  getOrSyncUser,
-  getCurrentDealer,
-} from "@/lib/data/users";
+import { ChatInbox } from "@/components/chat/chat-inbox";
 
 export const dynamic = "force-dynamic";
 
 /**
- * One inbox for everyone. Buyers and dealers get the same chat experience —
- * enquiries and quote negotiations merged into a single history, so nobody has
- * to remember which feature a conversation started in.
+ * The unified inbox. One place for every conversation this account has — with
+ * sellers, with buyers, and with the freight partner once a shipment is
+ * booked — instead of a separate list per relationship.
  */
 export default async function MessagesPage({
-  params,
+  searchParams,
 }: {
-  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ c?: string }>;
 }) {
-  const { locale } = await params;
-  setRequestLocale(locale);
-
-  const [role, user] = await Promise.all([
-    getDashboardRole().catch(() => "buyer" as const),
-    getOrSyncUser().catch(() => null),
-  ]);
-  const isSeller = role === "dealer" || role === "admin";
-  const dealer = isSeller ? await getCurrentDealer().catch(() => null) : null;
-
-  const conversations = user
-    ? await getConversationsFor(
-        user.id,
-        isSeller ? "seller" : "buyer",
-        dealer?.id,
-      ).catch(() => [])
-    : [];
-
-  const needsReply = conversations.filter((c) => c.awaitingMe).length;
+  const { c } = await searchParams;
 
   return (
     <>
       <DashboardHeader
         title="Messages"
-        subtitle={
-          conversations.length === 0
-            ? "Your conversations with buyers and sellers"
-            : `${conversations.length} conversation${conversations.length === 1 ? "" : "s"}${
-                needsReply ? ` · ${needsReply} awaiting your reply` : ""
-              }`
-        }
+        subtitle="Your conversations with sellers, buyers and freight partners"
       />
       <main className="p-5">
-        <ConversationInbox
-          conversations={conversations}
-          audience={isSeller ? "seller" : "buyer"}
-        />
+        <ChatInbox initialId={c} />
       </main>
     </>
   );

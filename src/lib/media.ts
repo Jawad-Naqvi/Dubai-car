@@ -46,11 +46,26 @@ let counter = 0;
  * uploadImages, just not restricted to image bytes. Used for KYC documents
  * (Emirates ID scans, trade license PDFs).
  */
-export async function uploadFiles(files: File[]): Promise<string[]> {
-  return uploadImages(files);
+export async function uploadFiles(
+  files: File[],
+  opts: MediaOwner = {},
+): Promise<string[]> {
+  // Identity documents are PRIVATE by default. They must never land in the
+  // same publicly-served namespace as listing photos.
+  return uploadImages(files, { visibility: "private", ...opts });
 }
 
-export async function uploadImages(files: File[]): Promise<string[]> {
+/** Who owns an upload, and whether it may be served to anyone. */
+export interface MediaOwner {
+  visibility?: "public" | "private";
+  ownerUserId?: string | null;
+  ownerOrgId?: string | null;
+}
+
+export async function uploadImages(
+  files: File[],
+  owner: MediaOwner = {},
+): Promise<string[]> {
   // ---- Postgres storage (default once DB is connected) ----
   if (!isR2Enabled() && isDbEnabled()) {
     const urls: string[] = [];
@@ -62,6 +77,9 @@ export async function uploadImages(files: File[]): Promise<string[]> {
           mimeType: file.type || "image/jpeg",
           size: bytes.length,
           data: bytes,
+          visibility: owner.visibility ?? "public",
+          ownerUserId: owner.ownerUserId ?? null,
+          ownerOrgId: owner.ownerOrgId ?? null,
         })
         .returning({ id: mediaAssets.id });
       urls.push(`/api/media/${row.id}`);

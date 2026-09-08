@@ -195,7 +195,7 @@ export function demoId(prefix: string) {
  * the database and broke the write with a unique-constraint error. Time-based
  * ids keep working across restarts, deploys and multiple server instances.
  */
-export function makeReference(prefix: "QT" | "OR") {
+export function makeReference(prefix: "QT" | "OR" | "FR" | "SH") {
   const stamp = Date.now().toString(36).toUpperCase().slice(-6);
   // 4 random chars (~1.7M combinations) so two references minted in the same
   // millisecond — concurrent requests — still don't collide.

@@ -6,10 +6,26 @@ import { isDbEnabled } from "./lib/db/enabled";
 
 const handleI18nRouting = createIntlMiddleware(routing);
 
-// Dashboard/admin areas are open when there's no real DB (demo) or when
-// OPEN_DASHBOARDS=true (testing against a live DB). In production with the flag
-// off, full Clerk auth + role gating below applies.
-const DEMO_MODE = !isDbEnabled() || process.env.OPEN_DASHBOARDS === "true";
+/**
+ * ONE FRONT DOOR.
+ *
+ * There is a single sign-in page for every kind of account. Buyers, dealers,
+ * freight forwarders and platform admins all authenticate through Clerk at
+ * /sign-in; what differs afterwards is only where /post-auth sends them and
+ * what their organization is allowed to do.
+ *
+ * This replaces a second, parallel login: /admin-login accepted a 4-digit PIN
+ * (defaulting to "1234") and set a static `dxb_admin` cookie whose expected
+ * value defaulted to the literal string "dxb-admin". Anyone could set that
+ * cookie by hand and read the whole admin console — the user table, dealer KYC
+ * status and revenue — with no account at all. Admin is now a role on a real
+ * signed-in identity, granted by invitation, and revocable.
+ */
+
+// Local-only convenience. Never loosens anything in a production build.
+const DEV_OPEN =
+  process.env.NODE_ENV !== "production" &&
+  (!isDbEnabled() || process.env.OPEN_DASHBOARDS === "true");
 
 const isProtectedRoute = createRouteMatcher([
   "/(.*)/dashboard(.*)",
@@ -19,8 +35,6 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 const isAdminRoute = createRouteMatcher(["/(.*)/admin(.*)", "/admin(.*)"]);
-
-const ADMIN_COOKIE = "dxb_admin";
 
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
@@ -32,22 +46,23 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   const locale = pathname.split("/")[1] || "en";
-  const isAdminLogin = pathname.includes("/admin-login");
 
-  // --- Admin PIN gate: /admin/* requires a valid admin PIN cookie ---
-  if (isAdminRoute(req) && !isAdminLogin) {
-    const token = req.cookies.get(ADMIN_COOKIE)?.value;
-    const expected = process.env.ADMIN_SESSION_TOKEN ?? "dxb-admin";
-    if (!token || token !== expected) {
-      return NextResponse.redirect(new URL(`/${locale}/admin-login`, req.url));
-    }
-  }
+  if (isProtectedRoute(req) && !DEV_OPEN) {
+    const { userId, sessionClaims, redirectToSignIn } = await auth();
 
-  // --- Dealer dashboard gate (Clerk) — admin handled by PIN above ---
-  if (!DEMO_MODE && isProtectedRoute(req) && !isAdminRoute(req)) {
-    const { userId, redirectToSignIn } = await auth();
+    // Not signed in: everyone goes to the same sign-in page.
     if (!userId) {
       return redirectToSignIn({ returnBackUrl: req.url });
+    }
+
+    // Signed in but not an admin: /admin/* is simply not their area. Send them
+    // to their own dashboard rather than a login prompt they cannot satisfy.
+    if (isAdminRoute(req)) {
+      const role = (sessionClaims?.metadata as { role?: string } | undefined)
+        ?.role;
+      if (role !== "admin") {
+        return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url));
+      }
     }
   }
 

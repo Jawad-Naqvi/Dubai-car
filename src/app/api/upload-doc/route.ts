@@ -56,6 +56,12 @@ export async function POST(req: Request) {
     }
   }
 
-  const urls = await uploadFiles(files);
+  // Stamp the uploader onto the asset so /api/media/[id] can decide who may
+  // read it back. Without an owner a private document is readable by nobody
+  // but an admin, which is the safe direction to fail.
+  const urls = await uploadFiles(files, {
+    visibility: "private",
+    ownerUserId: user.id,
+  });
   return NextResponse.json({ urls, stored: isStorageEnabled() });
 }

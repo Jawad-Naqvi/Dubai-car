@@ -1,6 +1,5 @@
 import { SignIn } from "@clerk/nextjs";
 import { Link } from "@/i18n/routing";
-import { ShieldCheck } from "lucide-react";
 import { AuthShell, clerkAuthAppearance } from "@/components/auth/auth-shell";
 
 export default async function SignInPage() {
@@ -22,13 +21,6 @@ export default async function SignInPage() {
               Create an account
             </Link>
           </span>
-          <Link
-            href="/admin-login"
-            className="inline-flex items-center gap-1.5 text-[11px] text-muted hover:text-[#141414] transition-colors"
-          >
-            <ShieldCheck className="h-3 w-3" />
-            Admin login
-          </Link>
         </div>
       }
     >

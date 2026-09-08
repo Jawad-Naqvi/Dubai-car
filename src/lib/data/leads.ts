@@ -4,8 +4,11 @@ import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/lib/db";
 import { leads, listings, dealers, users, leadReplies, type Lead } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
+import { isAdminAllowed } from "@/lib/data/users";
 import { demoStore, demoId, type DemoLead } from "./demo-store";
 import { sendLeadNotification, sendEmail } from "@/lib/notify";
+import { getOrCreateConversation } from "@/lib/data/chat";
+import { conversations, messages as chatMessages } from "@/lib/db/schema";
 import { sendWhatsApp } from "@/lib/whatsapp";
 
 const LEAD_TYPE_LABEL: Record<string, string> = {
@@ -114,6 +117,8 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
   let recipientEmail: string | undefined;
   let recipientWhatsapp: string | undefined;
   let listingTitle: string | undefined;
+  // Who owns the car — needed to open a two-party conversation on the enquiry.
+  let sellerUserId: string | undefined;
   if (input.listingId) {
     const dealerUser = alias(users, "dealer_user");
     const sellerUser = alias(users, "seller_user");
@@ -129,6 +134,8 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
         dealerWhatsapp: dealers.whatsapp,
         dealerPhone: dealers.phone,
         sellerPhone: sellerUser.phone,
+        dealerUserId: dealerUser.id,
+        sellerUserId: sellerUser.id,
       })
       .from(listings)
       .leftJoin(dealers, eq(listings.dealerId, dealers.id))
@@ -143,6 +150,7 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
       recipientWhatsapp =
         l[0].dealerWhatsapp ?? l[0].dealerPhone ?? l[0].sellerPhone ?? undefined;
       listingTitle = `${l[0].year} ${l[0].make} ${l[0].model}`;
+      sellerUserId = l[0].dealerUserId ?? l[0].sellerUserId ?? undefined;
     }
     await db
       .update(listings)
@@ -195,6 +203,28 @@ export async function createLead(input: CreateLeadInput): Promise<{ id: string }
     }),
     label: "new lead",
   });
+
+  // Open the durable thread for this enquiry. The lead is the transaction
+  // record; the conversation is where the two of them actually talk, and it is
+  // the same inbox the buyer uses for every other vendor they message.
+  if (input.buyerId && sellerUserId && input.buyerId !== sellerUserId) {
+    try {
+      const conversationId = await getOrCreateConversation({
+        kind: "listing",
+        subjectId: row.id,
+        title: listingTitle ?? "Vehicle enquiry",
+        participants: [
+          { userId: input.buyerId, role: "buyer" },
+          { userId: sellerUserId, role: "dealer" },
+        ],
+      });
+      if (conversationId && input.message?.trim()) {
+        await seedFirstMessage(conversationId, input.buyerId, input.message.trim());
+      }
+    } catch {
+      // A chat failure must never lose the lead itself.
+    }
+  }
 
   return { id: row.id };
 }
@@ -391,7 +421,12 @@ export async function getLeadsForDealer(
             .from(listings)
             .where(eq(listings.sellerId, sellerId)),
         )
-      : undefined;
+      : // SECURITY: neither a dealer nor a seller identity was supplied, so
+        // there is no owner to scope to. Deny rather than fall through to an
+        // unfiltered query — `.where(undefined)` returns EVERY dealer's leads
+        // (buyer names, emails, phones) to whoever asked. Admins that really
+        // want the global view call getAllLeadsForAdmin(), which says so.
+        sql`false`;
 
   const rows = await db
     .select()
@@ -510,4 +545,61 @@ export async function getMessagesForUser(userId: string): Promise<MessageThread[
   } catch {
     return [];
   }
+}
+
+/**
+ * EVERY lead on the platform, for the admin console only.
+ *
+ * Exists so that "give me all leads" has to be asked for by name. The previous
+ * behaviour — getLeadsForDealer() with no arguments quietly returning all of
+ * them — meant three ordinary dashboard pages were leaking every dealer's
+ * buyer contact details to every other dealer.
+ */
+export async function getAllLeadsForAdmin(): Promise<LeadView[]> {
+  if (!(await isAdminAllowed())) return [];
+  if (!isDbEnabled()) return getLeadsForDealer(undefined, undefined);
+  const rows = await db
+    .select()
+    .from(leads)
+    .orderBy(desc(leads.createdAt))
+    .limit(200);
+  const replyMap = await getRepliesFor(rows.map((r) => r.id));
+  return rows.map((l) => ({
+    id: l.id,
+    type: l.type,
+    buyerName: l.buyerName ?? "—",
+    buyerEmail: l.buyerEmail ?? "",
+    buyerPhone: l.buyerPhone ?? "",
+    message: l.message ?? "",
+    destinationCountry: l.destinationCountry ?? undefined,
+    feeAED: l.feeAED,
+    status: l.status,
+    createdAt: l.createdAt.toISOString(),
+    listingId: l.listingId ?? undefined,
+    replies: replyMap.get(l.id) ?? [],
+  }));
+}
+
+/**
+ * Writes the buyer's opening enquiry as the first message of the thread, so a
+ * conversation never starts empty and the seller sees what was actually asked.
+ * Inserted directly (rather than via sendMessage) because createLead runs for
+ * guests too, where there is no session to resolve a participant from.
+ */
+async function seedFirstMessage(
+  conversationId: string,
+  buyerUserId: string,
+  body: string,
+): Promise<void> {
+  await db.insert(chatMessages).values({
+    conversationId,
+    senderUserId: buyerUserId,
+    senderRole: "buyer",
+    body,
+    visibility: "all_parties",
+  });
+  await db
+    .update(conversations)
+    .set({ lastMessageAt: new Date(), lastMessagePreview: body.slice(0, 200) })
+    .where(eq(conversations.id, conversationId));
 }

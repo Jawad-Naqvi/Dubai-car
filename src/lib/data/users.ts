@@ -42,18 +42,33 @@ export async function getCurrentRole(): Promise<Role> {
   return role ?? "buyer";
 }
 
-/** True when dashboards/admin are intentionally opened for testing. */
+/**
+ * True when dashboards are intentionally opened for local testing.
+ *
+ * HARD-DISABLED IN PRODUCTION. This flag switches off ownership checks across
+ * listings, leads, replies and the admin API; left reachable in a deployed
+ * build it lets an anonymous request delete listings, reprice cars, post into
+ * strangers' message threads and read dealers' identity documents. A testing
+ * convenience must not be one environment variable away from disabling the
+ * authorization model, so the production check is not overridable.
+ */
 export function dashboardsOpen(): boolean {
+  if (process.env.NODE_ENV === "production") return false;
   return !isDbEnabled() || process.env.OPEN_DASHBOARDS === "true";
 }
 
 /**
- * Admin guard for API routes. Open in demo mode or when OPEN_DASHBOARDS=true (for
- * testing against a live DB); otherwise requires the Clerk admin role.
+ * Admin guard for API routes.
+ *
+ * Note what this deliberately no longer does: it does not treat "no database"
+ * or the open-dashboards flag as proof of admin. Demo mode should show demo
+ * data, not hand out moderation, dealer approval and user-role editing.
  */
 export async function isAdminAllowed(): Promise<boolean> {
-  if (dashboardsOpen()) return true;
-  return (await getCurrentRole()) === "admin";
+  if ((await getCurrentRole()) === "admin") return true;
+  // Local development convenience only — never in a production build.
+  if (process.env.NODE_ENV !== "production" && dashboardsOpen()) return true;
+  return false;
 }
 
 export interface CurrentUser {
@@ -141,7 +156,12 @@ export async function getOrSyncUser(): Promise<CurrentUser | null> {
   };
 }
 
-export type SidebarRole = "dealer" | "buyer" | "b2b" | "admin";
+export type SidebarRole =
+  | "dealer"
+  | "buyer"
+  | "b2b"
+  | "admin"
+  | "forwarder";
 
 /**
  * Which dashboard a signed-in user sees. Resolves from the real Clerk/DB role
@@ -154,6 +174,18 @@ export async function getDashboardRole(): Promise<SidebarRole> {
   const user = await getOrSyncUser();
   if (!user) return "dealer";
   if (user.role === "admin") return "admin";
+
+  // Freight partners exist only as an organization membership (there is no
+  // "forwarder" value on users.role), so resolve the workspace from the org.
+  // Imported lazily to avoid a cycle: orgs.ts depends on this module.
+  try {
+    const { getOrgsForUser } = await import("@/lib/data/orgs");
+    const orgs = await getOrgsForUser(user.id);
+    if (orgs.some((o) => o.type === "forwarder")) return "forwarder";
+  } catch {
+    // Fall through to the role-based answer.
+  }
+
   if (user.role === "b2b_importer") return "b2b";
   if (user.role === "dealer") return "dealer";
   return "buyer";

@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
-import { getOrSyncUser } from "@/lib/data/users";
+import { resolvePostAuthPath } from "@/lib/data/onboarding";
 
 /**
- * Post-sign-in gateway. Dealers, B2B importers, and admins go to the
- * operational dashboard. Individuals land back on the public site to browse —
- * UNLESS they haven't verified their Emirates ID yet, in which case they're
- * sent to /verify-identity first (Emirates ID is required for every account).
- * Set as Clerk's fallbackRedirectUrl so it only fires when no explicit
- * redirect_url was requested (e.g. "sign in to reveal contact" keeps returning
- * to the listing).
+ * The single front door's landing strip.
+ *
+ * Every account — buyer, dealer, freight forwarder, admin — signs in at the
+ * same /sign-in page. This is the one place that decides where they go next,
+ * based on the organization they belong to rather than on anything the visitor
+ * could have put in a URL. New accounts land on /welcome to say what they're
+ * here to do.
  */
 export default async function PostAuthPage({
   params,
@@ -16,16 +16,5 @@ export default async function PostAuthPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const user = await getOrSyncUser().catch(() => null);
-  if (!user) redirect(`/${locale}`);
-  if (
-    user.role === "dealer" ||
-    user.role === "b2b_importer" ||
-    user.role === "admin"
-  ) {
-    redirect(`/${locale}/dashboard`);
-  }
-  // Individual (buyer role): require Emirates ID before letting them in.
-  if (!user.idVerified) redirect(`/${locale}/verify-identity`);
-  redirect(`/${locale}`);
+  redirect(await resolvePostAuthPath(locale));
 }

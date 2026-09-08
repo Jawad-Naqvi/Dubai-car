@@ -8,7 +8,7 @@ import {
   getModerationQueue,
   getRevenueData,
 } from "@/lib/data/admin";
-import { getLeadsForDealer } from "@/lib/data/leads";
+import { getAllLeadsForAdmin } from "@/lib/data/leads";
 import {
   Users,
   Building2,
@@ -35,7 +35,7 @@ export default async function AdminOverview() {
     getAdminUsers(),
     getModerationQueue(),
     getRevenueData(),
-    getLeadsForDealer(),
+    getAllLeadsForAdmin(),
   ]);
 
   const pendingDealers = dealers.filter((d) => !d.isVerified).length;
