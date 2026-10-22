@@ -62,7 +62,7 @@ export const MARKETS: Record<MarketCode, Market> = {
     locales: ["en", "hi"],
     // TODO(client decision): final India brand name. Placeholder for now.
     brandName: "Motors India",
-    regionLabel: "State",
+    regionLabel: "City",
     enabled: true,
   },
 };

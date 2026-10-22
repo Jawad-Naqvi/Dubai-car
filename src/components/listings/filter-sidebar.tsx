@@ -11,7 +11,6 @@ import {
   drivetrains,
   dealRatings,
   regionalSpecs,
-  emirates,
   conditions,
   exteriorColors,
   interiorColors,
@@ -22,6 +21,8 @@ import {
   type ColorOption,
 } from "@/lib/brand";
 import { modelGroupsForMakes } from "@/lib/car-models";
+import { getRegions } from "@/lib/regions";
+import { useMarket } from "@/components/market/market-provider";
 import { cn } from "@/lib/utils";
 import { useQueryState } from "@/lib/use-query-state";
 
@@ -192,6 +193,8 @@ export function FilterSidebar({
 }) {
   const t = useTranslations("filters");
   const { params, push } = useQueryState();
+  const market = useMarket();
+  const regions = getRegions(market.code);
 
   // Draft state seeded from the URL; committed on Apply.
   const [makes, setMakes] = useState<string[]>([]);
@@ -389,8 +392,8 @@ export function FilterSidebar({
             !onApplied && "max-h-[calc(100vh-140px)] overflow-y-auto pr-1",
           )}
         >
-          <FilterGroup title={t("emirate")}>
-            {emirates.map((e) => (
+          <FilterGroup title={market.code === "AE" ? t("emirate") : market.regionLabel}>
+            {regions.map((e) => (
               <CheckRow
                 key={e.id}
                 label={e.en}

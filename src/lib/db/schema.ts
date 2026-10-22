@@ -158,6 +158,8 @@ export const dealers = pgTable(
     tradeLicense: varchar("trade_license", { length: 64 }),
     tradeLicenseDocUrl: text("trade_license_doc_url"),
     emirate: varchar("emirate", { length: 32 }).notNull(),
+    /** Market this dealer operates in (scopes the dealers directory). */
+    countryCode: varchar("country_code", { length: 2 }).notNull().default("AE"),
     address: text("address"),
     lat: doublePrecision("lat"),
     lng: doublePrecision("lng"),

@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { dealers, listings } from "@/lib/db/schema";
 import { isDbEnabled } from "@/lib/db/enabled";
 import { mockDealers } from "@/lib/mock-data";
+import { getActiveMarketCode } from "@/lib/market-active";
 
 export interface DealerView {
   id: string;
@@ -27,19 +28,22 @@ export interface DealerView {
 }
 
 const cachedDealers = unstable_cache(
-  () => runGetDealers(),
+  (countryCode: string) => runGetDealers(countryCode),
   ["all-dealers"],
   { revalidate: 300, tags: ["dealers"] },
 );
 
 export async function getDealers(): Promise<DealerView[]> {
   if (!isDbEnabled()) {
+    // Mock dealers are all UAE; a non-AE market shows none in demo mode.
+    const code = await getActiveMarketCode();
+    if (code !== "AE") return [];
     return mockDealers.map((d) => ({ ...d, tagline: d.tagline }));
   }
-  return cachedDealers();
+  return cachedDealers(await getActiveMarketCode());
 }
 
-async function runGetDealers(): Promise<DealerView[]> {
+async function runGetDealers(countryCode: string): Promise<DealerView[]> {
   const rows = await db
     .select({
       dealer: dealers,
@@ -50,6 +54,7 @@ async function runGetDealers(): Promise<DealerView[]> {
       listings,
       sql`${listings.dealerId} = ${dealers.id} and ${listings.status} = 'active'`,
     )
+    .where(eq(dealers.countryCode, countryCode))
     .groupBy(dealers.id)
     .orderBy(desc(dealers.isFeatured), desc(dealers.rating));
 
