@@ -9,6 +9,7 @@ import { brand } from "@/lib/brand";
 import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { AccountMenu } from "./account-menu";
 import { NavSearch } from "./nav-search";
+import { MarketSwitcher } from "@/components/market/market-switcher";
 import { useSavedListings } from "@/lib/saved-listings";
 import { useCompare } from "@/lib/compare";
 
@@ -107,6 +108,8 @@ export function Nav() {
             <Globe className="h-3 w-3" />
             {locale === "en" ? "AR" : "EN"}
           </button>
+
+          <MarketSwitcher className="hidden md:block" />
 
           <CountIcon
             href="/compare"
