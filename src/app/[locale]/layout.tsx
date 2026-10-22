@@ -9,6 +9,8 @@ import { routing } from "@/i18n/routing";
 import { brand } from "@/lib/brand";
 import { Toaster } from "sonner";
 import { NativeBridge } from "@/components/native/native-bridge";
+import { MarketProvider } from "@/components/market/market-provider";
+import { getActiveMarketCode } from "@/lib/market-active";
 
 /**
  * Self-hosted fonts via next/font — no render-blocking request to Google's CDN,
@@ -52,6 +54,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const marketCode = await getActiveMarketCode();
   const isRTL = locale === "ar";
 
   return (
@@ -82,8 +85,9 @@ export default async function LocaleLayout({
           }}
         >
           <NextIntlClientProvider messages={messages}>
-            <NativeBridge />
-            {children}
+            <MarketProvider code={marketCode}>
+              <NativeBridge />
+              {children}
             <Toaster
               theme="light"
               position="top-center"
@@ -95,6 +99,7 @@ export default async function LocaleLayout({
                 },
               }}
             />
+            </MarketProvider>
           </NextIntlClientProvider>
         </ClerkProvider>
       </body>

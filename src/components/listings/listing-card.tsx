@@ -1,7 +1,10 @@
+"use client";
+
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { formatAED, monthlyEMI } from "@/lib/utils";
+import { monthlyEMI } from "@/lib/utils";
+import { useMoney } from "@/components/market/market-provider";
 import { MapPin, Gauge, Calendar, Fuel, BadgeCheck, TrendingDown } from "lucide-react";
 import type { MockListing } from "@/lib/mock-data";
 import { SaveButton } from "./save-button";
@@ -16,6 +19,7 @@ export function ListingCard({
   listing: MockListing;
   locale?: "en" | "ar";
 }) {
+  const money = useMoney();
   return (
     <div className="group relative rounded-lg bg-white border border-[#E5E5EA] overflow-hidden hover:border-[#B9B9C4] transition-colors duration-200 flex flex-col">
       <Link
@@ -70,18 +74,18 @@ export function ListingCard({
               <div className="text-lg font-bold text-[#141414] leading-none">
                 {listing.saleMode === "quote_only"
                   ? "On request"
-                  : formatAED(listing.priceAED, locale)}
+                  : money(listing.priceAED, locale)}
               </div>
               <DealBadge rating={listing.dealRating} showIcon={false} />
             </div>
             {listing.previousPrice ? (
               <div className="mt-0.5 flex items-center gap-1.5">
                 <span className="text-[10px] text-muted line-through">
-                  {formatAED(listing.previousPrice, locale)}
+                  {money(listing.previousPrice, locale)}
                 </span>
                 <span className="inline-flex items-center gap-0.5 rounded-full bg-[#137A43] text-white px-1.5 py-0.5 text-[9px] font-semibold leading-none">
                   <TrendingDown className="h-2 w-2" />
-                  {formatAED(listing.previousPrice - listing.priceAED, locale)} off
+                  {money(listing.previousPrice - listing.priceAED, locale)} off
                 </span>
               </div>
             ) : listing.saleMode === "quote_only" ? (
@@ -90,7 +94,7 @@ export function ListingCard({
               </div>
             ) : (
               <div className="mt-0.5 text-[10px] text-muted">
-                From {formatAED(monthlyEMI(listing.priceAED), locale)}/mo
+                From {money(monthlyEMI(listing.priceAED), locale)}/mo
               </div>
             )}
           </div>

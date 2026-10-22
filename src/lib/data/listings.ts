@@ -32,6 +32,7 @@ import {
 import { deriveDrivetrain, computeDealRating } from "@/lib/vehicle-derive";
 import type { DealRating } from "@/lib/brand";
 import { carImageUrl } from "@/lib/car-images";
+import { getActiveMarketCode } from "@/lib/market-active";
 import { demoStore } from "./demo-store";
 
 /** Public universe in demo mode: seeded mock cars + approved user-created cars. */
@@ -89,6 +90,8 @@ export interface ListingSearchParams {
   createdAfter?: Date;
   /** Restrict to these listing ids (used by price-drop alert matching). */
   ids?: string[];
+  /** Market scope (country code). Defaults to the active market in searchListings. */
+  countryCode?: string;
   sort?: SortKey;
   page?: number;
   perPage?: number;
@@ -265,6 +268,8 @@ function filterMock(p: ListingSearchParams): MockListing[] {
       if (!hay.includes(p.q.toLowerCase())) return false;
     }
     if (p.ids?.length && !p.ids.includes(l.id)) return false;
+    // Mock/demo listings are all UAE; a non-AE market has none of them.
+    if (p.countryCode && p.countryCode !== "AE") return false;
     if (!matchMulti(l.make, p.make)) return false;
     if (!matchMulti(l.model, p.model)) return false;
     if (p.trim?.length && !matchMulti(l.trim ?? "", p.trim)) return false;
@@ -354,8 +359,13 @@ const cachedSearch = unstable_cache(
 export async function searchListings(
   p: ListingSearchParams = {},
 ): Promise<ListingSearchResult> {
-  if (!isDbEnabled()) return runSearchListings(p);
-  return cachedSearch(p);
+  // Scope to the active market unless a caller passed an explicit country.
+  // Resolved here (outside the cache) so the cache key stays per-country and
+  // UAE requests, which resolve to "AE", return exactly what they always have.
+  const countryCode = p.countryCode ?? (await getActiveMarketCode());
+  const params = { ...p, countryCode };
+  if (!isDbEnabled()) return runSearchListings(params);
+  return cachedSearch(params);
 }
 
 async function runSearchListings(
@@ -569,6 +579,7 @@ async function runSearchListings(
 function buildConditions(p: ListingSearchParams) {
   const conds = [];
   conds.push(eq(listings.status, (p.status as Listing["status"]) ?? "active"));
+  if (p.countryCode) conds.push(eq(listings.countryCode, p.countryCode));
   if (p.q) {
     const term = `%${p.q}%`;
     conds.push(

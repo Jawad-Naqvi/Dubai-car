@@ -251,6 +251,8 @@ export const listings = pgTable(
     description: text("description"),
     features: jsonb("features").$type<string[]>().default([]),
     emirate: varchar("emirate", { length: 32 }).notNull(),
+    /** Market this car belongs to (AE launch; IN etc. later). Scopes browse. */
+    countryCode: varchar("country_code", { length: 2 }).notNull().default("AE"),
     locationLat: doublePrecision("location_lat"),
     locationLng: doublePrecision("location_lng"),
     status: listingStatusEnum("status").notNull().default("draft"),
