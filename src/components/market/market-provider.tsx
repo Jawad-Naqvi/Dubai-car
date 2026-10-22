@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import {
   formatMoney,
   getMarket,
@@ -53,6 +54,33 @@ export function MarketProvider({
 
 export function useMarket(): Market {
   return useContext(MarketContext);
+}
+
+/**
+ * Switch markets: write the cookie and do a FULL navigation so the whole tree
+ * (layout + provider + server-scoped data) re-resolves to the new market. A
+ * soft client navigation would not remount the provider, so the market would
+ * appear not to change — which is exactly the bug this avoids.
+ */
+export function useSelectMarket() {
+  const locale = useLocale();
+  return useCallback(
+    (code: MarketCode, to?: string) => {
+      const market = getMarket(code);
+      document.cookie = `${MARKET_COOKIE}=${market.code}; path=/; max-age=${
+        60 * 60 * 24 * 365
+      }; samesite=lax`;
+      const lang = market.locales.includes(locale) ? locale : market.locales[0];
+      // Default: stay on the current page (swap the /<locale> prefix) so the
+      // user immediately sees the new market in context. `to` overrides it.
+      const rest =
+        to ?? window.location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+      const dest = `/${lang}${rest === "/" ? "" : rest}`;
+      // Hard navigation (not the Next router) so the cookie is re-read.
+      window.location.assign(dest || `/${lang}`);
+    },
+    [locale],
+  );
 }
 
 /**

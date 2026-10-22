@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useLocale } from "next-intl";
 import { ChevronDown, Check } from "lucide-react";
 import { listMarkets } from "@/lib/market";
-import { useMarket } from "@/components/market/market-provider";
-import { selectMarket } from "@/app/[locale]/(marketing)/select-country/actions";
+import { useMarket, useSelectMarket } from "@/components/market/market-provider";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,8 +12,8 @@ import { cn } from "@/lib/utils";
  * the client-resolved market, so it matches whatever the prices show.
  */
 export function MarketSwitcher({ className }: { className?: string }) {
-  const locale = useLocale();
   const market = useMarket();
+  const selectMarket = useSelectMarket();
   const markets = listMarkets();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -47,20 +45,23 @@ export function MarketSwitcher({ className }: { className?: string }) {
             Country
           </div>
           {markets.map((m) => (
-            <form key={m.code} action={selectMarket.bind(null, locale, m.code)}>
-              <button
-                type="submit"
-                disabled={!m.enabled}
-                className="flex w-full items-center gap-2 px-2 py-2 rounded-lg text-xs text-[#141414] hover:bg-[#F4F4F6] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="text-sm leading-none">{m.flag}</span>
-                <span className="flex-1 text-start">{m.shortName}</span>
-                <span className="text-[10px] text-muted">{m.currency}</span>
-                {m.code === market.code && (
-                  <Check className="h-3 w-3 text-[#137A43]" />
-                )}
-              </button>
-            </form>
+            <button
+              key={m.code}
+              type="button"
+              disabled={!m.enabled}
+              onClick={() => {
+                setOpen(false);
+                selectMarket(m.code);
+              }}
+              className="flex w-full items-center gap-2 px-2 py-2 rounded-lg text-xs text-[#141414] hover:bg-[#F4F4F6] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="text-sm leading-none">{m.flag}</span>
+              <span className="flex-1 text-start">{m.shortName}</span>
+              <span className="text-[10px] text-muted">{m.currency}</span>
+              {m.code === market.code && (
+                <Check className="h-3 w-3 text-[#137A43]" />
+              )}
+            </button>
           ))}
         </div>
       )}
