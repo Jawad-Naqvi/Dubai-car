@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { brand } from "@/lib/brand";
+import { MarketBrandName } from "@/components/market/market-brand-name";
 import {
   Linkedin,
   Instagram,
@@ -70,7 +71,7 @@ export function Footer() {
           <div className="col-span-2">
             <Link href="/" className="inline-block">
               <span className="font-extrabold text-2xl tracking-tight">
-                {brand.name}
+                <MarketBrandName />
                 <span className="text-[#AB74CF]">.</span>
               </span>
             </Link>
@@ -148,7 +149,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-6 pt-6 border-t border-white/10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <span className="text-[10px] text-white/45">
-            © {new Date().getFullYear()} {brand.name}. {t("rights")}
+            © {new Date().getFullYear()} <MarketBrandName />. {t("rights")}
           </span>
           <div className="flex items-center gap-5 text-[10px] text-white/45">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>

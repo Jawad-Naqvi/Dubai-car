@@ -10,6 +10,7 @@ import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { AccountMenu } from "./account-menu";
 import { NavSearch } from "./nav-search";
 import { MarketSwitcher } from "@/components/market/market-switcher";
+import { MarketBrandName } from "@/components/market/market-brand-name";
 import { useSavedListings } from "@/lib/saved-listings";
 import { useCompare } from "@/lib/compare";
 
@@ -75,7 +76,7 @@ export function Nav() {
         {/* Wordmark */}
         <Link href="/" className="flex-shrink-0 group">
           <span className="text-[#141414] font-extrabold text-xl tracking-tight">
-            {brand.name}
+            <MarketBrandName />
             <span className="text-[#8136B2]">.</span>
           </span>
         </Link>

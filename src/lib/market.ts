@@ -59,7 +59,9 @@ export const MARKETS: Record<MarketCode, Market> = {
     currency: "INR",
     numberLocale: "en-IN",
     dialCode: "+91",
-    locales: ["en", "hi"],
+    // English-first launch. Hindi ("hi") is a clean future addition: add the
+    // locale to i18n routing + a translated messages/hi.json, then list it here.
+    locales: ["en"],
     // TODO(client decision): final India brand name. Placeholder for now.
     brandName: "Motors India",
     regionLabel: "City",
