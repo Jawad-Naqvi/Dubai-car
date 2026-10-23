@@ -1,5 +1,7 @@
+"use client";
+
 import { History, TrendingDown, TrendingUp } from "lucide-react";
-import { formatAED } from "@/lib/utils";
+import { useMoney } from "@/components/market/market-provider";
 import type { PricePoint } from "@/lib/data/price";
 
 /**
@@ -14,6 +16,7 @@ export function PriceHistoryTable({
   points: PricePoint[];
   locale?: "en" | "ar";
 }) {
+  const money = useMoney();
   if (points.length === 0) return null;
 
   // Show only the 3 most recent changes (points are newest-first).
@@ -42,7 +45,7 @@ export function PriceHistoryTable({
               </span>
               <span className="flex items-center gap-1.5 text-xs">
                 <span className="text-muted line-through">
-                  {formatAED(p.oldPrice, locale)}
+                  {money(p.oldPrice, locale)}
                 </span>
                 <span
                   className={`inline-flex items-center gap-0.5 font-semibold ${
@@ -54,7 +57,7 @@ export function PriceHistoryTable({
                   ) : (
                     <TrendingUp className="h-3 w-3" />
                   )}
-                  {formatAED(p.newPrice, locale)}
+                  {money(p.newPrice, locale)}
                 </span>
               </span>
             </div>

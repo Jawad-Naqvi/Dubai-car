@@ -25,6 +25,8 @@ export interface MockListing {
   /** Chassis / VIN, shown on the detail page when the seller provided it. */
   vin?: string;
   emirate: string;
+  /** Market the car belongs to (drives its currency). Defaults to UAE. */
+  countryCode?: string;
   dealer: {
     id: string;
     slug: string;

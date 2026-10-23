@@ -159,6 +159,7 @@ function rowToView(r: DbRow): MockListing {
     exteriorColor: l.colorExterior ?? "—",
     vin: l.vin ?? undefined,
     emirate: l.emirate,
+    countryCode: l.countryCode ?? "AE",
     dealer: {
       id: l.dealerId ?? "private",
       slug: r.dealerSlug ?? "private-seller",

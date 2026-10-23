@@ -8,7 +8,9 @@ import {
   getListingMedia,
   incrementViewCount,
 } from "@/lib/data/listings";
-import { formatAED, formatKm, monthlyEMI, cn } from "@/lib/utils";
+import { formatKm, monthlyEMI, cn } from "@/lib/utils";
+import { getMarket, formatMoney } from "@/lib/market";
+import { MarketProvider } from "@/components/market/market-provider";
 import { ListingGallery } from "@/components/listings/listing-gallery";
 import { FinanceCalculator } from "@/components/listings/finance-calculator";
 import { ExportQuoteButton } from "@/components/listings/export-quote-button";
@@ -82,8 +84,8 @@ export async function generateMetadata({
   const listing = await getListingById(id);
   if (!listing) return { title: "Car not found — DXB Motors" };
 
-  const title = `${listing.year} ${listing.make} ${listing.model}${listing.trim ? ` ${listing.trim}` : ""} for sale in ${listing.emirate} — ${formatAED(listing.priceAED)}`;
-  const description = `${listing.year} ${listing.make} ${listing.model} · ${formatKm(listing.kms, locale as "en" | "ar")} · ${listing.fuel} · ${listing.transmission} · ${listing.regionalSpec} spec. ${formatAED(listing.priceAED)} at ${listing.dealer.name}, ${listing.emirate}. View photos, specs and finance options on DXB Motors.`;
+  const title = `${listing.year} ${listing.make} ${listing.model}${listing.trim ? ` ${listing.trim}` : ""} for sale in ${listing.emirate} — ${formatMoney(listing.priceAED, getMarket(listing.countryCode))}`;
+  const description = `${listing.year} ${listing.make} ${listing.model} · ${formatKm(listing.kms, locale as "en" | "ar")} · ${listing.fuel} · ${listing.transmission} · ${listing.regionalSpec} spec. ${formatMoney(listing.priceAED, getMarket(listing.countryCode))} at ${listing.dealer.name}, ${listing.emirate}. View photos, specs and finance options on DXB Motors.`;
   const image = listing.imageUrl?.startsWith("http")
     ? listing.imageUrl
     : `${SITE_URL}${listing.imageUrl ?? ""}`;
@@ -143,6 +145,7 @@ export default async function ListingDetailPage({
   const emi = monthlyEMI(listing.priceAED);
   const listingTitle = `${listing.year} ${listing.make} ${listing.model}`;
   const loc = locale as "en" | "ar";
+  const listingMarket = getMarket(listing.countryCode);
   // Wholesale-only stock has no public retail price — the page leads with the
   // quote proposition instead of a price the buyer can't actually transact on.
   const quoteOnly = listing.saleMode === "quote_only";
@@ -198,7 +201,7 @@ export default async function ListingDetailPage({
     offers: {
       "@type": "Offer",
       price: listing.priceAED,
-      priceCurrency: "AED",
+      priceCurrency: listingMarket.currency,
       // Must reflect reality: a sold car marked InStock is a false signal to
       // search engines and to buyers arriving from them.
       availability:
@@ -212,6 +215,7 @@ export default async function ListingDetailPage({
   };
 
   return (
+    <MarketProvider code={listing.countryCode ?? "AE"} fixed>
     <>
       <script
         type="application/ld+json"
@@ -283,7 +287,7 @@ export default async function ListingDetailPage({
                 <>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <span className="text-2xl font-extrabold text-[#141414] leading-none">
-                      {formatAED(listing.priceAED, loc)}
+                      {formatMoney(listing.priceAED, listingMarket, { locale: loc })}
                     </span>
                     <DealBadge rating={listing.dealRating} />
                     <HighDemandBadge show={isHighDemand(listing)} />
@@ -293,10 +297,10 @@ export default async function ListingDetailPage({
                   {listing.previousPrice && listing.previousPrice > listing.priceAED ? (
                     <div className="mt-2 flex items-center gap-1.5">
                       <span className="text-xs text-[#63666A] line-through">
-                        {formatAED(listing.previousPrice, loc)}
+                        {formatMoney(listing.previousPrice, listingMarket, { locale: loc })}
                       </span>
                       <span className="inline-flex items-center gap-0.5 rounded-full bg-[#137A43] text-white px-1.5 py-0.5 text-[10px] font-semibold">
-                        {formatAED(listing.previousPrice - listing.priceAED, loc)} price drop
+                        {formatMoney(listing.previousPrice - listing.priceAED, listingMarket, { locale: loc })} price drop
                       </span>
                     </div>
                   ) : (
@@ -304,7 +308,7 @@ export default async function ListingDetailPage({
                       href="#finance"
                       className="mt-2 inline-block text-xs text-[#141414] underline underline-offset-2 decoration-[#8136B2]/50"
                     >
-                      Est. {formatAED(emi, loc)}/mo
+                      Est. {formatMoney(emi, listingMarket, { locale: loc })}/mo
                     </a>
                   )}
                 </>
@@ -602,5 +606,6 @@ export default async function ListingDetailPage({
       {/* cars.com-style mobile sticky contact bar */}
       <MobileContactBar priceAED={listing.priceAED} locale={loc} />
     </>
+    </MarketProvider>
   );
 }

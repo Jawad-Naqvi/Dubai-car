@@ -6,7 +6,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Button } from "@/components/ui/button";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import { CollapsibleSection } from "./collapsible-section";
-import { formatAED } from "@/lib/utils";
+import { useMoney } from "@/components/market/market-provider";
 
 function emiFor(principal: number, years: number, apr: number) {
   const months = years * 12;
@@ -27,6 +27,7 @@ export function FinanceCalculator({
   locale?: "en" | "ar";
   className?: string;
 }) {
+  const money = useMoney();
   // UAE-tuned defaults: banks require ~20% down for residents; typical
   // reducing-balance car-loan APR sits ~3.5–5%. Overridable via env without a
   // code change (NEXT_PUBLIC_FINANCE_DEFAULT_APR).
@@ -45,7 +46,7 @@ export function FinanceCalculator({
     <CollapsibleSection
       icon={<Calculator className="h-4 w-4 text-[#8136B2] flex-shrink-0" />}
       title="Estimate monthly payment"
-      summary={`${formatAED(emi, locale)}/mo`}
+      summary={`${money(emi, locale)}/mo`}
       className={className}
     >
       <div className="relative">
@@ -56,7 +57,7 @@ export function FinanceCalculator({
           <div className="mt-4 space-y-4">
             <Slider
               label="Down payment"
-              value={`${downPct}% · ${formatAED(down, locale)}`}
+              value={`${downPct}% · ${money(down, locale)}`}
               min={0}
               max={60}
               step={5}
@@ -86,17 +87,17 @@ export function FinanceCalculator({
           <div className="mt-4 pt-4 border-t border-[#E5E5EA] flex items-center justify-between">
             <div className="text-xs text-secondary">Estimated monthly</div>
             <div className="text-lg font-bold text-[#141414]">
-              {formatAED(emi, locale)}/mo
+              {money(emi, locale)}/mo
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2 text-[10px] text-muted">
             <div className="flex justify-between rounded-lg bg-[#F4F4F6] px-2 py-1.5">
               <span>Total interest</span>
-              <span className="text-secondary">{formatAED(totalInterest, locale)}</span>
+              <span className="text-secondary">{money(totalInterest, locale)}</span>
             </div>
             <div className="flex justify-between rounded-lg bg-[#F4F4F6] px-2 py-1.5">
               <span>Total payable</span>
-              <span className="text-secondary">{formatAED(totalPayable, locale)}</span>
+              <span className="text-secondary">{money(totalPayable, locale)}</span>
             </div>
           </div>
 

@@ -1,7 +1,9 @@
+"use client";
+
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { formatAED, monthlyEMI } from "@/lib/utils";
+import { monthlyEMI } from "@/lib/utils";
 import { MapPin, BadgeCheck } from "lucide-react";
 import type { MockListing } from "@/lib/mock-data";
 import { SaveButton } from "./save-button";
@@ -9,6 +11,7 @@ import { CompareButton } from "./compare-button";
 import { DealBadge, HighDemandBadge } from "./deal-badge";
 import { BulkAvailableChip } from "./purchase-actions";
 import { isHighDemand } from "@/lib/vehicle-derive";
+import { useMoney, useMarket } from "@/components/market/market-provider";
 
 /**
  * Horizontal search-result card (cars.com SRP anatomy): photo left, then
@@ -24,6 +27,8 @@ export function ListingRow({
   locale?: "en" | "ar";
 }) {
   const href = `/listings/${listing.id}/${listing.slug}`;
+  const money = useMoney();
+  const market = useMarket();
   return (
     <div className="group relative flex flex-col sm:flex-row rounded-lg bg-white border border-[#E5E5EA] overflow-hidden hover:border-[#B9B9C4] transition-colors">
       {/* Photo */}
@@ -79,10 +84,10 @@ export function ListingRow({
         ) : (
           <>
             <div className="mt-2 text-xl font-bold text-[#141414] leading-none">
-              {formatAED(listing.priceAED, locale)}
+              {money(listing.priceAED, locale)}
             </div>
             <div className="mt-1 text-[11px] text-[#141414] underline underline-offset-2 decoration-[#8136B2]/50">
-              Est. {formatAED(monthlyEMI(listing.priceAED), locale)}/mo
+              Est. {money(monthlyEMI(listing.priceAED), locale)}/mo
             </div>
           </>
         )}
@@ -106,7 +111,7 @@ export function ListingRow({
             </div>
             <div className="mt-0.5 flex items-center gap-1">
               <MapPin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{listing.emirate}, UAE</span>
+              <span className="truncate">{listing.emirate}, {market.shortName}</span>
             </div>
           </div>
           <Link

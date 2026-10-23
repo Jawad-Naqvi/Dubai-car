@@ -1,4 +1,6 @@
-import { formatAED } from "@/lib/utils";
+"use client";
+
+import { useMoney } from "@/components/market/market-provider";
 import { cn } from "@/lib/utils";
 
 type Rating = "Great" | "Good" | "Fair";
@@ -25,6 +27,7 @@ export function PriceContextMeter({
   rating?: Rating | null;
   locale?: "en" | "ar";
 }) {
+  const money = useMoney();
   if (!rating || peerPrices.length < 2) return null;
 
   const all = [...peerPrices, price];
@@ -49,7 +52,7 @@ export function PriceContextMeter({
           className="absolute -top-6 -translate-x-1/2 text-xs font-bold text-[#141414] whitespace-nowrap"
           style={{ left: `${pct}%` }}
         >
-          {formatAED(price, locale)}
+          {money(price, locale)}
         </div>
 
         {/* Range track: green (below-market) fading to orange (above-market) */}
@@ -66,8 +69,8 @@ export function PriceContextMeter({
       </div>
 
       <div className="mt-2 flex justify-between text-[11px] text-[#63666A]">
-        <span>{formatAED(min, locale)}</span>
-        <span>{formatAED(max, locale)}</span>
+        <span>{money(min, locale)}</span>
+        <span>{money(max, locale)}</span>
       </div>
     </div>
   );

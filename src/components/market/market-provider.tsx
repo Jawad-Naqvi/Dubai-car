@@ -35,20 +35,27 @@ function readMarketCookie(): MarketCode | null {
  */
 export function MarketProvider({
   code,
+  fixed = false,
   children,
 }: {
-  code: MarketCode;
+  code: string;
+  /** When true, pin to `code` and ignore the cookie (used to force a subtree,
+   *  e.g. a listing detail page, into that listing's own market). */
+  fixed?: boolean;
   children: React.ReactNode;
 }) {
   const [market, setMarket] = useState<Market>(() => getMarket(code));
 
   useEffect(() => {
+    if (fixed) return;
     const cookie = readMarketCookie();
     if (cookie && cookie !== market.code) setMarket(getMarket(cookie));
-  }, [market.code]);
+  }, [market.code, fixed]);
 
   return (
-    <MarketContext.Provider value={market}>{children}</MarketContext.Provider>
+    <MarketContext.Provider value={fixed ? getMarket(code) : market}>
+      {children}
+    </MarketContext.Provider>
   );
 }
 

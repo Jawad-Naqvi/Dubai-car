@@ -1,6 +1,6 @@
 "use client";
 
-import { formatAED } from "@/lib/utils";
+import { useMoney } from "@/components/market/market-provider";
 
 /**
  * cars.com-style mobile sticky bottom bar on the vehicle detail page: price on
@@ -14,12 +14,13 @@ export function MobileContactBar({
   priceAED: number;
   locale?: "en" | "ar";
 }) {
+  const money = useMoney();
   return (
     <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#E5E5EA] shadow-[0_-4px_16px_-6px_rgba(0,0,0,0.12)] px-4 py-2.5 flex items-center justify-between gap-3">
       <div className="min-w-0">
         <div className="text-[10px] text-muted leading-none">Price</div>
         <div className="text-base font-bold text-[#141414] leading-tight">
-          {formatAED(priceAED, locale)}
+          {money(priceAED, locale)}
         </div>
       </div>
       <a
