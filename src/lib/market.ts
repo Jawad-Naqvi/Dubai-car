@@ -33,6 +33,12 @@ export interface Market {
   brandName: string;
   /** What a sub-region is called here (drives filter labels). */
   regionLabel: string;
+  /** One-line marketing tagline (used for non-UAE markets; UAE keeps its i18n one). */
+  tagline: string;
+  /** Office address block, one line per entry. */
+  addressLines: string[];
+  /** Contact email shown in the footer. */
+  email: string;
   /** Whether the market is live. India can ship behind a flag first. */
   enabled: boolean;
 }
@@ -49,6 +55,9 @@ export const MARKETS: Record<MarketCode, Market> = {
     locales: ["en", "ar"],
     brandName: "DXB Motors",
     regionLabel: "Emirate",
+    tagline: "Dubai's yard-forward automotive marketplace. Buy, sell, export — one OS.",
+    addressLines: ["Jebel Ali Free Zone", "Dubai, United Arab Emirates"],
+    email: "hello@dxbmotors.ae",
     enabled: true,
   },
   IN: {
@@ -65,6 +74,10 @@ export const MARKETS: Record<MarketCode, Market> = {
     // TODO(client decision): final India brand name. Placeholder for now.
     brandName: "Motors India",
     regionLabel: "City",
+    tagline: "India's trusted used-car marketplace. Buy, sell and finance — one platform.",
+    // TODO(client): confirm India office address + contact email.
+    addressLines: ["Bandra Kurla Complex", "Mumbai, India"],
+    email: "hello@motorsindia.in",
     enabled: true,
   },
 };

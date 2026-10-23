@@ -2,6 +2,7 @@ import { Link } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { brand } from "@/lib/brand";
 import { MarketBrandName } from "@/components/market/market-brand-name";
+import { MarketFooterInfo } from "@/components/market/market-footer-info";
 import {
   Linkedin,
   Instagram,
@@ -75,21 +76,7 @@ export function Footer() {
                 <span className="text-[#AB74CF]">.</span>
               </span>
             </Link>
-            <p className="mt-3 text-xs text-white/60 max-w-xs leading-relaxed">
-              {t("tagline")}
-            </p>
-            <p className="mt-5 text-xs text-white/60 leading-relaxed">
-              Jebel Ali Free Zone
-              <br />
-              Dubai, United Arab Emirates
-            </p>
-            <a
-              href={`mailto:${brand.email}`}
-              className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/80 hover:text-white transition-colors"
-            >
-              <Mail className="h-3 w-3" />
-              {brand.email}
-            </a>
+            <MarketFooterInfo uaeTagline={t("tagline")} />
 
             {/* Socials */}
             <div className="mt-5 flex items-center gap-3">
