@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMarket } from "@/components/market/market-provider";
 
 /**
  * Hero search. Parses a couple of light natural-language hints (price + make)
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
  */
 export function HomeSearch() {
   const t = useTranslations();
+  const market = useMarket();
   const router = useRouter();
   const [value, setValue] = useState("");
 
@@ -47,7 +49,11 @@ export function HomeSearch() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && go()}
-        placeholder={t("hero.searchPlaceholder")}
+        placeholder={
+          market.code === "AE"
+            ? t("hero.searchPlaceholder")
+            : "Try 'Hyundai Creta under ₹15 lakh'"
+        }
         suppressHydrationWarning
         className="flex-1 bg-transparent text-[#141414] placeholder:text-muted text-sm outline-none py-2"
       />
