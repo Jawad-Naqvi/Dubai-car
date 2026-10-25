@@ -6,7 +6,7 @@ import Image from "next/image";
 import { GitCompare, X, Trophy } from "lucide-react";
 import { useCompare } from "@/lib/compare";
 import { formatKm, monthlyEMI } from "@/lib/utils";
-import { useMoney } from "@/components/market/market-provider";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 import type { MockListing } from "@/lib/mock-data";
 
 type Row = {
@@ -18,6 +18,7 @@ type Row = {
 
 export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
   const money = useMoney();
+  const loanApr = useMarket().loanApr;
   const { ids, toggle, clear } = useCompare();
   const [items, setItems] = useState<MockListing[] | null>(null);
 
@@ -57,7 +58,7 @@ export function CompareView({ locale = "en" }: { locale?: "en" | "ar" }) {
 
   const rows: Row[] = [
     { label: "Price", get: (l) => money(l.priceAED, locale), best: "min", raw: (l) => l.priceAED },
-    { label: "Est. monthly", get: (l) => `${money(monthlyEMI(l.priceAED), locale)}/mo`, best: "min", raw: (l) => monthlyEMI(l.priceAED) },
+    { label: "Est. monthly", get: (l) => `${money(monthlyEMI(l.priceAED, 4, loanApr), locale)}/mo`, best: "min", raw: (l) => monthlyEMI(l.priceAED, 4, loanApr) },
     { label: "Year", get: (l) => l.year, best: "max", raw: (l) => l.year },
     { label: "Mileage", get: (l) => formatKm(l.kms, locale), best: "min", raw: (l) => l.kms },
     { label: "Body type", get: (l) => l.bodyType },

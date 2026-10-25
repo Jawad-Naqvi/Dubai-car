@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@/i18n/routing";
 import { Loader2 } from "lucide-react";
-import { emirates, makeModels } from "@/lib/brand";
+import { makeModels } from "@/lib/brand";
+import { useMarket } from "@/components/market/market-provider";
+import { getRegions } from "@/lib/regions";
 import { LabeledSelect } from "@/components/ui/labeled-select";
 
 interface Facet {
@@ -18,6 +20,8 @@ interface Facet {
  */
 export function HomeSearchBy() {
   const router = useRouter();
+  const market = useMarket();
+  const regions = getRegions(market.code);
 
   const [condition, setCondition] = useState("");
   const [make, setMake] = useState("");
@@ -124,11 +128,11 @@ export function HomeSearchBy() {
         />
         <LabeledSelect
           joined
-          label="Emirate"
+          label={market.regionLabel}
           value={emirate}
           onChange={setEmirate}
-          placeholder="All emirates"
-          options={emirates.map((e) => ({ value: e.en, label: e.en }))}
+          placeholder={`All ${market.regionPlural}`}
+          options={regions.map((e) => ({ value: e.en, label: e.en }))}
         />
       </div>
 

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { useQueryState } from "@/lib/use-query-state";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 
 /** Multi-value params rendered as one chip per selected value. */
 const MULTI_KEYS = [
@@ -68,6 +69,11 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 export function ActiveFilters() {
   const t = useTranslations("filters");
   const { params, getAll, push } = useQueryState();
+  const market = useMarket();
+  const money = useMoney();
+  // Price chips follow the market's currency; UAE keeps its "Min AED …" labels.
+  const priceLabel = (key: string, v: string) =>
+    `${key === "priceMin" ? "Min" : "Max"} ${money(Number(v))}`;
 
   const chips: { key: string; label: string; onRemove: () => void }[] = [];
 
@@ -88,7 +94,10 @@ export function ActiveFilters() {
     if (v) {
       chips.push({
         key,
-        label: fmt(v),
+        label:
+          market.code !== "AE" && (key === "priceMin" || key === "priceMax")
+            ? priceLabel(key, v)
+            : fmt(v),
         onRemove: () => push({ [key]: null }),
       });
     }

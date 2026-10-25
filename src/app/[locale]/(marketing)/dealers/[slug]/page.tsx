@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { getDealers, getDealerBySlug } from "@/lib/data/dealers";
 import { brand } from "@/lib/brand";
+import { getMarket } from "@/lib/market";
 import { whatsappLink } from "@/lib/utils";
 import { searchListings, type SortKey } from "@/lib/data/listings";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +46,7 @@ export default async function DealerStorefront({
   setRequestLocale(locale);
   const dealer = await getDealerBySlug(slug);
   if (!dealer) notFound();
+  const dealerMarket = getMarket(dealer.countryCode);
 
   const sp = await searchParams;
   const q = first(sp.q)?.trim() || undefined;
@@ -119,7 +121,7 @@ export default async function DealerStorefront({
               <MapPin className="h-4 w-4 text-[#63666A] flex-shrink-0" />
               <span className="underline underline-offset-2">
                 {dealer.address ? `${dealer.address}, ` : ""}
-                {dealer.emirate}, UAE
+                {dealer.emirate}{`, ${dealerMarket.shortName}`}
               </span>
             </p>
             <p className="flex items-center gap-1.5 text-[#63666A]">
@@ -148,7 +150,7 @@ export default async function DealerStorefront({
             <a
               href={whatsappLink(
                 dealer.whatsapp ?? brand.whatsapp,
-                `Hi ${dealer.name}, I found your showroom on ${brand.name} and I'd like to know more about your inventory.`,
+                `Hi ${dealer.name}, I found your showroom on ${dealerMarket.brandName} and I'd like to know more about your inventory.`,
               )}
               target="_blank"
               rel="noopener noreferrer"
@@ -228,7 +230,7 @@ export default async function DealerStorefront({
         </h2>
         <p className="mt-3 flex items-center gap-2 text-sm text-[#63666A]">
           <Heart className="h-4 w-4 text-[#8136B2]" />
-          This seller is a verified {brand.name} partner in {dealer.emirate}.
+          This seller is a verified {dealerMarket.brandName} partner in {dealer.emirate}.
         </p>
         {dealer.description && (
           <p className="mt-3 text-sm text-[#63666A] leading-relaxed max-w-3xl">
@@ -240,7 +242,7 @@ export default async function DealerStorefront({
             <ShieldCheck className="h-4 w-4 text-[#137A43] flex-shrink-0" />
             <span>
               <span className="font-semibold text-[#141414]">Verified dealer.</span>{" "}
-              Trade license checked and approved by the {brand.name} team.
+              Trade license checked and approved by the {dealerMarket.brandName} team.
             </span>
           </p>
         )}

@@ -11,6 +11,7 @@ import { Toaster } from "sonner";
 import { NativeBridge } from "@/components/native/native-bridge";
 import { MarketProvider } from "@/components/market/market-provider";
 import { getActiveMarketCode } from "@/lib/market-active";
+import { getMarket } from "@/lib/market";
 
 /**
  * Self-hosted fonts via next/font — no render-blocking request to Google's CDN,
@@ -33,7 +34,7 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export const metadata: Metadata = {
+const uaeMetadata: Metadata = {
   title: {
     default: `${brand.name} — Dubai's Yard-Forward Automotive Marketplace`,
     template: `%s · ${brand.name}`,
@@ -41,6 +42,19 @@ export const metadata: Metadata = {
   description:
     "Buy, sell, and export cars in the UAE on a single operating system. Verified dealers, AI-powered search, and end-to-end B2B export workflows.",
 };
+
+/** Browser title + description follow the market; UAE is returned unchanged. */
+export async function generateMetadata(): Promise<Metadata> {
+  const market = getMarket(await getActiveMarketCode());
+  if (market.code === "AE") return uaeMetadata;
+  return {
+    title: {
+      default: `${market.brandName} — ${market.tagline}`,
+      template: `%s · ${market.brandName}`,
+    },
+    description: market.tagline,
+  };
+}
 
 export default async function LocaleLayout({
   children,

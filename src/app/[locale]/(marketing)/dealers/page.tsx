@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { auth } from "@clerk/nextjs/server";
 import { Link } from "@/i18n/routing";
 import { getDealers, type DealerView } from "@/lib/data/dealers";
+import { getActiveMarket } from "@/lib/market-active";
 import { SignupWall } from "@/components/marketing/signup-wall";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Button } from "@/components/ui/button";
@@ -89,6 +90,7 @@ export default async function DealersPage({
   const isGuest = !userId;
 
   const allDealers = await getDealers();
+  const market = await getActiveMarket();
   const results = filterAndSort(allDealers, sp);
 
   const page = isGuest ? 1 : Math.max(1, parseInt(first(sp.page) ?? "1", 10) || 1);
@@ -113,7 +115,7 @@ export default async function DealersPage({
           <Eyebrow tone="gold">VERIFIED DEALER DIRECTORY</Eyebrow>
           <h1 className="mt-2 text-2xl lg:text-3xl font-light tracking-tight">
             {allDealers.length} <span className="font-extrabold">verified dealers</span>{" "}
-            across the UAE
+            {market.code === "AE" ? "across the UAE" : `across ${market.name}`}
           </h1>
           <p className="mt-1.5 text-xs text-secondary max-w-xl">
             Every dealer carries a valid trade license and passes our
@@ -160,8 +162,7 @@ export default async function DealersPage({
               No dealers match your filters
             </h3>
             <p className="mt-1 text-xs text-muted max-w-xs">
-              Try a different emirate, lower the rating bar, or clear your
-              search.
+              {`Try a different ${market.regionLabel.toLowerCase()}, lower the rating bar, or clear your search.`}
             </p>
             {hasFilters && (
               <Link

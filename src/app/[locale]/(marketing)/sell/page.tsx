@@ -6,6 +6,7 @@ import { BentoCard, BentoTitle, BentoDesc } from "@/components/marketing/bento-c
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import { QuickStartCard } from "@/components/sell/quick-start-card";
 import { Reveal } from "@/components/marketing/home/reveal";
+import { getActiveMarket } from "@/lib/market-active";
 import {
   Camera,
   Sparkles,
@@ -19,10 +20,10 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-const steps = [
+const stepsFor = (brandName: string) => [
   { icon: Camera, title: "Add photos & details", desc: "Take 6+ photos. Fill make, model, year, kms, condition." },
   { icon: Sparkles, title: "We suggest a price", desc: "Our AI valuation shows a fair market range based on similar listings." },
-  { icon: Upload, title: "Publish", desc: "Listing goes live across DXB Motors search + email alerts." },
+  { icon: Upload, title: "Publish", desc: `Listing goes live across ${brandName} search + email alerts.` },
   { icon: FileSignature, title: "Sell or export", desc: "Receive WhatsApp leads. Close the deal or pass to an exporter." },
 ];
 
@@ -33,6 +34,11 @@ export default async function SellPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // UAE copy is unchanged. Other markets get neutral copy — the UAE stats
+  // ("19 days", "2M+ buyers") aren't claims we can make there yet.
+  const market = await getActiveMarket();
+  const isUAE = market.code === "AE";
+  const steps = stepsFor(market.brandName);
 
   return (
     <>
@@ -44,12 +50,21 @@ export default async function SellPage({
               <div>
                 <Eyebrow tone="gold">LIST YOUR CAR</Eyebrow>
                 <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05]">
-                  Sell your car in Dubai — typically{" "}
-                  <span className="font-extrabold">within 19 days</span>.
+                  {isUAE ? (
+                    <>
+                      Sell your car in Dubai — typically{" "}
+                      <span className="font-extrabold">within 19 days</span>.
+                    </>
+                  ) : (
+                    <>
+                      Sell your car <span className="font-extrabold">across {market.name}</span>.
+                    </>
+                  )}
                 </h1>
                 <p className="mt-6 text-sm text-secondary max-w-xl leading-relaxed">
-                  Free listings. Reach 2M+ buyers across the UAE. WhatsApp leads
-                  delivered straight to your phone.
+                  {isUAE
+                    ? "Free listings. Reach 2M+ buyers across the UAE. WhatsApp leads delivered straight to your phone."
+                    : `Free listings. Reach buyers across ${market.name}. Leads delivered straight to your phone.`}
                 </p>
                 <div className="mt-10 flex flex-wrap gap-3">
                   <Button asChild variant="gold" size="xl">

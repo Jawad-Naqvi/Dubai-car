@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "@/i18n/routing";
 import { popularMakes, makeModels } from "@/lib/brand";
 import { formatAED } from "@/lib/utils";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 import { Search, TrendingUp, Loader2, ArrowUpRight, Car } from "lucide-react";
 
 /** Flat make/model index, built once — powers instant type-ahead. */
@@ -49,6 +50,10 @@ export function SearchAutocomplete({
   placeholder?: string;
 }) {
   const router = useRouter();
+  // UAE keeps formatAED exactly; other markets format in their own currency.
+  const market = useMarket();
+  const money = useMoney();
+  const fmtPrice = (n: number) => (market.code === "AE" ? formatAED(n) : money(n));
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
   const [loading, setLoading] = useState(false);
@@ -219,7 +224,7 @@ export function SearchAutocomplete({
                     {h.year} {h.make} {h.model}
                   </span>
                   <span className="block text-xs text-[#8136B2] font-bold">
-                    {formatAED(h.priceAED)}
+                    {fmtPrice(h.priceAED)}
                   </span>
                 </span>
               </button>

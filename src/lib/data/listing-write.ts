@@ -12,6 +12,7 @@ import { demoStore, demoId, type DemoListing } from "./demo-store";
 import { bust } from "./revalidate";
 import { isListingFeeEnabled, computeListingFee } from "./listing-fee";
 import type { CurrentUser } from "./users";
+import { getActiveMarketCode } from "@/lib/market-active";
 
 export const listingInputSchema = z.object({
   make: z.string().min(1, "Make is required"),
@@ -158,15 +159,25 @@ export async function createListing(
   // ---- DB mode ----
   let dealerId: string | undefined;
   let dealerVerified = false;
+  let dealerCountry: string | undefined;
   if (user) {
     const d = await db
-      .select({ id: dealers.id, isVerified: dealers.isVerified })
+      .select({
+        id: dealers.id,
+        isVerified: dealers.isVerified,
+        countryCode: dealers.countryCode,
+      })
       .from(dealers)
       .where(eq(dealers.userId, user.id))
       .limit(1);
     dealerId = d[0]?.id;
     dealerVerified = d[0]?.isVerified ?? false;
+    dealerCountry = d[0]?.countryCode;
   }
+  // A car belongs to its dealer's market; a private seller's car to the market
+  // they're listing from. UAE (no market cookie) resolves to "AE", exactly the
+  // column default this used to rely on.
+  const countryCode = dealerCountry ?? (await getActiveMarketCode());
   // Identity gate: every seller must have an Emirates ID on file (individuals
   // via /verify-identity, dealers via onboarding). Verified dealers are always
   // allowed. This enforces the "Emirates ID required to sell" rule server-side.
@@ -249,6 +260,7 @@ export async function createListing(
       colorExterior: input.colorExterior,
       colorInterior: input.colorInterior,
       emirate: input.emirate,
+      countryCode,
       condition: input.condition,
       vin: input.vin,
       cylinders: input.cylinders,

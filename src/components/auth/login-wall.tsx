@@ -4,6 +4,7 @@ import { SignIn } from "@clerk/nextjs";
 import { Link } from "@/i18n/routing";
 import { Modal } from "@/components/ui/modal";
 import { clerkAuthAppearance } from "@/components/auth/auth-shell";
+import { MarketBrandName } from "@/components/market/market-brand-name";
 
 /**
  * In-place login wall. A blurred-backdrop modal that lets a signed-out user
@@ -42,7 +43,7 @@ export function LoginWall({
           signUpForceRedirectUrl={redirectUrl}
         />
         <p className="mt-4 text-center text-xs text-secondary">
-          New to DXB Motors?{" "}
+          New to <MarketBrandName />?{" "}
           <Link
             href="/sign-up?role=buyer"
             className="font-semibold text-[#141414] hover:text-[#6B21A8] transition-colors"

@@ -16,11 +16,12 @@ import {
   transmissions,
   regionalSpecs,
   conditions,
-  emirates,
   exteriorColors,
   interiorColors,
 } from "@/lib/brand";
 import { modelsForMake } from "@/lib/car-models";
+import { useMarket, useMoney } from "@/components/market/market-provider";
+import { getRegions } from "@/lib/regions";
 import {
   Check,
   ChevronLeft,
@@ -101,6 +102,22 @@ export function SellWizard() {
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  // Market-aware location + currency. UAE keeps its emirates and AED exactly;
+  // other markets get their own regions and currency.
+  const market = useMarket();
+  const money = useMoney();
+  const isUAE = market.code === "AE";
+  const regions = getRegions(market.code);
+  const fmtPrice = (n: number) => (isUAE ? formatAED(n) : money(n));
+  // The market resolves on the client after mount (and a restored draft may
+  // carry another market's region), so snap an unknown region to this market's
+  // first one. UAE's default "Dubai" is always valid, so UAE never changes.
+  useEffect(() => {
+    if (!regions.some((r) => r.en === form.emirate)) {
+      setForm((f) => ({ ...f, emirate: regions[0].en }));
+    }
+  }, [regions, form.emirate]);
 
   /* ---------------- Autosave / restore ---------------- */
   const [restored, setRestored] = useState(false);
@@ -223,8 +240,9 @@ export function SellWizard() {
     }
   };
 
+  // The valuation model is AED/UAE-based, so it only suggests prices there.
   const suggested =
-    form.make && form.year
+    isUAE && form.make && form.year
       ? estimateValue({
           make: form.make,
           model: form.model,
@@ -595,7 +613,7 @@ export function SellWizard() {
             )}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelCls}>Asking price (AED) *</label>
+                <label className={labelCls}>Asking price ({market.currency}) *</label>
                 <input
                   type="number"
                   className={field}
@@ -605,13 +623,13 @@ export function SellWizard() {
                 />
               </div>
               <div>
-                <label className={labelCls}>Emirate</label>
+                <label className={labelCls}>{market.regionLabel}</label>
                 <select
                   className={field}
                   value={form.emirate}
                   onChange={(e) => set("emirate", e.target.value)}
                 >
-                  {emirates.map((e) => (
+                  {regions.map((e) => (
                     <option key={e.id}>{e.en}</option>
                   ))}
                 </select>
@@ -829,7 +847,7 @@ export function SellWizard() {
                   className={field}
                   value={form.sellerPhone}
                   onChange={(e) => set("sellerPhone", e.target.value)}
-                  placeholder="+971 5..."
+                  placeholder={`${market.dialCode} ${isUAE ? "5..." : "..."}`}
                 />
               </div>
             </div>
@@ -844,7 +862,7 @@ export function SellWizard() {
                 {form.trim && <span className="text-muted">{form.trim}</span>}
               </div>
               <div className="mt-1 text-lg font-bold text-[#141414]">
-                {form.priceAED ? formatAED(form.priceAED) : "—"}
+                {form.priceAED ? fmtPrice(form.priceAED) : "—"}
               </div>
               <div className="mt-2 grid grid-cols-3 gap-2 text-[11px] text-secondary">
                 <span>{form.kms.toLocaleString()} km</span>

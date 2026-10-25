@@ -6,6 +6,7 @@ import { CheckCircle2, Loader2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { formatAED } from "@/lib/utils";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 
 const FieldLabel = ({ children }: { children: React.ReactNode }) => (
   <label className="block text-[10px] uppercase tracking-wider text-muted mb-1">
@@ -33,6 +34,10 @@ export function ReserveButton({
   priceAED: number;
   className?: string;
 }) {
+  // UAE keeps formatAED exactly; other markets format in their own currency.
+  const market = useMarket();
+  const money = useMoney();
+  const fmtPrice = (n: number) => (market.code === "AE" ? formatAED(n) : money(n));
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
@@ -92,7 +97,7 @@ export function ReserveButton({
         description={
           reference
             ? undefined
-            : `${listingTitle} · ${formatAED(priceAED)}`
+            : `${listingTitle} · ${fmtPrice(priceAED)}`
         }
       >
         {reference ? (
@@ -120,7 +125,7 @@ export function ReserveButton({
             <div className="rounded-md bg-[#F4F4F6] px-3 py-2.5 flex items-center justify-between">
               <span className="text-xs text-[#63666A]">Vehicle price</span>
               <span className="text-base font-bold text-[#141414]">
-                {formatAED(priceAED)}
+                {fmtPrice(priceAED)}
               </span>
             </div>
             <div>
@@ -149,7 +154,7 @@ export function ReserveButton({
                   className={inputCls}
                   value={form.phone}
                   onChange={(e) => set("phone", e.target.value)}
-                  placeholder="+971 5…"
+                  placeholder={market.code === "AE" ? "+971 5…" : `${market.dialCode} …`}
                 />
               </div>
             </div>

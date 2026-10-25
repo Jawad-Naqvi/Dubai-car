@@ -6,7 +6,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Button } from "@/components/ui/button";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import { CollapsibleSection } from "./collapsible-section";
-import { useMoney } from "@/components/market/market-provider";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 
 function emiFor(principal: number, years: number, apr: number) {
   const months = years * 12;
@@ -28,10 +28,15 @@ export function FinanceCalculator({
   className?: string;
 }) {
   const money = useMoney();
+  const market = useMarket();
+  const isUAE = market.code === "AE";
   // UAE-tuned defaults: banks require ~20% down for residents; typical
   // reducing-balance car-loan APR sits ~3.5–5%. Overridable via env without a
   // code change (NEXT_PUBLIC_FINANCE_DEFAULT_APR).
-  const defaultApr = Number(process.env.NEXT_PUBLIC_FINANCE_DEFAULT_APR) || 4.5;
+  // Other markets use their own typical rate (India ~9.5%).
+  const defaultApr = isUAE
+    ? Number(process.env.NEXT_PUBLIC_FINANCE_DEFAULT_APR) || 4.5
+    : market.loanApr * 100;
   const [downPct, setDownPct] = useState(20);
   const [termMonths, setTermMonths] = useState(48);
   const [apr, setApr] = useState(defaultApr);
@@ -74,10 +79,10 @@ export function FinanceCalculator({
               onChange={setTermMonths}
             />
             <Slider
-              label="APR (UAE avg)"
+              label={`APR (${market.shortName} avg)`}
               value={`${apr.toFixed(1)}%`}
               min={1}
-              max={10}
+              max={isUAE ? 10 : 20}
               step={0.5}
               current={apr}
               onChange={setApr}

@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/routing";
-import { brand } from "@/lib/brand";
+import { MarketBrandName } from "@/components/market/market-brand-name";
 import { GradientArt } from "@/components/marketing/gradient-art";
 
 /**
@@ -72,7 +72,7 @@ export function AuthShell({
 
           <Link href="/" className="flex items-center justify-center gap-2">
             <span className="text-[#141414] font-extrabold text-lg tracking-tight">
-              {brand.name}
+              <MarketBrandName />
               <span className="text-[#8136B2]">.</span>
             </span>
           </Link>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useMarket } from "@/components/market/market-provider";
 
 export type LeadType =
   | "inquiry"
@@ -45,6 +46,7 @@ export function LeadForm({
   submitLabel?: string;
 }) {
   const isExport = type === "export_inquiry";
+  const market = useMarket();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -118,7 +120,7 @@ export function LeadForm({
               className={inputCls}
               value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
-              placeholder="+971 5..."
+              placeholder={market.code === "AE" ? "+971 5..." : `${market.dialCode} ...`}
             />
           </div>
           <div>

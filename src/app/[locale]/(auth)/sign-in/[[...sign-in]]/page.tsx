@@ -1,6 +1,7 @@
 import { SignIn } from "@clerk/nextjs";
 import { Link } from "@/i18n/routing";
 import { AuthShell, clerkAuthAppearance } from "@/components/auth/auth-shell";
+import { MarketBrandName } from "@/components/market/market-brand-name";
 
 export default async function SignInPage() {
   return (
@@ -13,7 +14,7 @@ export default async function SignInPage() {
       footer={
         <div className="flex flex-col items-center gap-3">
           <span>
-            New to DXB Motors?{" "}
+            New to <MarketBrandName />?{" "}
             <Link
               href="/sign-up"
               className="font-bold text-[#141414] hover:text-[#6B21A8] transition-colors"

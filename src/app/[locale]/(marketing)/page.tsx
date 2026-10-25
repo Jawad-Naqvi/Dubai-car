@@ -4,6 +4,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { mockListings } from "@/lib/mock-data";
 import { formatAED } from "@/lib/utils";
+import { formatMoney } from "@/lib/market";
+import { getActiveMarket } from "@/lib/market-active";
+import { searchListings } from "@/lib/data/listings";
 import { carImageUrl } from "@/lib/car-images";
 import { Reveal } from "@/components/marketing/home/reveal";
 import { HomeSearchTabs } from "@/components/marketing/home-search-tabs";
@@ -49,17 +52,26 @@ export default async function LandingPage({
     carImageUrl({ make: l.make, model: l.model, year: l.year, angle: "01", fallbackUrl: l.imageUrl }),
   );
 
-  const topCars: TopCar[] = mockListings.slice(0, 8).map((l, i) => ({
+  // UAE keeps its curated showcase exactly as before. Other markets show their
+  // own live listings in their own currency (never UAE cars priced in AED).
+  const market = await getActiveMarket();
+  const isUAE = market.code === "AE";
+  const marketCars = isUAE
+    ? mockListings
+    : (await searchListings({ countryCode: market.code, perPage: 8 })).items;
+  const price = (n: number) => (isUAE ? formatAED(n, loc) : formatMoney(n, market));
+
+  const topCars: TopCar[] = marketCars.slice(0, 8).map((l, i) => ({
     id: l.id,
     slug: l.slug,
     name: `${l.make} ${l.model}`,
-    priceLabel: formatAED(l.priceAED, loc),
+    priceLabel: price(l.priceAED),
     rating: 3.9 + ((i * 3) % 10) / 10,
     image: carImageUrl({ make: l.make, model: l.model, year: l.year, fallbackUrl: l.imageUrl }),
     tint: TINTS[i % TINTS.length],
   }));
 
-  const gridCars = mockListings.slice(2, 8);
+  const gridCars = isUAE ? mockListings.slice(2, 8) : marketCars.slice(0, 6);
   const categoryValues = ["SUV", "Sedan", "Coupe", "Pickup"];
 
   const whyImage = carImageUrl({
@@ -376,7 +388,7 @@ export default async function LandingPage({
                       </div>
                     </div>
                     <div className="text-sm font-bold text-[#141414] whitespace-nowrap">
-                      {formatAED(l.priceAED, loc)}
+                      {price(l.priceAED)}
                     </div>
                   </div>
                 </Link>

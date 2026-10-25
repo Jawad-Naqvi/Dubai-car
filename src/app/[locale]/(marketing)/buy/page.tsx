@@ -11,6 +11,7 @@ import { ListingSortSelect } from "@/components/listings/listings-toolbar";
 import { Pagination } from "@/components/listings/pagination";
 import { SignupWall } from "@/components/marketing/signup-wall";
 import { searchListings } from "@/lib/data/listings";
+import { getActiveMarket } from "@/lib/market-active";
 import { parseListingParams } from "@/lib/data/search-params";
 import { SearchX, ChevronRight } from "lucide-react";
 import { Link } from "@/i18n/routing";
@@ -46,6 +47,7 @@ export default async function BuyPage({
   const query = parseListingParams(sp);
   if (isGuest) query.page = 1; // guests can't paginate past the wall
   const result = await searchListings(query);
+  const market = await getActiveMarket();
   const view = (Array.isArray(sp.view) ? sp.view[0] : sp.view) === "grid" ? "grid" : "list";
 
   // Cap the public list for signed-out visitors.
@@ -70,7 +72,7 @@ export default async function BuyPage({
           {query.q ? (
             <>Results for &ldquo;{query.q}&rdquo;</>
           ) : (
-            <>New and used cars for sale across the UAE</>
+            <>{`New and used cars for sale across ${market.code === "AE" ? "the UAE" : market.name}`}</>
           )}
         </h1>
         <ListingSortSelect className="w-48" />

@@ -5,7 +5,8 @@ import { Search, ArrowUpDown, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LabeledSelect } from "@/components/ui/labeled-select";
 import { useQueryState } from "@/lib/use-query-state";
-import { emirates } from "@/lib/brand";
+import { useMarket } from "@/components/market/market-provider";
+import { getRegions } from "@/lib/regions";
 
 const SORT_LABELS: Record<string, string> = {
   newest: "Newest first",
@@ -61,6 +62,8 @@ export function ListingSortSelect({ className }: { className?: string }) {
 
 export function ListingSortBar() {
   const { get, push } = useQueryState();
+  const market = useMarket();
+  const regions = getRegions(market.code);
   const sort = get("sort") ?? "newest";
   const emirate = get("emirate") ?? "";
 
@@ -73,8 +76,8 @@ export function ListingSortBar() {
           suppressHydrationWarning
           className="appearance-none flex items-center gap-1 h-7 pl-6 pr-6 rounded-full bg-white border border-[#E5E5EA] text-[10px] text-secondary hover:border-[#141414]/30 focus:outline-none focus:ring-2 focus:ring-[#141414]/10 cursor-pointer"
         >
-          <option value="">All emirates</option>
-          {emirates.map((e) => (
+          <option value="">{`All ${market.regionPlural}`}</option>
+          {regions.map((e) => (
             <option key={e.id} value={e.en}>
               {e.en}
             </option>

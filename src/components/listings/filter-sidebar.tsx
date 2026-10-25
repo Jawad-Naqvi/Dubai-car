@@ -520,7 +520,7 @@ export function FilterSidebar({
             ))}
           </FilterGroup>
 
-          <FilterGroup title="Price (AED)">
+          <FilterGroup title={`Price (${market.currency})`}>
             <div className="grid grid-cols-2 gap-1.5">
               <input
                 value={priceMin}
@@ -542,13 +542,17 @@ export function FilterSidebar({
               />
             </div>
             <div className="flex flex-wrap gap-1 mt-2">
-              {[50000, 100000, 200000, 500000].map((p) => (
+              {(market.code === "AE"
+                ? [50000, 100000, 200000, 500000]
+                : [300000, 500000, 1000000, 2000000]
+              ).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPriceMax(String(p))}
                   className="text-[10px] px-2 py-0.5 rounded-full border border-[#141414]/20 text-[#141414] hover:bg-[#141414] hover:text-white transition-colors"
                 >
-                  &lt; {p / 1000}k
+                  {/* India buyers think in lakhs (1L = 100,000). */}
+                  {market.code === "AE" ? <>&lt; {p / 1000}k</> : <>&lt; {p / 100000}L</>}
                 </button>
               ))}
             </div>

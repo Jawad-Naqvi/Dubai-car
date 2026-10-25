@@ -4,7 +4,7 @@ import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { monthlyEMI } from "@/lib/utils";
-import { useMoney } from "@/components/market/market-provider";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 import { MapPin, Gauge, Calendar, Fuel, BadgeCheck, TrendingDown } from "lucide-react";
 import type { MockListing } from "@/lib/mock-data";
 import { SaveButton } from "./save-button";
@@ -20,6 +20,7 @@ export function ListingCard({
   locale?: "en" | "ar";
 }) {
   const money = useMoney();
+  const loanApr = useMarket().loanApr;
   return (
     <div className="group relative rounded-lg bg-white border border-[#E5E5EA] overflow-hidden hover:border-[#B9B9C4] transition-colors duration-200 flex flex-col">
       <Link
@@ -94,7 +95,7 @@ export function ListingCard({
               </div>
             ) : (
               <div className="mt-0.5 text-[10px] text-muted">
-                From {money(monthlyEMI(listing.priceAED), locale)}/mo
+                From {money(monthlyEMI(listing.priceAED, 4, loanApr), locale)}/mo
               </div>
             )}
           </div>

@@ -87,7 +87,7 @@ export function ListingRow({
               {money(listing.priceAED, locale)}
             </div>
             <div className="mt-1 text-[11px] text-[#141414] underline underline-offset-2 decoration-[#8136B2]/50">
-              Est. {money(monthlyEMI(listing.priceAED), locale)}/mo
+              Est. {money(monthlyEMI(listing.priceAED, 4, market.loanApr), locale)}/mo
             </div>
           </>
         )}

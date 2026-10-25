@@ -85,7 +85,7 @@ export async function generateMetadata({
   if (!listing) return { title: "Car not found — DXB Motors" };
 
   const title = `${listing.year} ${listing.make} ${listing.model}${listing.trim ? ` ${listing.trim}` : ""} for sale in ${listing.emirate} — ${formatMoney(listing.priceAED, getMarket(listing.countryCode))}`;
-  const description = `${listing.year} ${listing.make} ${listing.model} · ${formatKm(listing.kms, locale as "en" | "ar")} · ${listing.fuel} · ${listing.transmission} · ${listing.regionalSpec} spec. ${formatMoney(listing.priceAED, getMarket(listing.countryCode))} at ${listing.dealer.name}, ${listing.emirate}. View photos, specs and finance options on DXB Motors.`;
+  const description = `${listing.year} ${listing.make} ${listing.model} · ${formatKm(listing.kms, locale as "en" | "ar")} · ${listing.fuel} · ${listing.transmission} · ${listing.regionalSpec} spec. ${formatMoney(listing.priceAED, getMarket(listing.countryCode))} at ${listing.dealer.name}, ${listing.emirate}. View photos, specs and finance options on ${getMarket(listing.countryCode).brandName}.`;
   const image = listing.imageUrl?.startsWith("http")
     ? listing.imageUrl
     : `${SITE_URL}${listing.imageUrl ?? ""}`;
@@ -142,7 +142,7 @@ export default async function ListingDetailPage({
   void incrementViewCount(id);
 
   const gallery = media.length > 0 ? media : [listing.imageUrl];
-  const emi = monthlyEMI(listing.priceAED);
+  const emi = monthlyEMI(listing.priceAED, 4, getMarket(listing.countryCode).loanApr);
   const listingTitle = `${listing.year} ${listing.make} ${listing.model}`;
   const loc = locale as "en" | "ar";
   const listingMarket = getMarket(listing.countryCode);
@@ -453,7 +453,7 @@ export default async function ListingDetailPage({
 
               <div className="mt-3 rounded-md bg-[#F4F4F6] px-3 py-2.5 flex items-center gap-2 text-xs text-[#141414]">
                 <MapPin className="h-3.5 w-3.5 text-[#63666A] flex-shrink-0" />
-                {listing.emirate}, United Arab Emirates
+                {listing.emirate}{`, ${listingMarket.name}`}
               </div>
               <div className="mt-1.5 rounded-md bg-[#F4F4F6] px-3 py-2.5 flex items-center gap-2 text-xs text-[#141414]">
                 <Clock className="h-3.5 w-3.5 text-[#63666A] flex-shrink-0" />

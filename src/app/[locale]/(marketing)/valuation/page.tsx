@@ -11,6 +11,7 @@ import { formatAED } from "@/lib/utils";
 import { popularMakes, conditions } from "@/lib/brand";
 import { estimateValue } from "@/lib/valuation";
 import { Sparkles, AlertCircle, Loader2, BadgeCheck } from "lucide-react";
+import { useMarket } from "@/components/market/market-provider";
 
 function ValuationForm() {
   // Prefill from the home "Sell your car" tab (or any deep link), else defaults.
@@ -32,6 +33,13 @@ function ValuationForm() {
 
   // Instant client-side estimate (same model the API uses).
   const v = estimateValue({ make, model, year, kms, condition });
+
+  // The valuation model is UAE/AED-specific (UAE base prices per make). Other
+  // markets don't get its numbers — showing a UAE price as a local one would be
+  // wrong. TODO(client): India valuation data (base prices incl. Maruti, Tata,
+  // Mahindra) — then drop this gate.
+  const market = useMarket();
+  const isUAE = market.code === "AE";
 
   const getDetailed = async () => {
     setLoading(true);
@@ -66,7 +74,7 @@ function ValuationForm() {
         <div className="text-center max-w-3xl mx-auto">
           <Eyebrow tone="gold">FREE VALUATION</Eyebrow>
           <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05]">
-            What&apos;s your car <span className="font-extrabold">worth today</span> in Dubai?
+            What&apos;s your car <span className="font-extrabold">worth today</span>{` in ${isUAE ? "Dubai" : market.name}?`}
           </h1>
           <p className="mt-4 text-sm text-secondary">
             Instant estimate, blended with live market data from active listings.
@@ -141,6 +149,7 @@ function ValuationForm() {
           </div>
 
           {/* Estimate */}
+          {isUAE ? (
           <div className="rounded-2xl bg-[#F3EDF9] border border-[#E5E5EA] shadow-card p-5 relative overflow-hidden">
             <RadialGlow color="gold" size="md" className="-top-20 -right-20 opacity-40" />
             <div className="relative">
@@ -209,6 +218,27 @@ function ValuationForm() {
               </div>
             </div>
           </div>
+          ) : (
+            <div className="rounded-2xl bg-[#F3EDF9] border border-[#E5E5EA] shadow-card p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="h-5 w-5 text-[#8136B2]" />
+                <Eyebrow tone="gold">ESTIMATE</Eyebrow>
+              </div>
+              <div className="mt-4 text-sm text-secondary">
+                {year} {make} {model}
+              </div>
+              <p className="mt-3 text-sm text-[#141414]">
+                {`Instant valuations for ${market.name} are coming soon. List your car and set your own asking price — buyers see it in ${market.currency}.`}
+              </p>
+              <Button asChild variant="gold" size="lg" className="w-full mt-6">
+                <Link
+                  href={`/sell/new?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}&kms=${kms}`}
+                >
+                  List my car
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </section>

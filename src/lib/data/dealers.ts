@@ -15,6 +15,8 @@ export interface DealerView {
   logoUrl: string;
   coverUrl: string;
   emirate: string;
+  /** Market the dealer operates in (absent on mock dealers → UAE). */
+  countryCode?: string;
   rating: number;
   reviewCount: number;
   listingCount: number;
@@ -66,6 +68,7 @@ async function runGetDealers(countryCode: string): Promise<DealerView[]> {
     logoUrl: r.dealer.logoUrl ?? "",
     coverUrl: r.dealer.coverUrl ?? "",
     emirate: r.dealer.emirate,
+    countryCode: r.dealer.countryCode,
     rating: r.dealer.rating ?? 0,
     reviewCount: r.dealer.reviewCount ?? 0,
     listingCount: r.listingCount,
@@ -121,6 +124,7 @@ async function runGetDealerBySlug(
     logoUrl: r.dealer.logoUrl ?? "",
     coverUrl: r.dealer.coverUrl ?? "",
     emirate: r.dealer.emirate,
+    countryCode: r.dealer.countryCode,
     rating: r.dealer.rating ?? 0,
     reviewCount: r.dealer.reviewCount ?? 0,
     listingCount: r.listingCount,

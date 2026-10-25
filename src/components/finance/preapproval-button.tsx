@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useMarket } from "@/components/market/market-provider";
 
 /**
  * Loan pre-approval capture. Replaces the old dead-end "/contact" link: collects
@@ -32,6 +33,7 @@ export function FinancePreapprovalButton({
 }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const currency = useMarket().currency;
   const [done, setDone] = useState(false);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -48,10 +50,10 @@ export function FinancePreapprovalButton({
     }
     const message = [
       `Finance pre-approval request${bank ? ` — ${bank}` : ""}.`,
-      amount ? `Loan amount: AED ${amount.toLocaleString()}` : null,
+      amount ? `Loan amount: ${currency} ${amount.toLocaleString()}` : null,
       termYears ? `Term: ${termYears} years` : null,
       aprFrom ? `Rate from: ${aprFrom}%` : null,
-      income ? `Monthly income: AED ${income}` : null,
+      income ? `Monthly income: ${currency} ${income}` : null,
       employment ? `Employment: ${employment}` : null,
     ]
       .filter(Boolean)
@@ -133,7 +135,7 @@ export function FinancePreapprovalButton({
                   <p className="text-xs text-muted">
                     No impact on your credit score.
                     {amount
-                      ? ` For AED ${amount.toLocaleString()} over ${termYears} years.`
+                      ? ` For ${currency} ${amount.toLocaleString()} over ${termYears} years.`
                       : ""}
                   </p>
                 </div>
@@ -162,7 +164,7 @@ export function FinancePreapprovalButton({
                   <input
                     name="income"
                     inputMode="numeric"
-                    placeholder="Monthly income (AED)"
+                    placeholder={`Monthly income (${currency})`}
                     className="w-full h-9 rounded-lg border border-[#E5E5E5] px-3 text-sm focus:outline-none focus:border-[#C8A93E]"
                   />
                   <select

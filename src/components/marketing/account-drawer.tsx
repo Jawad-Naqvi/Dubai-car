@@ -7,6 +7,7 @@ import { useSavedListings } from "@/lib/saved-listings";
 import { SellWizard } from "@/components/sell/sell-wizard";
 import { AccountThreadChat } from "@/components/marketing/account-thread-chat";
 import { formatAED } from "@/lib/utils";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 import { X, Heart, Bell, MessageSquare, Tag, Loader2, Search } from "lucide-react";
 
 export type AccountView = "saved" | "alerts" | "messages" | "sell";
@@ -134,6 +135,10 @@ interface SavedRow {
 
 function SavedView() {
   const { ids, toggle } = useSavedListings();
+  // UAE keeps formatAED exactly; other markets format in their own currency.
+  const market = useMarket();
+  const money = useMoney();
+  const fmtPrice = (n: number) => (market.code === "AE" ? formatAED(n) : money(n));
   const [rows, setRows] = useState<SavedRow[] | null>(null);
 
   useEffect(() => {
@@ -177,7 +182,7 @@ function SavedView() {
               <div className="text-xs font-semibold text-[#141414] truncate">
                 {l.year} {l.make} {l.model}
               </div>
-              <div className="text-xs text-[#8136B2] font-bold">{formatAED(l.priceAED)}</div>
+              <div className="text-xs text-[#8136B2] font-bold">{fmtPrice(l.priceAED)}</div>
             </div>
           </Link>
           <button

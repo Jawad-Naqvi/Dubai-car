@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -8,7 +8,10 @@ import { RadialGlow } from "@/components/marketing/radial-glow";
 import { formatAED, monthlyEMI } from "@/lib/utils";
 import { FinancePreapprovalButton } from "@/components/finance/preapproval-button";
 import { Calculator, Wallet, Building2, Percent } from "lucide-react";
+import { useMarket, useMoney } from "@/components/market/market-provider";
 
+// UAE bank partners. TODO(client): India bank partners + their real rates —
+// until then the section is hidden outside the UAE rather than faked.
 const banks = [
   { name: "Emirates NBD", aprFrom: 3.49, logo: "ENBD" },
   { name: "ADCB", aprFrom: 3.69, logo: "ADCB" },
@@ -22,6 +25,24 @@ export default function FinancePage() {
   const [years, setYears] = useState(4);
   const [apr, setApr] = useState(4);
 
+  // UAE keeps its AED ranges and defaults exactly. Other markets get local
+  // currency and realistic local ranges (India: lakhs, ~9–10% car-loan rates).
+  const market = useMarket();
+  const money = useMoney();
+  const isUAE = market.code === "AE";
+  const fmt = (n: number) => (isUAE ? formatAED(n) : money(n));
+  const priceRange = isUAE
+    ? { min: 20000, max: 1500000, step: 5000 }
+    : { min: 100000, max: 10000000, step: 10000 };
+  const aprRange = isUAE ? { min: 2.5, max: 9 } : { min: 7, max: 18 };
+  // The market resolves on the client after mount; move to local defaults then.
+  useEffect(() => {
+    if (!isUAE) {
+      setPrice(800000);
+      setApr(9.5);
+    }
+  }, [isUAE]);
+
   const principal = price * (1 - down / 100);
   const emi = monthlyEMI(principal, years, apr / 100);
   const totalInterest = emi * years * 12 - principal;
@@ -34,7 +55,7 @@ export default function FinancePage() {
           <div className="max-w-3xl">
             <Eyebrow tone="gold">CAR LOAN CALCULATOR</Eyebrow>
             <h1 className="mt-6 text-3xl lg:text-5xl font-light tracking-tight leading-[1.05]">
-              Estimate your <span className="font-extrabold">monthly car payment</span> in AED.
+              Estimate your <span className="font-extrabold">monthly car payment</span>{` in ${market.currency}.`}
             </h1>
             <p className="mt-6 text-sm text-secondary max-w-xl">
               Adjust price, down payment, and term. Compare bank rates side-by-side.
@@ -47,13 +68,13 @@ export default function FinancePage() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-sm text-secondary">Car price</label>
-                    <span className="text-sm font-semibold">{formatAED(price)}</span>
+                    <span className="text-sm font-semibold">{fmt(price)}</span>
                   </div>
                   <input
                     type="range"
-                    min={20000}
-                    max={1500000}
-                    step={5000}
+                    min={priceRange.min}
+                    max={priceRange.max}
+                    step={priceRange.step}
                     value={price}
                     onChange={(e) => setPrice(Number(e.target.value))}
                     className="w-full accent-[#141414]"
@@ -94,8 +115,8 @@ export default function FinancePage() {
                   </div>
                   <input
                     type="range"
-                    min={2.5}
-                    max={9}
+                    min={aprRange.min}
+                    max={aprRange.max}
                     step={0.1}
                     value={apr}
                     onChange={(e) => setApr(Number(e.target.value))}
@@ -110,15 +131,15 @@ export default function FinancePage() {
                 <Calculator className="h-6 w-6 text-[#8136B2]" />
                 <div className="mt-4 text-sm text-secondary">Monthly payment</div>
                 <div className="mt-2 text-2xl lg:text-3xl font-extrabold tracking-tight text-[#141414] leading-none">
-                  {formatAED(emi)}
+                  {fmt(emi)}
                 </div>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    { label: "Loan amount", value: formatAED(principal) },
-                    { label: "Down payment", value: formatAED(price * (down / 100)) },
-                    { label: "Total interest", value: formatAED(totalInterest) },
-                    { label: "Total payable", value: formatAED(emi * years * 12) },
+                    { label: "Loan amount", value: fmt(principal) },
+                    { label: "Down payment", value: fmt(price * (down / 100)) },
+                    { label: "Total interest", value: fmt(totalInterest) },
+                    { label: "Total payable", value: fmt(emi * years * 12) },
                   ].map((r) => (
                     <div
                       key={r.label}
@@ -141,6 +162,7 @@ export default function FinancePage() {
           </div>
 
           {/* Bank rates */}
+          {isUAE && (
           <div className="mt-24">
             <Eyebrow tone="emerald">BANK PARTNERS</Eyebrow>
             <h2 className="mt-4 text-2xl lg:text-3xl font-bold tracking-tight">
@@ -176,6 +198,7 @@ export default function FinancePage() {
               ))}
             </div>
           </div>
+          )}
         </div>
       </section>
     </>

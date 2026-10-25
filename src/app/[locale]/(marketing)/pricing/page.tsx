@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import { subscriptionTiers } from "@/lib/brand";
 import { formatAED } from "@/lib/utils";
+import { formatMoney } from "@/lib/market";
+import { getActiveMarket } from "@/lib/market-active";
 import { CheckCircle2, Sparkles, Building2, ShieldCheck } from "lucide-react";
 
 const tierIcons = [Sparkles, Sparkles, ShieldCheck, Building2];
@@ -18,6 +20,11 @@ export default async function PricingPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("pricing");
+  const market = await getActiveMarket();
+  // UAE keeps formatAED exactly as before (Arabic numerals on /ar); other
+  // markets format in their own currency.
+  const money = (n: number) =>
+    market.code === "AE" ? formatAED(n, locale as "en" | "ar") : formatMoney(n, market);
 
   return (
     <>
@@ -40,6 +47,7 @@ export default async function PricingPage({
             {subscriptionTiers.map((tier, i) => {
               const Icon = tierIcons[i];
               const isRecommended = "recommended" in tier && tier.recommended;
+              const monthly = market.planPrices[tier.id];
               return (
                 <div
                   key={tier.id}
@@ -59,9 +67,9 @@ export default async function PricingPage({
                         <h3 className="text-sm font-bold">{tier.name}</h3>
                         <div className="mt-4">
                           <span className="text-2xl font-extrabold tracking-tight text-[#141414]">
-                            {tier.monthlyAED === 0 ? "Free" : formatAED(tier.monthlyAED, locale as "en" | "ar")}
+                            {monthly === 0 ? "Free" : money(monthly)}
                           </span>
-                          {tier.monthlyAED > 0 && (
+                          {monthly > 0 && (
                             <span className="text-sm text-muted ml-1">
                               {t("monthly")}
                             </span>
@@ -91,11 +99,9 @@ export default async function PricingPage({
                       <h3 className="text-sm font-bold">{tier.name}</h3>
                       <div className="mt-4">
                         <span className="text-2xl font-extrabold tracking-tight text-[#141414]">
-                          {tier.monthlyAED === 0
-                            ? "Free"
-                            : formatAED(tier.monthlyAED, locale as "en" | "ar")}
+                          {monthly === 0 ? "Free" : money(monthly)}
                         </span>
-                        {tier.monthlyAED > 0 && (
+                        {monthly > 0 && (
                           <span className="text-sm text-muted ml-1">
                             {t("monthly")}
                           </span>
@@ -142,10 +148,10 @@ export default async function PricingPage({
             </h2>
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { name: "Featured listing", price: "AED 49", desc: "Top of search for 7 days" },
-                { name: "Homepage banner", price: "From AED 500/wk", desc: "Hero exposure to all visitors" },
-                { name: "Category sponsor", price: "AED 800/mo", desc: "Top of a make or body type" },
-                { name: "B2B export visibility", price: "AED 1,000/mo", desc: "Appear in the export module" },
+                { name: "Featured listing", price: money(market.addOnPrices.featuredListing), desc: "Top of search for 7 days" },
+                { name: "Homepage banner", price: `From ${money(market.addOnPrices.homepageBannerWeekly)}/wk`, desc: "Hero exposure to all visitors" },
+                { name: "Category sponsor", price: `${money(market.addOnPrices.categorySponsorMonthly)}/mo`, desc: "Top of a make or body type" },
+                { name: "B2B export visibility", price: `${money(market.addOnPrices.exportVisibilityMonthly)}/mo`, desc: "Appear in the export module" },
               ].map((a) => (
                 <div
                   key={a.name}

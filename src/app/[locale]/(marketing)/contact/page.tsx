@@ -3,6 +3,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { RadialGlow } from "@/components/marketing/radial-glow";
 import { ContactForm } from "@/components/marketing/contact-form";
 import { brand } from "@/lib/brand";
+import { getActiveMarket } from "@/lib/market-active";
 import { Mail, Phone, MessageCircle, MapPin } from "lucide-react";
 
 export default async function ContactPage({
@@ -12,6 +13,12 @@ export default async function ContactPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // UAE renders exactly as before. Other markets show their own email + office;
+  // phone/WhatsApp are UAE numbers, so they're hidden until the market has its own.
+  // TODO(client): India phone + WhatsApp number.
+  const market = await getActiveMarket();
+  const isUAE = market.code === "AE";
+  const email = isUAE ? brand.email : market.email;
 
   return (
     <section className="relative pt-12 pb-24 overflow-hidden">
@@ -30,7 +37,7 @@ export default async function ContactPage({
 
             <div className="mt-10 space-y-4">
               <a
-                href={`mailto:${brand.email}`}
+                href={`mailto:${email}`}
                 className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
               >
                 <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
@@ -38,35 +45,39 @@ export default async function ContactPage({
                 </div>
                 <div>
                   <div className="text-xs text-muted">Email</div>
-                  <div className="font-semibold">{brand.email}</div>
+                  <div className="font-semibold">{email}</div>
                 </div>
               </a>
-              <a
-                href={`tel:${brand.whatsapp}`}
-                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
-              >
-                <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
-                  <Phone className="h-5 w-5 text-[#8136B2]" />
-                </div>
-                <div>
-                  <div className="text-xs text-muted">Phone</div>
-                  <div className="font-semibold">{brand.whatsapp}</div>
-                </div>
-              </a>
-              <a
-                href={brand.whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
-              >
-                <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-[#8136B2]" />
-                </div>
-                <div>
-                  <div className="text-xs text-muted">WhatsApp</div>
-                  <div className="font-semibold">Chat with sales</div>
-                </div>
-              </a>
+              {isUAE && (
+                <>
+                  <a
+                    href={`tel:${brand.whatsapp}`}
+                    className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
+                  >
+                    <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
+                      <Phone className="h-5 w-5 text-[#8136B2]" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Phone</div>
+                      <div className="font-semibold">{brand.whatsapp}</div>
+                    </div>
+                  </a>
+                  <a
+                    href={brand.whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5 hover:border-[#D8D4C6] hover:shadow-card-hover transition-all"
+                  >
+                    <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
+                      <MessageCircle className="h-5 w-5 text-[#8136B2]" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">WhatsApp</div>
+                      <div className="font-semibold">Chat with sales</div>
+                    </div>
+                  </a>
+                </>
+              )}
               <div className="flex items-center gap-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-card p-5">
                 <div className="h-11 w-11 rounded-full bg-[#F3EDF9] flex items-center justify-center">
                   <MapPin className="h-5 w-5 text-[#8136B2]" />
@@ -74,7 +85,7 @@ export default async function ContactPage({
                 <div>
                   <div className="text-xs text-muted">Office</div>
                   <div className="font-semibold">
-                    Dubai Internet City, Dubai, UAE
+                    {isUAE ? "Dubai Internet City, Dubai, UAE" : market.addressLines.join(", ")}
                   </div>
                 </div>
               </div>

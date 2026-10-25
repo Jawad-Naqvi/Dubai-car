@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQueryState } from "@/lib/use-query-state";
-import { emirates } from "@/lib/brand";
+import { useMarket } from "@/components/market/market-provider";
+import { getRegions } from "@/lib/regions";
 import { cn } from "@/lib/utils";
 
 export const DEALER_SORT_LABELS: Record<string, string> = {
@@ -59,6 +60,8 @@ const selectClass =
 
 export function DealerFilterSortBar() {
   const { get, push } = useQueryState();
+  const market = useMarket();
+  const regions = getRegions(market.code);
   const emirate = get("emirate") ?? "";
   const rating = get("rating") ?? "";
   const verified = get("verified") === "1";
@@ -73,8 +76,8 @@ export function DealerFilterSortBar() {
           suppressHydrationWarning
           className={selectClass}
         >
-          <option value="">All emirates</option>
-          {emirates.map((e) => (
+          <option value="">{`All ${market.regionPlural}`}</option>
+          {regions.map((e) => (
             <option key={e.id} value={e.en}>
               {e.en}
             </option>

@@ -33,12 +33,25 @@ export interface Market {
   brandName: string;
   /** What a sub-region is called here (drives filter labels). */
   regionLabel: string;
+  /** Lower-case plural of the region word, for "All …" dropdown options. */
+  regionPlural: string;
   /** One-line marketing tagline (used for non-UAE markets; UAE keeps its i18n one). */
   tagline: string;
   /** Office address block, one line per entry. */
   addressLines: string[];
   /** Contact email shown in the footer. */
   email: string;
+  /** Typical car-loan APR (decimal) for "est. monthly" figures on listings. */
+  loanApr: number;
+  /** Dealer plan monthly prices, in this market's currency, by tier id. */
+  planPrices: Record<"free" | "silver" | "gold" | "platinum", number>;
+  /** Performance add-on prices, in this market's currency. */
+  addOnPrices: {
+    featuredListing: number;
+    homepageBannerWeekly: number;
+    categorySponsorMonthly: number;
+    exportVisibilityMonthly: number;
+  };
   /** Whether the market is live. India can ship behind a flag first. */
   enabled: boolean;
 }
@@ -55,9 +68,18 @@ export const MARKETS: Record<MarketCode, Market> = {
     locales: ["en", "ar"],
     brandName: "DXB Motors",
     regionLabel: "Emirate",
+    regionPlural: "emirates",
     tagline: "Dubai's yard-forward automotive marketplace. Buy, sell, export — one OS.",
     addressLines: ["Jebel Ali Free Zone", "Dubai, United Arab Emirates"],
     email: "hello@dxbmotors.ae",
+    loanApr: 0.04,
+    planPrices: { free: 0, silver: 299, gold: 699, platinum: 1499 },
+    addOnPrices: {
+      featuredListing: 49,
+      homepageBannerWeekly: 500,
+      categorySponsorMonthly: 800,
+      exportVisibilityMonthly: 1000,
+    },
     enabled: true,
   },
   IN: {
@@ -74,10 +96,22 @@ export const MARKETS: Record<MarketCode, Market> = {
     // TODO(client decision): final India brand name. Placeholder for now.
     brandName: "Motors India",
     regionLabel: "City",
+    regionPlural: "cities",
     tagline: "India's trusted used-car marketplace. Buy, sell and finance — one platform.",
     // TODO(client): confirm India office address + contact email.
     addressLines: ["Bandra Kurla Complex", "Mumbai, India"],
     email: "hello@motorsindia.in",
+    // TODO(client): confirm with India finance partners (bank car loans ~9–10%).
+    loanApr: 0.095,
+    // TODO(client): confirm India dealer plan + add-on pricing. Placeholders set
+    // at India price points, not an FX conversion of the AED plans.
+    planPrices: { free: 0, silver: 2999, gold: 6999, platinum: 14999 },
+    addOnPrices: {
+      featuredListing: 499,
+      homepageBannerWeekly: 4999,
+      categorySponsorMonthly: 7999,
+      exportVisibilityMonthly: 9999,
+    },
     enabled: true,
   },
 };
